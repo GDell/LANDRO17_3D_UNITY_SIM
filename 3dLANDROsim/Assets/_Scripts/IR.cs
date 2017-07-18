@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class IR : MonoBehaviour {
 	public bool hitWall;
+	public float maxIRdistance = 533f;
 	public float irDistance;
 	public float irScore;
 	public int collisionScore = 0;
 	public string sensorName;
+	public float IRthreshold = 200;
 
 	public bool isBumped = false;
 
@@ -72,7 +74,10 @@ public class IR : MonoBehaviour {
 			if (source.name.Contains ("Wall")) {
 				hitWall = true;
 				irDistance = Vector3.Distance(this.transform.position,source.transform.position);
-				irScore = 533f - irDistance;
+				irScore = maxIRdistance - irDistance;
+				if (irScore > IRthreshold) {
+					print("IR threshold exceeded!");
+				} 
 				// print(irScore);
 				// print(this + " IR SCORE iS: " + irScore);
 				// print ("HIT THE WALL");

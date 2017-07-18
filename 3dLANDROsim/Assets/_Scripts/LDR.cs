@@ -10,6 +10,7 @@ public class LDR : MonoBehaviour {
 	public GameObject lightSource;
 	public float clacLightScore;
 	public float maxSpotRange = 1550f;//641;
+	public float lightThreshold = 500;
 
 	// public float comulativeIndividualLightScore = 0;
 	public string sensorName;
@@ -34,7 +35,9 @@ public class LDR : MonoBehaviour {
 		// Calculate how much light the sensor has collected
 		clacLightScore = maxSpotRange - distance;
 
-
+		if (clacLightScore > lightThreshold) {
+			print("LDR threshold exceeded!");
+		}
 		// comulativeIndividualLightScore = clacLightScore + comulativeIndividualLightScore;
 		// print("Light collected at sensor"+ this + " is: "+ clacLightScore );
 		
