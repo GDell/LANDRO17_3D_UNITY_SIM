@@ -17,9 +17,15 @@ public class AxleInfo {
 public class SimpleCarController : MonoBehaviour {
     public List<AxleInfo> axleInfos; 
 
+	GameObject wheelColliders;
+    List<WheelCollider> wheels = new List<WheelCollider>();
+    public Rigidbody rb;
+
+    // Keeping track of number of LDR and IR sensors.
     public int LDRnumber = 0;
 	public int IRnumber = 0;
 
+	// Motor torque and steering parameters.
     public float maxMotorTorque;
     public float maxSteeringAngle;
 
@@ -33,17 +39,13 @@ public class SimpleCarController : MonoBehaviour {
 		// True if you want neural network debug info.
 	public bool debugNeuralNetwork;
 		// True if you want bumper debug info.
-	public bool debugBumber;
+	public bool debugBumper;
 
-
-	GameObject wheelColliders;
-    List<WheelCollider> wheels = new List<WheelCollider>();
-    public Rigidbody rb;
 	public int baseMovementRate;
-
-
 	public string frontBumpType;
 	public string backBumpType;
+
+	public float timeTrial;
 
     public float timeNext;
     public float timeSet;
@@ -81,6 +83,7 @@ public class SimpleCarController : MonoBehaviour {
     public float[] irCollisionDataArray;
     public int irSensorNumber = 0;
     public int[] chosenSensorArray;
+    public int[][] listOfChosenSensorArrays;
 
     // LDR DATA COLLECTION VARIABLES
     public float LEFTfrontLDRreadings;
@@ -112,14 +115,6 @@ public class SimpleCarController : MonoBehaviour {
     public void Start(){
     	wheelColliders = GameObject.Find("WheelColliders");
 
-    	// BOOLEAN TOGGLES.
-		displayFitnessInfo = false;
-		useNetwork = true;
-		exampleXORnetwork = true;
-		debugNeuralNetwork = false;
-		debugBumber = false;
-
-		firstRun = 0;
 		// VECTORS FOR PLACING SENSORS.///////////////
 		Quaternion backBump_rotation = new Quaternion();
 		Vector3 backBump_position = new Vector3();
@@ -133,6 +128,30 @@ public class SimpleCarController : MonoBehaviour {
 		Quaternion ldr_rotation = new Quaternion();
     	Vector3 ldr_position    = new Vector3();
     	/////////////////////////////////////////////
+
+    	// BOOLEAN TOGGLES.
+		displayFitnessInfo = false;
+			// T: use network, F: auto movement.
+		useNetwork = true;
+			// T: use the example neural network.
+		exampleXORnetwork = true;
+			// T: enable print statements in neural network function.
+		debugNeuralNetwork = false;
+			// T: enable print statements for bumper functions.
+		debugBumper = false;
+
+		firstRun = 0;
+
+		// TIMING VARIABLES.
+		// Time set is the length of a trial (in seconds).
+		timeTrial = 60f;
+		timeSet  = timeTrial;
+		timeCurrent = 0;
+
+		// Threshold values for the fitness function. 
+        // Currently 25:75 ratio for good/bad XOR ratio in simulated arena.
+		IRthreshold = 200f;
+		LDRthreshold = 500f;
 
     	//morningstar = GameObject.Find("Directional Light").GetComponent<Light>();
     	wheels.Add(wheelColliders.transform.Find("frontRight").GetComponent<WheelCollider>());
@@ -167,17 +186,11 @@ public class SimpleCarController : MonoBehaviour {
 		hIRlLDRfitnessScore = 0;
         lIRhLDRfitnessScore = 0; 
 
-		IRthreshold = 200f;
-		LDRthreshold = 500f;
-
-		// TIMING VARIABLES.
-			// TimeSet is the length of a trial.
-		timeSet  = 20f;
-		timeCurrent = 0;
 
 		leftMotor.motorTorque = rightWheelTorque;
 		rightMotor.motorTorque = leftWheelTorque;
 
+		// Selected sensors for input into neural network function.
 		chosenSensorArray = new int[4] {2,3,13,14}; 
 
 		//////////////////////////// PLACING SENSORS ON LANDRO BODY //////////////////////////// 
@@ -320,7 +333,6 @@ public class SimpleCarController : MonoBehaviour {
 		}
 		//////////////////////COLLECT LDR DATA//////////////////////////////////////
 		foreach(LDR ldr_sensor in ldr_sensors) {
-
 			fitnessLDRscore = fitnessLDRscore + ldr_sensor.clacLightScore;
 
 			if( (ldr_sensor.clacLightScore > 0) && (ldr_sensor.name.Contains("FRONT_LEFT")) ) {
@@ -409,11 +421,14 @@ public class SimpleCarController : MonoBehaviour {
  		maxLDRIndex = ldrReadingArray.ToList().IndexOf(maxOfLDRArray);
  		// print("Max index is: " + maxLDRIndex);
 
- 		//////////////////// MOVEMENT FUNCTIONS.
+ 		if (timeCurrent >= (timeSet)) {	
+			finalFitnessCalculation();
+		}		
+
  		// NEURALNETWORK && MOVEMENT CONTROL.
  		if(useNetwork) {
 			if (timeCurrent <  timeSet) {	
-				evaluateTrialFitness(rawldrDataArray, rawirDataArray, chosenSensorArray);			
+				evaluateTrialFitness(rawldrDataArray, rawirDataArray, chosenSensorArray);
  				// RUN THE NEURAL NETWORK: powers motors based on neural network calculation using provided params.h.
  				neuralNetwork(ldrDataArray, irDataArray, chosenSensorArray, frontBumpType, backBumpType, timeCurrent);
  				// timeSet = (timeSet - timeCurrent);
@@ -430,28 +445,31 @@ public class SimpleCarController : MonoBehaviour {
  		// backBumpType = "";
  		frontBumpType = "";
     }
-    /* This function implements the activation function for updating
-	* network nodes(specifically hidden nodes).  There are two
-	* slightly different formulations, one for recurrent connections
-	* and one for non-recurrent connections. */
-    float activation(float val) {
-    	float update_value;
-    	update_value = (float)Math.Tanh(val - 1) + 1;
-    	return update_value;
-    }
     // PRINTS INFORMATION ABOUT AN ARRAY.
     void showArrayInformation (Array arr, bool showORnah) {
     	if (showORnah) {
     		print("The length of array: " + arr.Length);
     	}
     }
+    /* This function implements the activation function for updating
+	* network nodes(specifically hidden nodes).  There are two
+	* slightly different formulations, one for recurrent connections
+	* and one for non-recurrent connections. */
+    float activation(float val) {
+    	float update_value;
+    	update_value = (float)(Math.Tanh(val - 2) + 1)/2.0f;
+    	return update_value;
+    }
     // SCALES MOTOR VALUES.
 	float motorScale(float val) {
-		float fromLow = 0;
-		float fromHigh = 2;
-		float toLow = 0;
-		float toHigh = 1000;
+		float fromLow = -1;
+		float fromHigh = 1;
+		float toLow = -1000;
+		// 0
+		// -400 in arduino code.
+		float toHigh = 2000;
 		// 500
+		// 400 in arduino code.
 		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
 		return (mapVal);
 	}
@@ -460,7 +478,7 @@ public class SimpleCarController : MonoBehaviour {
 		float fromLow = 0;
 		float fromHigh = 409;
 		float toLow = 0;
-		float toHigh = 2;
+		float toHigh = 1;
 		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
 		return (mapVal);
 	}
@@ -469,7 +487,7 @@ public class SimpleCarController : MonoBehaviour {
 		float fromLow = 0;
 		float fromHigh = 1550f;
 		float toLow = 0;
-		float toHigh = 2;
+		float toHigh = 1;
 		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
 		return (mapVal);
 	}
@@ -534,7 +552,7 @@ public class SimpleCarController : MonoBehaviour {
  		float nonScaledLMspeed = 0;
 
     	// MAPPING INPUT FROM SELECTED ACTIVE SENSOR VALUES.
-    	// Ipdates input nodes from sensor values
+    	// Updates input nodes from sensor values
 		for (int runs = 0; runs < selectedArraySize; runs++){
 			if(selectedSensors[runs] == 0) {
 				input[runs] = irSensorArray[0];
@@ -572,7 +590,7 @@ public class SimpleCarController : MonoBehaviour {
     	}
 		for (h = 0; h < NUM_HIDDEN; h++) {
 			hidden[h] = 0;
-			// Update hidden from inputs.
+			// Update hidden nodes using inputs for time t.
 			for (i = 0; i < NUM_INPUT; i++) {
 		  		hidden[h] = hidden[h] + input[i] * input_to_hidden[i,h];
 		  		if (debugNeuralNetwork) {
@@ -645,22 +663,22 @@ public class SimpleCarController : MonoBehaviour {
 		} else if (frontBumpType == "leftFront") {
 			float time = 0f;
 			while (time < turnTime) {
-				leftMotor.motorTorque = 3725;
-				rightMotor.motorTorque = -4000;
+				leftMotor.motorTorque = 5725;
+				rightMotor.motorTorque = -6000;
 				time = time + Time.deltaTime;
 			}
 		} else if (frontBumpType == "rightFront") {
 			float time = 0f;
 			while (time < turnTime) {
-				leftMotor.motorTorque =	-4000;
-				rightMotor.motorTorque = 3725;
+				leftMotor.motorTorque =	-6000;
+				rightMotor.motorTorque = 5725;
 				time = time + Time.deltaTime;
 			}
 		} else if (frontBumpType == "middleFront") {
 			float time = 0f;
 			while (time < turnTime) {
-				leftMotor.motorTorque = 4725;
-				rightMotor.motorTorque = -5000;
+				leftMotor.motorTorque = 4500;
+				rightMotor.motorTorque = -4725;
 				time = time + Time.deltaTime;
 			} 
 		} else if (backBumpType == "middleBack") {
@@ -746,14 +764,20 @@ public class SimpleCarController : MonoBehaviour {
     		print("NOT FIT");
     	} else if(exceededIRthreshold && (!exceededLDRthreshold)) {
     		hIRlLDRfitnessScore = hIRlLDRfitnessScore + 1;
+    		// print("hIRlLDRfitnessScore: " + hIRlLDRfitnessScore);
     	} else if(exceededLDRthreshold && (!exceededIRthreshold)) {
     		lIRhLDRfitnessScore = lIRhLDRfitnessScore + 1;
+    		// print("lIRhLDRfitnessScore: " + lIRhLDRfitnessScore);
     	}
     }
     float finalFitnessCalculation() {
     	overallFitnessScore = (((hIRlLDRfitnessScore/totalIterations)*100) + ((lIRhLDRfitnessScore/totalIterations)*100) + 
     			((((hIRlLDRfitnessScore/totalIterations)*100) + 
     				((lIRhLDRfitnessScore/totalIterations)*100))/10));
+    	// print("Total iterations!!!!!: " + totalIterations);
+    	// print("hIRlLDRfitnessScore!!!!!!!!: "+ hIRlLDRfitnessScore);
+    	// print("lIRhLDRfitnessScore!!!!!!!!: "+ lIRhLDRfitnessScore);
+    	// print("INTERMEDIATE: "+ ((hIRlLDRfitnessScore/totalIterations)*100));
     	print("THE FINAL FITNESS: " + overallFitnessScore);
     	return overallFitnessScore;
     }
@@ -808,7 +832,7 @@ public class SimpleCarController : MonoBehaviour {
     	totalIterations = 0;
     	overallFitnessScore = 0;
     	timeCurrent = 0;
-    	timeSet = 20;
+    	timeSet = timeTrial;
     	SceneManager.LoadScene("Experiment");
     }
     // Use to stop all movement of Landro.

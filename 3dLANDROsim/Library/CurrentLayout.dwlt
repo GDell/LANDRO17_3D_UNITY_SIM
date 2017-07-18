@@ -357,7 +357,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 18250000
     m_LastClickedID: 9496
-    m_ExpandedIDs: 00000000c024000000ca9a3bffffff7f
+    m_ExpandedIDs: 00000000c0240000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -503,7 +503,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: c0f5faff8ca6fcffe6fbffff00000000c4250000ec2500003626000006270000366300002c7d0000
+    m_ExpandedIDs: e6fbffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -521,8 +521,7 @@ MonoBehaviour:
       m_IsRenamingFilename: 0
       m_ClientGUIView: {fileID: 4}
     m_SearchString: 
-  m_ExpandedScenes:
-  - Experiment
+  m_ExpandedScenes: []
   m_CurrenRootInstanceID: 0
   m_Locked: 0
   m_CurrentSortingName: TransformSorting
@@ -558,9 +557,9 @@ MonoBehaviour:
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -246.2853, y: 572.588, z: 459.3894}
+    m_Target: {x: -241.56279, y: 20.534382, z: 1247.2162}
     speed: 2
-    m_Value: {x: -246.2853, y: 572.588, z: 459.3894}
+    m_Value: {x: -241.56279, y: 20.534382, z: 1247.2162}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -583,13 +582,13 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+    m_Target: {x: 0.010558135, y: 0.5458874, z: 0.006879746, w: -0.8377638}
     speed: 2
-    m_Value: {x: -0.7071068, y: 0, z: -0, w: -0.7071068}
+    m_Value: {x: 0.010558135, y: 0.5458874, z: 0.006879746, w: -0.8377638}
   m_Size:
-    m_Target: 3523.4233
+    m_Target: 316.74994
     speed: 2
-    m_Value: 3523.4233
+    m_Value: 316.74994
   m_Ortho:
     m_Target: 0
     speed: 2
