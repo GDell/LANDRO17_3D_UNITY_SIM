@@ -15,7 +15,15 @@ public class AxleInfo {
 }
 
 public class SimpleCarController : MonoBehaviour {
+
+
+	public readonly int NUM_INPUT;
+	public readonly int NUM_HIDDEN;
+	public readonly int NUM_OUTPUT;
+
     public List<AxleInfo> axleInfos; 
+
+    
 
 	GameObject wheelColliders;
     List<WheelCollider> wheels = new List<WheelCollider>();
@@ -37,7 +45,7 @@ public class SimpleCarController : MonoBehaviour {
     	// True if you want to use network, false for default IR/Light behavior.
 	public bool useNetwork;
 		// True if you want neural network debug info.
-	public bool debugNeuralNetwork;
+	// public bool debugNeuralNetwork;
 		// True if you want bumper debug info.
 	public bool debugBumper;
 
@@ -57,6 +65,8 @@ public class SimpleCarController : MonoBehaviour {
     private LDR[] ldr_sensors;
     private BumpSensor[] bump_sensors;
     private BumpSensorBack[] backBump_sensors;
+    // public NeuralNetwork neuralNet;
+
 
 	public int[] irReadingArray;
 	public float[] ldrReadingArray;
@@ -136,7 +146,7 @@ public class SimpleCarController : MonoBehaviour {
 			// T: use the example neural network.
 		exampleXORnetwork = true;
 			// T: enable print statements in neural network function.
-		debugNeuralNetwork = false;
+		// debugNeuralNetwork = false;
 			// T: enable print statements for bumper functions.
 		debugBumper = false;
 
@@ -160,6 +170,8 @@ public class SimpleCarController : MonoBehaviour {
 		WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
 
 		// GRAB THE THREE SENSOR TYPES.
+		// neuralNet = GameObject.GetComponent<NeuralNetwork>();
+		// neuralNet = GetComponent<NeuralNetwork>();
 		ir_sensors = GameObject.FindObjectsOfType<IR>();
 		ldr_sensors = GameObject.FindObjectsOfType<LDR>();
 		bump_sensors = GameObject.FindObjectsOfType<BumpSensor>();
@@ -257,6 +269,8 @@ public class SimpleCarController : MonoBehaviour {
 		irDataArray = new float[irSensorNumber];
 		ldrDataArray = new float[ldrSensorNumber];
     }
+
+
  
     public void FixedUpdate() {	
     	timeCurrent = Time.timeSinceLevelLoad;
@@ -430,7 +444,7 @@ public class SimpleCarController : MonoBehaviour {
 			if (timeCurrent <  timeSet) {	
 				evaluateTrialFitness(rawldrDataArray, rawirDataArray, chosenSensorArray);
  				// RUN THE NEURAL NETWORK: powers motors based on neural network calculation using provided params.h.
- 				neuralNetwork(ldrDataArray, irDataArray, chosenSensorArray, frontBumpType, backBumpType, timeCurrent);
+ 				NeuralNetwork.neuralNetwork(ldrDataArray, irDataArray, chosenSensorArray, frontBumpType, backBumpType, 4, 6, 2);
  				// timeSet = (timeSet - timeCurrent);
  				// print("TIME SET: " + timeCurrent);
  			} else if (timeCurrent >= timeSet){
@@ -451,263 +465,7 @@ public class SimpleCarController : MonoBehaviour {
     		print("The length of array: " + arr.Length);
     	}
     }
-    /* This function implements the activation function for updating
-	* network nodes(specifically hidden nodes).  There are two
-	* slightly different formulations, one for recurrent connections
-	* and one for non-recurrent connections. */
-    float activation(float val) {
-    	float update_value;
-    	update_value = (float)(Math.Tanh(val - 2) + 1)/2.0f;
-    	return update_value;
-    }
-    // SCALES MOTOR VALUES.
-	float motorScale(float val) {
-		float fromLow = -1;
-		float fromHigh = 1;
-		float toLow = -1000;
-		// 0
-		// -400 in arduino code.
-		float toHigh = 2000;
-		// 500
-		// 400 in arduino code.
-		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
-		return (mapVal);
-	}
-	// SCALES IR VALUES GIVEN MIN AND MAX POSSIBLE IR VALUES.
-	float irScale(float val) {
-		float fromLow = 0;
-		float fromHigh = 409;
-		float toLow = 0;
-		float toHigh = 1;
-		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
-		return (mapVal);
-	}
-	// SCALES LDR VALUES GIVEN MIN AND MAX POSSIBLE IR VALUES.
-	float photoScale(float val) {
-		float fromLow = 0;
-		float fromHigh = 1550f;
-		float toLow = 0;
-		float toHigh = 1;
-		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
-		return (mapVal);
-	}
-    // RUNS AN ITERATION OF THE NEURAL NETWORK.
-    void neuralNetwork(float[] ldrSensorArray, float[] irSensorArray, int[] selectedSensors, string frontBumpType, string backBumpType, float timeCurrent) {
-    	WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
-		WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
-		// timeNext = timeSinceLevelLoad + 20;
 
-			float turnTime = 10000f;
-
-			const int RMILength = 1; 
-			const int LMILength = 1; 
-			const int NUM_INPUT = 4; 
-			const int NUM_HIDDEN = 6; 
-			const int NUM_OUTPUT = 2;
-
-			float[] hidden = new float[NUM_HIDDEN]; 
-			float[] old_hidden = new float[NUM_HIDDEN]; 
-			float[] old_output = new float [NUM_OUTPUT];
-			float[] output = new float[NUM_OUTPUT];
-
-			int[] RMI = new int[RMILength] {0};
-			int[] LMI = new int[LMILength] {1};
-
-	    	float[,] input_to_output = new float[NUM_INPUT,NUM_OUTPUT] {{0,0},{0,0},{0,0},{0,0}};
-			float[,] input_to_hidden = new float[NUM_INPUT,NUM_HIDDEN] {{0,0,1,-1,0,0},{0,0,-1,1,0,0},{1,-1,0,0,0,0},{-1,1,0,0,0,0}};
-			float[,] hidden_to_hidden = new float[NUM_HIDDEN,NUM_HIDDEN] {{0,0,0,0,1,0},{0,0,0,0,1,0},{0,0,0,0,0,1},{0,0,0,0,0,1},{0,0,0,0,0,0},{0,0,0,0,0,0}};
-			float[,] hidden_to_output = new float[NUM_HIDDEN,NUM_OUTPUT] {{0,0},{0,0},{0,0},{0,0},{1,-0.5f},{-0.5f,1}};
-			float[,] output_to_hidden = new float[NUM_OUTPUT,NUM_HIDDEN] {{0,0,0,0,0,0},{0,0,0,0,0,0}};
-
-			// const int RMILength = 1; 
-			// const int LMILength = 1; 
-
-			// const int NUM_INPUT = 2; 
-			// const int NUM_HIDDEN = 1; 
-			// const int NUM_OUTPUT = 2;
-
-			// float[] hidden = new float[NUM_HIDDEN]; 
-			// float[] old_hidden = new float[NUM_HIDDEN]; 
-			// float[] old_output = new float [NUM_OUTPUT];
-			// float[] output = new float[NUM_OUTPUT];
-
-			// int[] RMI = new int[RMILength] {0};
-			// int[] LMI = new int[LMILength] {1};
-
-			// float[,] input_to_hidden = new float[NUM_INPUT,NUM_HIDDEN] {{0},{0}};
-			// float[,] hidden_to_hidden = new float[NUM_HIDDEN,NUM_HIDDEN] {{0}};
-			// float[,] hidden_to_output = new float[NUM_HIDDEN,NUM_OUTPUT] {{0,0}};
-			// float[,] input_to_output = new float[NUM_INPUT,NUM_OUTPUT] {{1,-0.5f},{-0.5f,1}}; 
-			// float[,] output_to_hidden = new float[NUM_OUTPUT,NUM_HIDDEN] {{0},{0}};
-
-
-		int selectedArraySize = selectedSensors.Length;
-    	int h, p, o, i;
-    	float[] input = new float[selectedArraySize];
-
-		float rmSpeed = 0;
-		float nonScaledRMspeed = 0;
-
- 		float lmSpeed = 0;
- 		float nonScaledLMspeed = 0;
-
-    	// MAPPING INPUT FROM SELECTED ACTIVE SENSOR VALUES.
-    	// Updates input nodes from sensor values
-		for (int runs = 0; runs < selectedArraySize; runs++){
-			if(selectedSensors[runs] == 0) {
-				input[runs] = irSensorArray[0];
-    		} else if(selectedSensors[runs] == 1) {
-    			input[runs] = ldrSensorArray[2];
-    		} else if(selectedSensors[runs] == 2) {
-    			input[runs] = irSensorArray[1];
-    		} else if(selectedSensors[runs] == 3) {
-    			input[runs] = ldrSensorArray[3];
-    		} else if(selectedSensors[runs] == 4) {
-    			input[runs] = irSensorArray[2];
-    		} else if(selectedSensors[runs] == 5) {
-    			input[runs] = ldrSensorArray[4];
-    		} else if(selectedSensors[runs] == 6) {
-    			input[runs] = irSensorArray[3];
-    		} else if(selectedSensors[runs] == 7) {
-    			input[runs] = ldrSensorArray[5];
-    		} else if(selectedSensors[runs] == 8) {
-    			input[runs] = irSensorArray[4];
-    		} else if(selectedSensors[runs] == 9) {
-    			input[runs] = ldrSensorArray[6];
-    		} else if(selectedSensors[runs] == 10) {
-    			input[runs] = irSensorArray[5];
-    		} else if(selectedSensors[runs] == 11) {
-    			input[runs] = ldrSensorArray[7];
-    		} else if(selectedSensors[runs] == 12) {
-    			input[runs] = irSensorArray[6];
-    		} else if(selectedSensors[runs] == 13) {
-    			input[runs] = ldrSensorArray[0];
-    		} else if(selectedSensors[runs] == 14) {
-    			input[runs] = irSensorArray[7];
-    		} else if(selectedSensors[runs] == 15) {
-    			input[runs] = ldrSensorArray[1];
-    		}
-    	}
-		for (h = 0; h < NUM_HIDDEN; h++) {
-			hidden[h] = 0;
-			// Update hidden nodes using inputs for time t.
-			for (i = 0; i < NUM_INPUT; i++) {
-		  		hidden[h] = hidden[h] + input[i] * input_to_hidden[i,h];
-		  		if (debugNeuralNetwork) {
-	  		        print("Input: " + (input[i].ToString()));
-	  				print("Input to Hidden: " + (input_to_hidden[i,h].ToString()));
-		  		}
-			}
-			//Update hidden nodes using hidden (last) values) from time t-1.
-			for (p = 0; p < NUM_HIDDEN; p++) {
-		  		hidden[h] = hidden[h] + old_hidden[p] * hidden_to_hidden[p,h];
-		  		if (debugNeuralNetwork) {
-	    			print("Old Hidden: " + (old_hidden[p].ToString()));
-	 				print("Hidden to Hidden: " + (hidden_to_hidden[p,h].ToString()));
-		  		}
-			}
-			//Update hidden based on old motor vals.
-			for(o = 0; o < NUM_OUTPUT; o++){
-		  		hidden[h] = hidden[h] + old_output[o] * output_to_hidden[o,h];
-			}
-			if (debugNeuralNetwork) {
-				print("Hidden: " + (hidden[h].ToString()));
-			}
-			// Apply the tanh function.
-			hidden[h] = activation(hidden[h]);
-			// Update old_hidden with new tanh values.
-			old_hidden[h] = hidden[h];
-			if (debugNeuralNetwork) {
-				print("Tanh Hidden: " + (hidden[h].ToString()));
-			}
-		}
-		// UPDATES OUTPUT (MOTOR) NODES BASED ON INPUT NODES.
-		for (o = 0; o < NUM_OUTPUT; o++) {
-			output[o] = 0;
-			for (i = 0; i < NUM_INPUT; i++) {
-				output[o] = output[o] + input[i] * input_to_output[i,o];
-				if (debugNeuralNetwork) {
-					print("Input: " + (input[i].ToString()));
-					print("Connect: " + (input_to_output[i,o].ToString()));
-				}
-			}
-			for (h = 0; h < NUM_HIDDEN; h++) {
-		  		output[o] = output[o] + hidden[h] * hidden_to_output[h,o];
-			}
-			if (debugNeuralNetwork) {
-				print("Output: " + (output[o].ToString()));
-			}
-			output[o] = activation(output[o]);
-			if (debugNeuralNetwork) {
-				print("Output Tanh: " + (output[o].ToString()));
-			}
-			old_output[o] = output[o];
-		}
-		// MOVING LANDRO: as long as bumpers are not pressed, neural network output drives the motors.
-		// Else there are fixed responses contingent on the exact bumper that collided with a wall.
-		if ((backBumpType == "") && (frontBumpType == "")) {
-			// CALCULATE RM SPEED FROM OUTPUT.
-			for(i = 0; i < RMILength; i++){
-				nonScaledRMspeed = output[RMI[i]];
-				rmSpeed += motorScale(nonScaledRMspeed);
-				// print("RM SPEED: "+ motorScale(rmSpeed));
-				rightMotor.motorTorque = rmSpeed;
-			}
-			// CALCULATE LM SPEED FROM OUTPUT.
-			for(i = 0; i < LMILength; i++){
-				nonScaledLMspeed = output[LMI[i]];
-				lmSpeed += motorScale(nonScaledLMspeed);
-				// print("LM SPEED: "+ motorScale(lmSpeed));
-			 	leftMotor.motorTorque = lmSpeed;
-			}
-		} else if (frontBumpType == "leftFront") {
-			float time = 0f;
-			while (time < turnTime) {
-				leftMotor.motorTorque = 5725;
-				rightMotor.motorTorque = -6000;
-				time = time + Time.deltaTime;
-			}
-		} else if (frontBumpType == "rightFront") {
-			float time = 0f;
-			while (time < turnTime) {
-				leftMotor.motorTorque =	-6000;
-				rightMotor.motorTorque = 5725;
-				time = time + Time.deltaTime;
-			}
-		} else if (frontBumpType == "middleFront") {
-			float time = 0f;
-			while (time < turnTime) {
-				leftMotor.motorTorque = 4500;
-				rightMotor.motorTorque = -4725;
-				time = time + Time.deltaTime;
-			} 
-		} else if (backBumpType == "middleBack") {
-			float time = 0f;
-			while (time < turnTime) {
-				leftMotor.motorTorque = 2000;
-				rightMotor.motorTorque = 2000;
-				time = time + Time.deltaTime;
-			}
-			backBumpType = "";
-		} else if (backBumpType == "rightBack") {
-			float time = 0f;
-			while (time < turnTime) {
-				leftMotor.motorTorque = -1000;
-				rightMotor.motorTorque = 725;
-				time = time + Time.deltaTime;
-			}
-			backBumpType = "";
-		} else if (backBumpType == "leftBack") {
-			float time = 0f;
-			while (time < turnTime) {
-				leftMotor.motorTorque = 725;
-				rightMotor.motorTorque = -1000;
-				time = time + Time.deltaTime;
-			}
-			backBumpType = "";
-		}
-		arrowMove();
-    }
     void evaluateTrialFitness(float[] ldrSensorArray, float[] irSensorArray, int[] selectedSensors) {
     	int selectedArraySize = selectedSensors.Length;
     	bool exceededIRthreshold = false;
@@ -842,11 +600,36 @@ public class SimpleCarController : MonoBehaviour {
 		rb = GameObject.Find("L16A").GetComponent<Rigidbody>();
 		leftMotor.motorTorque = 0;
 		leftMotor.motorTorque = 0;
-		rb.velocity = new Vector3(0, 0, 0);
+		rb.velocity = new Vector3(0, 0, 0); 
 		leftMotor.brakeTorque = 1000;
 		rightMotor.brakeTorque = 1000;
 		print("STOPPED");
     }
+
+   	// SCALES IR VALUES GIVEN MIN AND MAX POSSIBLE IR VALUES.
+	float irScale(float val) {
+		float fromLow = 0;
+		float fromHigh = 409;
+		float toLow = 0;
+		float toHigh = 1;
+		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
+		return (mapVal);
+	}
+	// SCALES LDR VALUES GIVEN MIN AND MAX POSSIBLE IR VALUES.
+	float photoScale(float val) {
+		float fromLow = 0;
+		float fromHigh = 1550f;
+		float toLow = 0;
+		float toHigh = 1;
+		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
+		return (mapVal);
+	}
+
+
+    void mutate() {
+
+    }
+
     // Allows the user to control Landro using the arrow keys. Good for debugging and testing purposes.
     void arrowMove() {
     	WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
@@ -872,5 +655,18 @@ public class SimpleCarController : MonoBehaviour {
 		    print("LEFT");
     	}
 	}
+
+
+
+
+    void generateBeginningGeneration() {
+
+    	
+
+    }
+
+    
+
+
 
 }
