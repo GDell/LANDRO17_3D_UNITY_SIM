@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System;
+// using System.Math;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
+// using microsoft.xna.framework.dll;
 
 public class genomeHandler : MonoBehaviour {
 
@@ -42,6 +44,10 @@ public class genomeHandler : MonoBehaviour {
 		// public int gDurationMin;
 		// public int gDurationMax;
 
+		public double x;
+		public double y;
+		public float size;
+
 		public float partType;// # 0 = Part Type (0 = IR, 1 = Photo, 2 = Neuron, 3 = R Motor, 4 = L Motor)
 		public float angle;// # 1 = Angle
 		public float startTime;// # 2 = Start Time
@@ -50,7 +56,6 @@ public class genomeHandler : MonoBehaviour {
 		public float growthRate;// # 5 = Growth Rate
 		public float growthTime;// # 6 = Growth Time
 		public float index;// # 7 = Index
-
 
 		public void setGeneParameters(int maxSpawn,  int vMax, int vDurationMin, int vDurationMax, int gMax, int gDurationMin, int gDurationMax, int index) {
 			rand = new System.Random();
@@ -87,7 +92,6 @@ public class genomeHandler : MonoBehaviour {
 		public bool firstDupe;
 
 		public int numberOfDuplications;
-
 
 		// Function to set the genome parameters.
 		public void setGenomeParameters(int numberOfGenesInGenome, float dupeRate, float muteRate, float delRate, float changePercent) {
@@ -243,88 +247,83 @@ public class genomeHandler : MonoBehaviour {
 		}
 	}
 
-	
+
+
+	public struct genomeToPhenotypeParams {
+
+		public genome givenGenome; 
+
+		public int genomeLength;
+
+		public float[] center;
+		public const int pointRadius = 3;
+		public int count;
+
+		public int[] irPointList;
+		public int[] photoPointList;
+		public int[] genePosList;
+
+		public int[] currentList;
+
+		public double x;
+		public double y;
+
+		public float size;
+
+
+		public void passGenome(genome thisGenome) {
+			givenGenome = thisGenome;
+			center = new float[2] {375,325};
+			count = 0;
+			genomeLength = thisGenome.arrayOfGenes.Length;
+		}
+
+
+		public void devoGraphics() {
+
+		//0 public float partType;// # 0 = Part Type (0 = IR, 1 = Photo, 2 = Neuron, 3 = R Motor, 4 = L Motor)
+		//1 public float angle;// # 1 = Angle
+		//2 public float startTime;// # 2 = Start Time
+		//3 public float velocity;// # 3 = Velocity
+		//4 public float travelTime;// # 4 = Travel Time
+		//5 public float growthRate;// # 5 = Growth Rate
+		//6 public float growthTime;// # 6 = Growth Time
+		//7 public float index;// # 7 = Index
+
+			for (int j = 0; j < genomeLength; j++) {
+				if (givenGenome.arrayOfGenes[j].startTime <= count) {
+					if ((givenGenome.arrayOfGenes[j].travelTime + givenGenome.arrayOfGenes[j].startTime) >= count) {
+						x = center[0] + givenGenome.arrayOfGenes[j].velocity * (count - givenGenome.arrayOfGenes[j].startTime)*Math.Cos(degreeToRadians(givenGenome.arrayOfGenes[j].angle));
+						x = center[1] + givenGenome.arrayOfGenes[j].velocity * (count - givenGenome.arrayOfGenes[j].startTime)*Math.Sin(degreeToRadians(givenGenome.arrayOfGenes[j].angle));
+					} else {
+						x = (center[0] + givenGenome.arrayOfGenes[j].velocity*givenGenome.arrayOfGenes[j].travelTime*Math.Cos(degreeToRadians(givenGenome.arrayOfGenes[j].angle)));
+						y = (center[1] + givenGenome.arrayOfGenes[j].velocity*givenGenome.arrayOfGenes[j].travelTime*Math.Sin(degreeToRadians(givenGenome.arrayOfGenes[j].angle)));
+					}
+
+					if ((givenGenome.arrayOfGenes[j].growthTime + givenGenome.arrayOfGenes[j].startTime) >= count) {
+						size = (1 + givenGenome.arrayOfGenes[j].growthRate*(count - givenGenome.arrayOfGenes[j].startTime));
+					} else {
+						size =  (1 + givenGenome.arrayOfGenes[j].growthRate * givenGenome.arrayOfGenes[j].growthTime);
+					}
+
+					givenGenome.arrayOfGenes[j].x = x;
+					givenGenome.arrayOfGenes[j].y = y;
+					givenGenome.arrayOfGenes[j].size = size;
+				}
+				// givenGenome[j].setGeneParameters(100, 5, 1, 100, 3, 1, 100, i);
+			}
+
+		}
+
+
+
+		public double degreeToRadians(double angle) {
+			return (Math.PI * angle / 180f);
+		}
+
+	}
 
 	
-
-	
-
-
-	// public struct genome {
-
-	// 	public System.Random rnd;
-	// 	public float[,] theGenome;
-	// 	public int numberOfGenesInGenome;
-	// 	public const int maxSpawn = 100;
-	// 	public const  int vMax = 5;
-	// 	public const int vDurationMin = 1;
-	// 	public const int vDurationMax = 100;
-	// 	public const int gMax = 3;
-	// 	public const int gDurationMin = 1;
-	// 	public const int gDurationMax = 100;
-
-	// 	public const float dupeRate = 0.05f;
-	// 	public const float muteRate = 0.05f;
-	// 	public const float delRate = 0.01f;
-	// 	public const float changePercent = 0.15f;
-
-	// 	public float[,] newGenome;
-
-	// 	public void setGenomeVariables(int numberOfGenes) {
-	// 		numberOfGenesInGenome = numberOfGenes;
-	// 		rnd = new System.Random();
-
-	// 	}
-
-
-	// 	public float[,] makeGenome() {
-
-	// 		theGenome = new float[numberOfGenesInGenome, 8];
-
-	//     	for (int x = 0; x < numberOfGenesInGenome; x++) {
-	//     		for (int y = 0; y < 8; y ++) {
-	//     			theGenome[x,y] = 0;
-	//     		};
-	//     	};
-
-
-	//     	for(int i = 0; i < numberOfGenesInGenome; i ++) {
-	//     		theGenome[i,0] = rnd.Next(0,4);
-	//     		theGenome[i,1] = rnd.Next(0,360);
-	//     		theGenome[i,2] = rnd.Next(0,maxSpawn);
-	//     		theGenome[i,3] = rnd.Next(1,vMax);
-	//     		theGenome[i,4] = rnd.Next(vDurationMin,vDurationMax);
-	//     		theGenome[i,5] = rnd.Next(1,gMax);
-	//     		theGenome[i,6] = rnd.Next(gDurationMin,gDurationMax);
-	//     		theGenome[i,7] = i;
-
-	//     	}
-	//     	string printString = "THE GENERATED GENOME: ";
-	//     	// Debug.Log("THIs IS IT: " +genome);
-	//     	foreach(var item in theGenome){
-	//     		printString = printString + item.ToString() +", ";
-	// 		    // Debug.Log(item.ToString());
-	// 		}
-
-	// 		for (int i = 0; i<theGenome.Length/2; i++) {
-
-	// 		}
-
-	// 		Debug.Log(printString);
-	// 		duplicateGenome()
-	//     	// Array.ForEach( theGenome, x => Debug.Log(x));
-	//     	return theGenome;
-	// 	}
-
-	// 	public float duplicateGenome(int[] gene){
-
-	// 	}
-
-	// 	// public float[,] dupNmute(float[,] genome) {
-
-	// 	// }
-
-	// }
 
 
 	// Use this for initialization
@@ -365,29 +364,6 @@ public class genomeHandler : MonoBehaviour {
 	}
 
 
-
-
-	
-
-
-
-
-
-
-
-	// void makeGenOne() {
-	// 	int[][] allGenomes = new int[][] {};
-
-	// 	int minVal = 0;
-	// 	int maxVal = 20;
-	// 	int sd = 2;
-
-	// 	for (int x = 1; x < 6; x++) {
-	// 		numGenes = NormalizeRandom(minVal, maxVal);
-	// 	}
-
-
-	// }
 
 
 }
