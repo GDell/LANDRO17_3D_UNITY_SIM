@@ -108,14 +108,25 @@ public class genomeHandler : MonoBehaviour {
 
 		// Duplicates and deletes the different genes in a genome.
 		public void duplicateAndDelete() {
+			int numDeleted = 0;
 			// Int i for indexing which gene is doubled.
 			List<gene> geneDuplicatedAndNotDeleted = new List<gene>();
-			int i = 0;
+			int countOfnonDeleted = 0;
 			foreach (var item in arrayOfGenes) {
+				if (rand.NextDouble() > delRate) {
+					geneDuplicatedAndNotDeleted.Add(item);
+					countOfnonDeleted = countOfnonDeleted + 1;
+				} else {
+					numDeleted = numDeleted + 1;
+					Debug.Log("THERE HAS BEEN A DELETION, num: " + numDeleted + ", index: " + item.index);
+				} 
+			};
+
+			for (int k = 0; k < countOfnonDeleted; k++) {
 				if (rand.NextDouble() <= dupeRate) {
 					numberOfDuplications = numberOfDuplications + 1;
-					geneDuplicatedAndNotDeleted.Add(item);
-					geneDuplicatedAndNotDeleted.Add(item);
+					geneDuplicatedAndNotDeleted.Add(geneDuplicatedAndNotDeleted[k]);
+					Debug.Log("THERE HAS BEEN A DUPLICATION, num dups: " + numberOfDuplications);
 					if (firstDupe) {
 						dupeRate = 0.5f;
 						firstDupe = false;
@@ -126,16 +137,26 @@ public class genomeHandler : MonoBehaviour {
 					dupeRate = 0.05f;
 					firstDupe = true;
 				}
-				if (rand.NextDouble() > delRate) {
-					geneDuplicatedAndNotDeleted.Add(item);
-				}
-				i = i +1;
-			}
+			};
+				
+
+			// foreach (var item in arrayOfGenes) {
+
+			// 	// i = i +1;
+			// }
+
+			
+			int listCount =  geneDuplicatedAndNotDeleted.Count();
+			numberOfGenes = listCount;
+			Debug.Log("SIZE OF LIST: "+listCount);
+			// arrayOfGenes = geneDuplicatedAndNotDeleted.ToArray();
+			arrayOfGenes = new gene[listCount];
 			arrayOfGenes = geneDuplicatedAndNotDeleted.ToArray();
 			int lengthOfNewArray = arrayOfGenes.Length;
 			for (int j = 0; j < lengthOfNewArray; j++) {
 				arrayOfGenes[j].index = j;	
 			}
+
 		}
 
 		// Mutates the genes in the genome.
@@ -145,6 +166,7 @@ public class genomeHandler : MonoBehaviour {
 			for (int j = 0; j < lengthOfArray; j++) {
 				for (int i = 0; i < 7; i++) {
 					if (rand.NextDouble() <= muteRate) {
+						Debug.Log("THERE HAS BEEN A MUTATION");
 						if (i == 0) {
 							arrayOfGenes[j].partType = rand.Next(0,4);
 							// Debug.Log("THERE HAS BEEN A MUTATION");
@@ -271,16 +293,17 @@ public class genomeHandler : MonoBehaviour {
 
 
 	////// STRUCT: genomeToPhenotype
-	// 	This structure represents a single generation, or a collection of genomes (individuals).
+	// 	This structure contains all the functions for taking a genome and running the
+	//  G-->P process on it. It will produce the nessary output to feed into the createParams 
+	//  structure.
 	// 	Functions:
-	// 		setGenerationParameters() : specifies number of genes.
-	// 			INPUT: (int meanNumberOfGenes, int meanStandardDeviationOfGenes, int numberOfIndividualsInGeneration)
-	//			OUTPUT: assigns the generation's parameters.
-	//		createStartGeneration() : creates a generation given the parameters set above.
-	// 		createNumberOfGenes() : creates the number of genes for a given genome in the generation.
+	// 			passGenome() : passes a genome into this structure for processing.
+	// 			devoGrpahics() : given a genome, creates an array of x,y coordinates and sizes for 
+	//							 each gene.
 	public struct genomeToPhenotype {
 
 		List<float[]> arrayList;
+		List<float[]> connectionList;
 
 		public genome givenGenome; 
 
@@ -288,7 +311,7 @@ public class genomeHandler : MonoBehaviour {
 
 		public float[] center;
 		public const int pointRadius = 3;
-		public int count;
+		public int theCount;
 
 		public int[] irPointList;
 		public int[] photoPointList;
@@ -305,15 +328,23 @@ public class genomeHandler : MonoBehaviour {
 		public void passGenome(genome thisGenome) {
 			givenGenome = thisGenome;
 			center = new float[2] {375,325};
-			count = 0;
+			theCount = 0;
 			genomeLength = thisGenome.arrayOfGenes.Length;
 		}
 
 
-		public void devoGraphics() {
+		public void runDevoGraphics() {
+
+		}
+
+
+		// "Runs" the graphics in order to determine the x,y coordinate and size of each node created 
+		// by each gene in a genome.
+		// Returns a list of arrays that contain the x,y coordinate and size of each gene in the 
+		// provided genome.
+		public void devoGraphics(int count) {
 
 			arrayList = new List<float[]>();
-
 			//0 public float partType;// # 0 = Part Type (0 = IR, 1 = Photo, 2 = Neuron, 3 = R Motor, 4 = L Motor)
 			//1 public float angle;// # 1 = Angle
 			//2 public float startTime;// # 2 = Start Time
@@ -322,37 +353,46 @@ public class genomeHandler : MonoBehaviour {
 			//5 public float growthRate;// # 5 = Growth Rate
 			//6 public float growthTime;// # 6 = Growth Time
 			//7 public float index;// # 7 = Index
+			
+			// for (count = 0; count < 500; count++) {
+				for (int j = 0; j < genomeLength; j++) {
+					Debug.Log("IN DEVO GRAPHICS");
+					if (givenGenome.arrayOfGenes[j].startTime <= count) {
+						if ((givenGenome.arrayOfGenes[j].travelTime + givenGenome.arrayOfGenes[j].startTime) >= count) {
+							x = center[0] + givenGenome.arrayOfGenes[j].velocity * (count - givenGenome.arrayOfGenes[j].startTime)*Math.Cos(degreeToRadians(givenGenome.arrayOfGenes[j].angle));
+							x = center[1] + givenGenome.arrayOfGenes[j].velocity * (count - givenGenome.arrayOfGenes[j].startTime)*Math.Sin(degreeToRadians(givenGenome.arrayOfGenes[j].angle));
+						} else {
+							x = (center[0] + givenGenome.arrayOfGenes[j].velocity*givenGenome.arrayOfGenes[j].travelTime*Math.Cos(degreeToRadians(givenGenome.arrayOfGenes[j].angle)));
+							y = (center[1] + givenGenome.arrayOfGenes[j].velocity*givenGenome.arrayOfGenes[j].travelTime*Math.Sin(degreeToRadians(givenGenome.arrayOfGenes[j].angle)));
+						}
 
-			for (int j = 0; j < genomeLength; j++) {
-				if (givenGenome.arrayOfGenes[j].startTime <= count) {
-					if ((givenGenome.arrayOfGenes[j].travelTime + givenGenome.arrayOfGenes[j].startTime) >= count) {
-						x = center[0] + givenGenome.arrayOfGenes[j].velocity * (count - givenGenome.arrayOfGenes[j].startTime)*Math.Cos(degreeToRadians(givenGenome.arrayOfGenes[j].angle));
-						x = center[1] + givenGenome.arrayOfGenes[j].velocity * (count - givenGenome.arrayOfGenes[j].startTime)*Math.Sin(degreeToRadians(givenGenome.arrayOfGenes[j].angle));
-					} else {
-						x = (center[0] + givenGenome.arrayOfGenes[j].velocity*givenGenome.arrayOfGenes[j].travelTime*Math.Cos(degreeToRadians(givenGenome.arrayOfGenes[j].angle)));
-						y = (center[1] + givenGenome.arrayOfGenes[j].velocity*givenGenome.arrayOfGenes[j].travelTime*Math.Sin(degreeToRadians(givenGenome.arrayOfGenes[j].angle)));
+						if ((givenGenome.arrayOfGenes[j].growthTime + givenGenome.arrayOfGenes[j].startTime) >= count) {
+							size = (1 + givenGenome.arrayOfGenes[j].growthRate*(count - givenGenome.arrayOfGenes[j].startTime));
+						} else {
+							size =  (1 + givenGenome.arrayOfGenes[j].growthRate * givenGenome.arrayOfGenes[j].growthTime);
+						}
+
+						float[] tempArray = new float[4];
+						tempArray[0] = (float)x;
+						tempArray[1] = (float)y;
+						tempArray[2] = size;
+						tempArray[3] = givenGenome.arrayOfGenes[j].index;
+						// givenGenome.arrayOfGenes[j].x = x;
+						// givenGenome.arrayOfGenes[j].y = y;
+						// givenGenome.arrayOfGenes[j].size = size;
+						Debug.Log(tempArray[0]);
+						arrayList.Add(tempArray);
+
 					}
-
-					if ((givenGenome.arrayOfGenes[j].growthTime + givenGenome.arrayOfGenes[j].startTime) >= count) {
-						size = (1 + givenGenome.arrayOfGenes[j].growthRate*(count - givenGenome.arrayOfGenes[j].startTime));
-					} else {
-						size =  (1 + givenGenome.arrayOfGenes[j].growthRate * givenGenome.arrayOfGenes[j].growthTime);
-					}
-
-					float[] tempArray = new float[4];
-					tempArray[0] = (float)x;
-					tempArray[1] = (float)y;
-					tempArray[2] = size;
-					tempArray[3] = givenGenome.arrayOfGenes[j].index;
-					// givenGenome.arrayOfGenes[j].x = x;
-					// givenGenome.arrayOfGenes[j].y = y;
-					// givenGenome.arrayOfGenes[j].size = size;
-					arrayList.Add(tempArray);
-
+					// givenGenome[j].setGeneParameters(100, 5, 1, 100, 3, 1, 100, i);
 				}
-				// givenGenome[j].setGeneParameters(100, 5, 1, 100, 3, 1, 100, i);
-			}
-			int lengthfList = arrayList.Count;
+
+			// }
+
+			float tempFLoat = arrayList[0][0];
+			// return arrayList;
+			// Debug.Log(tempFLoat);
+			// int lengthfList = arrayList.Count;
 
 			// for (int i = 0; i < lengthfList; i ++) {
 			// 	Debug.Log(arrayList[i]);
@@ -361,13 +401,41 @@ public class genomeHandler : MonoBehaviour {
 		}
 
 
-
-
-		public double degreeToRadians(double angle) {
-			return (Math.PI * angle / 180f);
+		// Creates the list of connection arrays.
+		public void checkConds(List<float[]> currentLocations) {
+			connectionList = new List<float[]>();
+			int currentLocationsLength = currentLocations.Count();
+			for (int i = 0; i < (currentLocationsLength - 1); i++) {
+				for (int j = i+1; j < currentLocationsLength; j++) {
+					float dist = distance(currentLocations[i][0], currentLocations[j][0], currentLocations[i][1], currentLocations[j][1]);
+					float combRad = currentLocations[i][2] + currentLocations[j][2];
+					if (dist <= combRad) {
+						float[] newComb = new float[2];
+						newComb[0] = currentLocations[i][3];
+						newComb[1] = currentLocations[j][3];
+						connectionList.Add(newComb);
+					}
+				}
+			}
 		}
 
+
+
+		// HELPER FUNCTIONS:
+		////////////////////
+		// Converts a degreee to a Radian
+		public double degreeToRadians(double angle) {
+			return (Math.PI * angle / 180f);
+		}	
+		// Converts two x,y pairs into the distance between those two coordinates.
+		public float distance(float x1, float x2, float y1, float y2){
+			return ((float)(Math.Sqrt(Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2))));
+		}
+	
+
 	}
+
+
 
 	////// STRUCT: createParams
 	// 	This structure represents a single generation, or a collection of genomes (individuals).
@@ -408,6 +476,7 @@ public class genomeHandler : MonoBehaviour {
 		// int[] rmiVal = new int[1] {0};
 		// int[] lmiVal = new int[1] {1};
 
+
 		int maxSpawn = 100;
 		int vMax = 5;
 		int vDurationMin = 1;
@@ -418,12 +487,16 @@ public class genomeHandler : MonoBehaviour {
 
 		int numberOfGenes = 8;
 
-		float dupeRate = 0.05f;
+		float dupeRate = 0.5f;
+		// .05
 		float muteRate = 0.05f;
 		// .05
 		float delRate = 0.01f;
+		// .01
 		float changePercent = 0.15f;
 		genome testGenome = new genome();
+		genomeToPhenotype testGtoP = new genomeToPhenotype();
+
 		testGenome.createRandomFunction();
 		// Set the genome parameters.
 		testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
@@ -431,8 +504,16 @@ public class genomeHandler : MonoBehaviour {
 		testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
 		// Print the contents of the genome.
 		testGenome.printGenomeContents();
-		testGenome.mutate();
-		testGenome.printGenomeContents();
+
+		testGtoP.passGenome(testGenome);
+		// testGtoP.devoGraphics(0);
+
+
+		// MUTATE AND DELETE.
+		// testGenome.mutate();
+		// testGenome.printGenomeContents();
+		// testGenome.duplicateAndDelete();
+		// testGenome.printGenomeContents();
 
 
 
