@@ -301,9 +301,14 @@ public class genomeHandler : MonoBehaviour {
 	// 			devoGrpahics() : given a genome, creates an array of x,y coordinates and sizes for 
 	//							 each gene.
 	public struct genomeToPhenotype {
-
-		List<float[]> arrayList;
-		List<float[]> connectionList;
+		// Step 1
+		List<int[]> currentArrayList;
+		// Step 2
+		List<int[]> connectionList;
+		// Step 3
+		List<int[]> finalConnections;
+		// Step 4
+		List<int[]> sortedConnects;
 
 		public genome givenGenome; 
 
@@ -324,7 +329,7 @@ public class genomeHandler : MonoBehaviour {
 
 		public float size;
 
-
+		// Passes a genome into an instance of this struct.
 		public void passGenome(genome thisGenome) {
 			givenGenome = thisGenome;
 			center = new float[2] {375,325};
@@ -332,11 +337,16 @@ public class genomeHandler : MonoBehaviour {
 			genomeLength = thisGenome.arrayOfGenes.Length;
 		}
 
-
+		// Combines the functions written below to run the given genome through
+		// the G->P process.
 		public void runDevoGraphics() {
+			while (theCount < 500) {
+				devoGraphics(theCount);
+				proccessConnections();
+				theCount = theCount +1;
+			}
 
 		}
-
 
 		// "Runs" the graphics in order to determine the x,y coordinate and size of each node created 
 		// by each gene in a genome.
@@ -344,7 +354,7 @@ public class genomeHandler : MonoBehaviour {
 		// provided genome.
 		public void devoGraphics(int count) {
 
-			arrayList = new List<float[]>();
+			currentArrayList = new List<int[]>();
 			//0 public float partType;// # 0 = Part Type (0 = IR, 1 = Photo, 2 = Neuron, 3 = R Motor, 4 = L Motor)
 			//1 public float angle;// # 1 = Angle
 			//2 public float startTime;// # 2 = Start Time
@@ -372,16 +382,16 @@ public class genomeHandler : MonoBehaviour {
 							size =  (1 + givenGenome.arrayOfGenes[j].growthRate * givenGenome.arrayOfGenes[j].growthTime);
 						}
 
-						float[] tempArray = new float[4];
-						tempArray[0] = (float)x;
-						tempArray[1] = (float)y;
-						tempArray[2] = size;
-						tempArray[3] = givenGenome.arrayOfGenes[j].index;
+						int[] tempArray = new int[4];
+						tempArray[0] = (int)x;
+						tempArray[1] = (int)y;
+						tempArray[2] = (int)size;
+						tempArray[3] = (int)givenGenome.arrayOfGenes[j].index;
 						// givenGenome.arrayOfGenes[j].x = x;
 						// givenGenome.arrayOfGenes[j].y = y;
 						// givenGenome.arrayOfGenes[j].size = size;
 						Debug.Log(tempArray[0]);
-						arrayList.Add(tempArray);
+						currentArrayList.Add(tempArray);
 
 					}
 					// givenGenome[j].setGeneParameters(100, 5, 1, 100, 3, 1, 100, i);
@@ -389,7 +399,8 @@ public class genomeHandler : MonoBehaviour {
 
 			// }
 
-			float tempFLoat = arrayList[0][0];
+				checkConds(currentArrayList);
+			// float tempFLoat = currentArrayList[0][0];
 			// return arrayList;
 			// Debug.Log(tempFLoat);
 			// int lengthfList = arrayList.Count;
@@ -402,15 +413,15 @@ public class genomeHandler : MonoBehaviour {
 
 
 		// Creates the list of connection arrays.
-		public void checkConds(List<float[]> currentLocations) {
-			connectionList = new List<float[]>();
+		public void checkConds(List<int[]> currentLocations) {
+			connectionList = new List<int[]>();
 			int currentLocationsLength = currentLocations.Count();
 			for (int i = 0; i < (currentLocationsLength - 1); i++) {
 				for (int j = i+1; j < currentLocationsLength; j++) {
 					float dist = distance(currentLocations[i][0], currentLocations[j][0], currentLocations[i][1], currentLocations[j][1]);
 					float combRad = currentLocations[i][2] + currentLocations[j][2];
 					if (dist <= combRad) {
-						float[] newComb = new float[2];
+						int[] newComb = new int[2];
 						newComb[0] = currentLocations[i][3];
 						newComb[1] = currentLocations[j][3];
 						connectionList.Add(newComb);
@@ -419,7 +430,75 @@ public class genomeHandler : MonoBehaviour {
 			}
 		}
 
+		public void proccessConnections() {
+			finalConnections = new List<int[]>();
+			foreach (var item in connectionList) {
+				if (!(finalConnections.Contains(item))) {
+					finalConnections.Add(item);
+				}
+			}
+		}
 
+
+		// Proccesses the final connections array.
+		public void makeConnectome() {
+			sortedConnects = new List<int[]>();
+			int lenghtOfFinalConnects = finalConnections.Count();
+			string[] partTypes = new string[5] {"IR", "Photo", "Neuron", "Right Motor", "Left Motor"};
+			int sortedConnectsLength;
+
+			for (int i = 0; i < lenghtOfFinalConnects; i++) {
+				// Debug.Log( finalConnections[i][0]);
+				// int temp1 = finalConnections[i][0];
+				// int temp2 = finalConnections[i][0];
+				int[] tempIntArray  = new int[2];
+				float size1 = ((givenGenome.arrayOfGenes[finalConnections[i][0]].growthRate)) * ((givenGenome.arrayOfGenes[finalConnections[i][0]].growthTime));
+				float size2 = ((givenGenome.arrayOfGenes[finalConnections[i][1]].growthRate)) * ((givenGenome.arrayOfGenes[finalConnections[i][1]].growthTime));
+				if (size1 > size2) {
+					sortedConnects.Add(finalConnections[i]);
+				} else if(size2 > size1) {
+					tempIntArray[0] = finalConnections[i][1];
+					tempIntArray[1] = finalConnections[i][0];
+					sortedConnects.Add(tempIntArray);
+				} else {
+					sortedConnects.Add(finalConnections[i]);
+					sortedConnects.Add(tempIntArray);
+				}
+			}
+
+
+			sortedConnectsLength = sortedConnects.Count();
+
+			List<int> popList = new List<int>();
+
+			for (int i = 0; i < sortedConnectsLength; i ++) {
+				if ((givenGenome.arrayOfGenes[sortedConnects[i][1]].partType == 0) || (givenGenome.arrayOfGenes[sortedConnects[i][1]].partType == 1)) {
+					popList.Add(i);
+				} else if (((givenGenome.arrayOfGenes[sortedConnects[i][0]].partType == 3) || (givenGenome.arrayOfGenes[sortedConnects[i][0]].partType == 4)) &&  ((givenGenome.arrayOfGenes[sortedConnects[i][1]].partType == 3) || (givenGenome.arrayOfGenes[sortedConnects[i][1]].partType == 4))) {
+					popList.Add(i);
+				}
+			}
+
+			// List<int[]> tempList = new List<int>();
+
+			// tempList.Add(popList.Reverse());
+
+			popList.Reverse();
+
+			// popList = new List<int>();
+			 
+
+			foreach (var item in popList) {
+				sortedConnects.RemoveAt(item);
+			}
+
+
+			// foreach(var link in sortedConnects) {
+
+			// }
+
+
+		}
 
 		// HELPER FUNCTIONS:
 		////////////////////
@@ -446,6 +525,10 @@ public class genomeHandler : MonoBehaviour {
 	//		createStartGeneration() : creates a generation given the parameters set above.
 	// 		createNumberOfGenes() : creates the number of genes for a given genome in the generation.
 	public struct createParams {
+
+		List<int[]> connectionMatrix;
+
+
 		int RMI;
 		int LMI;
 		int NUM_INPUT;
@@ -459,6 +542,12 @@ public class genomeHandler : MonoBehaviour {
 		float[,] TESToutput_to_hidden;
 		int[] rmiVal;
 		int[] lmiVal;	
+
+		public void passConnectionMatrix(List<int[]> vConnect) {
+			connectionMatrix = vConnect;
+		}
+
+
 	}
 
 
