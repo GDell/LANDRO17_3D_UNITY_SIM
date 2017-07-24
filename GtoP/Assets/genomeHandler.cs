@@ -526,27 +526,335 @@ public class genomeHandler : MonoBehaviour {
 	// 		createNumberOfGenes() : creates the number of genes for a given genome in the generation.
 	public struct createParams {
 
+		public genome paramsGenome; 
+
+		List<float> senseToInput;
+
+		List<float[]> inputToHidden;
+		List<float[]> hiddenToHidden;
+		List<float[]> hiddenToOutput;
+		List<float[]> inputToOutput;
+		List<float[]> outputToHidden;
+
+
 		List<int[]> connectionMatrix;
 
+		List<int> usedList;
 
-		int RMI;
-		int LMI;
+		List<int> inputIndexes;
+		List<int> hiddenIndexes;
+		List<int> outputIndexes;
+
+		List<int> RMI;
+		List<int> LMI;
+
+
+		int motorCount;
+
+		int RMIlength;
+		int LMIlength;
+
+
+		// Final resulting Params
+		float[,] input_to_output;
+		float[,] input_to_hidden;
+		float[,] hidden_to_hidden;
+		float[,] hidden_to_output;
+		float[,] output_to_hidden;
+
 		int NUM_INPUT;
 		int NUM_HIDDEN;
 		int NUM_OUTPUT;
 
-		float[,] TESTinput_to_output;
-		float[,] TESTinput_to_hidden;
-		float[,] TESThidden_to_hidden;
-		float[,] TESThidden_to_output;
-		float[,] TESToutput_to_hidden;
-		int[] rmiVal;
-		int[] lmiVal;	
+		// int[] rmiVal;
+		// int[] lmiVal;	
 
-		public void passConnectionMatrix(List<int[]> vConnect) {
+
+		// Passes the current genome and its resulting connection matrix.
+		public void passConnectionMatrix(List<int[]> vConnect, genome thisGenome) {
 			connectionMatrix = vConnect;
+			paramsGenome = thisGenome;
+
+			usedList = new List<int>();
+
+			inputIndexes = new List<int>();
+			hiddenIndexes = new List<int>();
+			outputIndexes = new List<int>();
+
+			inputToHidden = new List<float[]>();
+			hiddenToHidden = new List<float[]>();
+			hiddenToOutput = new List<float[]>();
+			inputToOutput = new List<float[]>();
+			outputToHidden = new List<float[]>();
+
+			RMI = new List<int>();
+			LMI = new List<int>();
+
+			NUM_INPUT = 0;
+			NUM_HIDDEN = 0;
+			NUM_OUTPUT = 0;
+
+			RMIlength = 0;
+			LMIlength = 0;
+
+			motorCount = 0;
 		}
 
+		// Uses the genome and the connection matrix in order to set num_input,
+		// num_hidden, and num_output.
+		public void setNodeLayerNumbers() {
+			foreach (var item in connectionMatrix) {
+
+				if (!(usedList.Contains(item[0]))) {
+					if ((paramsGenome.arrayOfGenes[item[0]].partType == 0) || (paramsGenome.arrayOfGenes[item[0]].partType == 1)) {
+						NUM_INPUT = NUM_INPUT + 1;
+						inputIndexes.Add(item[0]);
+					} else if (paramsGenome.arrayOfGenes[item[0]].partType == 2) {
+						NUM_HIDDEN = NUM_HIDDEN + 1;
+						hiddenIndexes.Add(item[0]);
+					} else if ((paramsGenome.arrayOfGenes[item[0]].partType == 3) || (paramsGenome.arrayOfGenes[item[0]].partType == 4)) {
+						NUM_OUTPUT = NUM_OUTPUT + 1;
+						outputIndexes.Add(item[0]);
+					}
+					usedList.Add(item[0]);
+				}
+
+				if (!(usedList.Contains(item[1]))) {
+					if (paramsGenome.arrayOfGenes[item[1]].partType == 2) {
+						NUM_HIDDEN = NUM_HIDDEN + 1;
+						hiddenIndexes.Add(item[1]);
+					} else if ((paramsGenome.arrayOfGenes[item[1]].partType == 3) || (paramsGenome.arrayOfGenes[item[1]].partType == 4)) {
+						NUM_OUTPUT = NUM_OUTPUT + 1;
+						outputIndexes.Add(item[1]);
+					}
+					usedList.Add(item[1]);
+				}
+
+			}
+			usedList = new List<int>();
+		}
+
+
+
+		public void motorIndexes() {
+			foreach (var connection in connectionMatrix) {
+
+				if ((!(usedList.Contains(connection[0]))) || (!(usedList.Contains(connection[1]))))  {
+
+					if (paramsGenome.arrayOfGenes[connection[0]].partType == 3) {
+						motorCount = motorCount + 1;
+					} 
+					if (paramsGenome.arrayOfGenes[connection[0]].partType == 4) {
+						motorCount = motorCount + 1;
+					}
+					if (paramsGenome.arrayOfGenes[connection[1]].partType == 3) {
+						RMIlength = RMIlength + 1;
+						RMI.Add(motorCount);
+						motorCount = motorCount + 1;
+					}
+					if (paramsGenome.arrayOfGenes[connection[1]].partType == 4) {
+						LMIlength = LMIlength + 1;
+						LMI.Add(motorCount);
+						motorCount = motorCount + 1;
+					}
+					usedList.Add(connection[0]);
+					usedList.Add(connection[1]);
+				}
+			}
+			usedList = new List<int>();
+		}
+
+		// Assigns sensor output to input nodes.
+		public void sensorToInputs() {
+			foreach (var con in connectionMatrix) {
+				if (!(usedList.Contains(con[0]))) {
+					if (paramsGenome.arrayOfGenes[con[0]].partType == 0) {
+						float tempOutput = (float)((((paramsGenome.arrayOfGenes[con[0]].angle)+22.5)/45)%8) * 2;
+						senseToInput.Add(tempOutput);
+					}
+					if (paramsGenome.arrayOfGenes[con[0]].partType == 1) {
+						float tempOutput = (float)(((((paramsGenome.arrayOfGenes[con[0]].angle))/45)%8) * 2) + 1;
+						senseToInput.Add(tempOutput);
+					}
+					usedList.Add(con[0]);
+				}
+			}
+		}
+
+
+		//0 public float partType;// # 0 = Part Type (0 = IR, 1 = Photo, 2 = Neuron, 3 = R Motor, 4 = L Motor)
+		//1 public float angle;// # 1 = Angle
+		//2 public float startTime;// # 2 = Start Time
+		//3 public float velocity;// # 3 = Velocity
+		//4 public float travelTime;// # 4 = Travel Time
+		//5 public float growthRate;// # 5 = Growth Rate
+		//6 public float growthTime;// # 6 = Growth Time
+		//7 public float index;// # 7 = Index
+
+		// Creates the input to hidden connections.
+		public void createInputToHidden() {
+			for (int i = 0; i < NUM_INPUT; i++) {
+				List<float> tempInput = new List<float>();
+				for (int j = 0; j < NUM_HIDDEN; j++) {
+					int[] currentTempArray = new int[2];
+					currentTempArray[0] = inputIndexes[i];
+					currentTempArray[1] = hiddenIndexes[j];
+
+					if (connectionMatrix.Contains(currentTempArray)) {
+						gene sensor = paramsGenome.arrayOfGenes[inputIndexes[i]];
+						gene hidden = paramsGenome.arrayOfGenes[hiddenIndexes[j]];
+						float strength = (float)(((sensor.velocity) * (sensor.travelTime) + (hidden.velocity) * (hidden.travelTime)) / 250.0);
+
+						if ((((sensor.angle) + 180)%360) < hidden.angle) {
+							strength = strength * -1;
+						}
+						tempInput.Add(strength);
+
+					} else {
+						tempInput.Add(0);
+					}
+				}
+				inputToHidden.Add(tempInput.ToArray());
+			}
+		}
+
+
+		public void createHiddenToHidden() {
+			for (int i = 0; i < NUM_HIDDEN; i++) {
+				List<float> tempHidden = new List<float>();
+				for (int j = 0; j < NUM_HIDDEN; j++) {
+					int[] currentTempArray = new int[2];
+					currentTempArray[0] = hiddenIndexes[i];
+					currentTempArray[1] = hiddenIndexes[j];
+
+					if (connectionMatrix.Contains(currentTempArray)) {
+						gene hidden1 = paramsGenome.arrayOfGenes[hiddenIndexes[i]];
+						gene hidden2 = paramsGenome.arrayOfGenes[hiddenIndexes[j]];
+						float strength = (float)(((hidden1.velocity * hidden1.travelTime) + (hidden2.velocity * hidden2.travelTime)) / 250.0);
+
+						if ((hidden1.angle + 180)%360 < hidden2.angle) {
+							strength = strength * -1;
+						}
+						tempHidden.Add(strength);
+
+					} else {
+						tempHidden.Add(0);
+					}
+				}
+				hiddenToHidden.Add(tempHidden.ToArray());
+			}
+
+		}
+
+
+		// Creates hidden to output.
+		public void createHiddenToOutput() {
+			for (int i = 0; i < NUM_HIDDEN; i++) {
+				List<float> tempOutput = new List<float>();
+				for (int j = 0; j < NUM_OUTPUT; j++) {
+					int[] currentTempArray = new int[2];
+					currentTempArray[0] = hiddenIndexes[i];
+					currentTempArray[1] = outputIndexes[j];
+
+					if (connectionMatrix.Contains(currentTempArray)) {
+						gene hidden = paramsGenome.arrayOfGenes[hiddenIndexes[i]];
+						gene output = paramsGenome.arrayOfGenes[outputIndexes[j]];
+						float strength = (float)(((hidden.velocity * hidden.travelTime) + (output.velocity * output.travelTime)) / 250.0);
+
+						if ((hidden.angle + 180)%360 < output.angle) {
+							strength = strength * -1;
+						}
+						tempOutput.Add(strength);
+
+					} else {
+						tempOutput.Add(0);
+					}
+				}
+				hiddenToOutput.Add(tempOutput.ToArray());
+			}
+
+		}
+
+		// Creates input to output.
+		public void createInputToOutput() {
+			for (int i = 0; i < NUM_INPUT; i++) {
+				List<float> tempOutput = new List<float>();
+				for (int j = 0; j < NUM_OUTPUT; j++) {
+					int[] currentTempArray = new int[2];
+					currentTempArray[0] = inputIndexes[i];
+					currentTempArray[1] = outputIndexes[j];
+
+					if (connectionMatrix.Contains(currentTempArray)) {
+						gene sensor = paramsGenome.arrayOfGenes[inputIndexes[i]];
+						gene output = paramsGenome.arrayOfGenes[outputIndexes[j]];
+						float strength = (float)(((sensor.velocity * sensor.travelTime) + (output.velocity * output.travelTime)) / 250.0);
+
+						if ((sensor.angle + 180)%360 < output.angle) {
+							strength = strength * -1;
+						}
+						tempOutput.Add(strength);
+
+					} else {
+						tempOutput.Add(0);
+					}
+				}
+				inputToOutput.Add(tempOutput.ToArray());
+			}
+
+		}
+
+
+		// Creates output to hidden.
+		public void createOutputToHidden() {
+			for (int i = 0; i < NUM_OUTPUT; i++) {
+				List<float> tempOutput = new List<float>();
+				for (int j = 0; j < NUM_HIDDEN; j++) {
+					int[] currentTempArray = new int[2];
+					currentTempArray[0] = outputIndexes[i];
+					currentTempArray[1] = hiddenIndexes[j];
+					if (connectionMatrix.Contains(currentTempArray)) {
+						gene output = paramsGenome.arrayOfGenes[outputIndexes[i]];
+						gene hidden = paramsGenome.arrayOfGenes[hiddenIndexes[j]];
+						float strength = (float)(((output.velocity * output.travelTime) + (hidden.velocity * hidden.travelTime)) / 250.0);
+						if ((output.angle + 180)%360 < hidden.angle) {
+							strength = strength * -1;
+						}
+						tempOutput.Add(strength);
+					} else {
+						tempOutput.Add(0);
+					}
+				}
+				outputToHidden.Add(tempOutput.ToArray());
+			}
+		}
+
+		// Turns the generated lists into jagged arrays and then into 2D arrays such that they
+		// may be fed into the neural network.
+		public void finalToArray() {
+			input_to_output = To2D(inputToOutput.ToArray());
+			input_to_hidden = To2D(inputToHidden.ToArray());
+			hidden_to_hidden = To2D(hiddenToHidden.ToArray());
+			hidden_to_output = To2D(hiddenToOutput.ToArray());
+			output_to_hidden = To2D(outputToHidden.ToArray());
+		}
+
+
+		// This function converts a jagged array into a 2D array.
+		public T[,] To2D<T>(T[][] source) {
+			try{
+				int FirstDim = source.Length;
+				int SecondDim = source.GroupBy(row => row.Length).Single().Key;
+				var result = new T[FirstDim, SecondDim];
+				for (int i = 0; i < FirstDim; i++) {
+					for (int j = 0; j < SecondDim; j++) {
+						result[i,j] = source[i][j];
+					}
+				}
+				return result;
+			} catch (InvalidOperationException) {
+				 throw new InvalidOperationException("The given jagged array is not rectangular.");
+			}
+		} 
 
 	}
 
@@ -586,6 +894,7 @@ public class genomeHandler : MonoBehaviour {
 		genome testGenome = new genome();
 		genomeToPhenotype testGtoP = new genomeToPhenotype();
 
+		// Creates an instance of the random function.
 		testGenome.createRandomFunction();
 		// Set the genome parameters.
 		testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
