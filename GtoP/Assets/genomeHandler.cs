@@ -302,13 +302,13 @@ public class genomeHandler : MonoBehaviour {
 	//							 each gene.
 	public struct genomeToPhenotype {
 		// Step 1
-		List<int[]> currentArrayList;
+		public List<int[]> currentArrayList;
 		// Step 2
-		List<int[]> connectionList;
+		public List<int[]> connectionList;
 		// Step 3
-		List<int[]> finalConnections;
+		public List<int[]> finalConnections;
 		// Step 4
-		List<int[]> sortedConnects;
+		public List<int[]> sortedConnects;
 
 		public genome givenGenome; 
 
@@ -342,7 +342,7 @@ public class genomeHandler : MonoBehaviour {
 		public void runDevoGraphics() {
 			while (theCount < 500) {
 				devoGraphics(theCount);
-				proccessConnections();
+				processConnections();
 				theCount = theCount +1;
 			}
 
@@ -430,7 +430,7 @@ public class genomeHandler : MonoBehaviour {
 			}
 		}
 
-		public void proccessConnections() {
+		public void processConnections() {
 			finalConnections = new List<int[]>();
 			foreach (var item in connectionList) {
 				if (!(finalConnections.Contains(item))) {
@@ -528,43 +528,43 @@ public class genomeHandler : MonoBehaviour {
 
 		public genome paramsGenome; 
 
-		List<float> senseToInput;
+		public List<float> senseToInput;
 
-		List<float[]> inputToHidden;
-		List<float[]> hiddenToHidden;
-		List<float[]> hiddenToOutput;
-		List<float[]> inputToOutput;
-		List<float[]> outputToHidden;
-
-
-		List<int[]> connectionMatrix;
-
-		List<int> usedList;
-
-		List<int> inputIndexes;
-		List<int> hiddenIndexes;
-		List<int> outputIndexes;
-
-		List<int> RMI;
-		List<int> LMI;
+		public List<float[]> inputToHidden;
+		public List<float[]> hiddenToHidden;
+		public List<float[]> hiddenToOutput;
+		public List<float[]> inputToOutput;
+		public List<float[]> outputToHidden;
 
 
-		int motorCount;
+		public List<int[]> connectionMatrix;
 
-		int RMIlength;
-		int LMIlength;
+		public List<int> usedList;
+
+		public List<int> inputIndexes;
+		public List<int> hiddenIndexes;
+		public List<int> outputIndexes;
+
+		public List<int> RMI;
+		public List<int> LMI;
+
+
+		public int motorCount;
+
+		public int RMIlength;
+		public int LMIlength;
 
 
 		// Final resulting Params
-		float[,] input_to_output;
-		float[,] input_to_hidden;
-		float[,] hidden_to_hidden;
-		float[,] hidden_to_output;
-		float[,] output_to_hidden;
+		public float[,] input_to_output;
+		public float[,] input_to_hidden;
+		public float[,] hidden_to_hidden;
+		public float[,] hidden_to_output;
+		public float[,] output_to_hidden;
 
-		int NUM_INPUT;
-		int NUM_HIDDEN;
-		int NUM_OUTPUT;
+		public int NUM_INPUT;
+		public int NUM_HIDDEN;
+		public int NUM_OUTPUT;
 
 		// int[] rmiVal;
 		// int[] lmiVal;	
@@ -586,6 +586,8 @@ public class genomeHandler : MonoBehaviour {
 			hiddenToOutput = new List<float[]>();
 			inputToOutput = new List<float[]>();
 			outputToHidden = new List<float[]>();
+
+			senseToInput = new List<float>();
 
 			RMI = new List<int>();
 			LMI = new List<int>();
@@ -891,9 +893,17 @@ public class genomeHandler : MonoBehaviour {
 		float delRate = 0.01f;
 		// .01
 		float changePercent = 0.15f;
-		genome testGenome = new genome();
-		genomeToPhenotype testGtoP = new genomeToPhenotype();
 
+
+
+		// GENOME STRUCT
+		genome testGenome = new genome();
+		// G->P STRUCT
+		genomeToPhenotype testGtoP = new genomeToPhenotype();
+		// PARAMS STRUCT
+		createParams testParams = new createParams();
+
+		// CREATING A GENOME:
 		// Creates an instance of the random function.
 		testGenome.createRandomFunction();
 		// Set the genome parameters.
@@ -903,8 +913,26 @@ public class genomeHandler : MonoBehaviour {
 		// Print the contents of the genome.
 		testGenome.printGenomeContents();
 
+		// RUNNING THE G-->P PROCESS:
+		// Passes the current genome into G-->P struct.
 		testGtoP.passGenome(testGenome);
-		// testGtoP.devoGraphics(0);
+		// Simulate graphics.
+		testGtoP.runDevoGraphics();
+		// Check to see what connections are made.
+		testGtoP.makeConnectome();
+
+		// CREATING NEURAL NETWORK PARAMETERS
+		testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
+		testParams.setNodeLayerNumbers();
+		testParams.motorIndexes();
+		testParams.sensorToInputs();
+		testParams.createInputToHidden();
+		testParams.createHiddenToHidden();
+		testParams.createHiddenToOutput();
+		testParams.createInputToOutput();
+		testParams.createOutputToHidden();
+		testParams.finalToArray();
+
 
 
 		// MUTATE AND DELETE.
