@@ -11,7 +11,6 @@ public class genomeHandler : MonoBehaviour {
 
 	System.Random rand = new System.Random();
 
-
 	////// STRUCT: gene
 	// 	This structure represents a single gene.
 	// 	Functions:
@@ -19,8 +18,6 @@ public class genomeHandler : MonoBehaviour {
 	//			INPUT: int maxSpawn,  int vMax, int vDurationMin, int vDurationMax, int gMax, int gDurationMin, int gDurationMax, int index
 	//			OUTPUT: a gene with --> (partType, angle, startTime, velocity, traveltime, growthRate, growthTime, index).
 	public struct gene {
-		
-
 		public double x;
 		public double y;
 		public float size;
@@ -33,7 +30,6 @@ public class genomeHandler : MonoBehaviour {
 		public float growthRate;// # 5 = Growth Rate
 		public float growthTime;// # 6 = Growth Time
 		public float index;// # 7 = Index
-
 
 		public void setGeneParameters(int pt,  int ang, int sT, int vel, int tT, int gR, int gT, int geneNumber) {
 			// Debug.Log("GENES ARE BEING SET");
@@ -222,7 +218,6 @@ public class genomeHandler : MonoBehaviour {
 			}
 			Debug.Log(printString);
 		}
-
 	}
 
 	////// STRUCT: generation
@@ -290,7 +285,6 @@ public class genomeHandler : MonoBehaviour {
 			return numberOfGenes;
 		}
 	}
-
 
 	////// STRUCT: genomeToPhenotype
 	// 	This structure contains all the functions for taking a genome and running the
@@ -394,21 +388,8 @@ public class genomeHandler : MonoBehaviour {
 						currentArrayList.Add(tempArray);
 
 					}
-					// givenGenome[j].setGeneParameters(100, 5, 1, 100, 3, 1, 100, i);
 				}
-
-			// }
-
 				checkConds(currentArrayList);
-			// float tempFLoat = currentArrayList[0][0];
-			// return arrayList;
-			// Debug.Log(tempFLoat);
-			// int lengthfList = arrayList.Count;
-
-			// for (int i = 0; i < lengthfList; i ++) {
-			// 	Debug.Log(arrayList[i]);
-			// }
-
 		}
 
 
@@ -482,25 +463,11 @@ public class genomeHandler : MonoBehaviour {
 				}
 			}
 
-			// List<int[]> tempList = new List<int>();
-
-			// tempList.Add(popList.Reverse());
-
 			popList.Reverse();
-
-			// popList = new List<int>();
-			 
 
 			foreach (var item in popList) {
 				sortedConnects.RemoveAt(item);
 			}
-
-
-
-
-			// foreach(var link in sortedConnects) {
-
-			// }
 
 
 		}
@@ -514,7 +481,6 @@ public class genomeHandler : MonoBehaviour {
 			for (int j = 0; j < lengthOfArrayRow; j++) {
 				for (int i = 0; i < lengthOfArrayCol; i++) {
 				printString += sortedConnectsArray[j,i] + ", ";
-
 				// Debug.Log("PART TYPE: "+arrayOfGenes[j].partType);// 1
 				// Debug.Log("ANGLE: "+arrayOfGenes[j].angle);// 2
 				// Debug.Log("START TIME: "+arrayOfGenes[j].startTime);// 3
@@ -524,13 +490,11 @@ public class genomeHandler : MonoBehaviour {
 				// Debug.Log("GROWTH TIME: "+arrayOfGenes[j].growthTime);// 7
 				// Debug.Log("INDEX: "+arrayOfGenes[j].index);// 8
 				}
-	
 			}
 			Debug.Log(printString);
 		}
 
 		// HELPER FUNCTIONS:
-		////////////////////
 		// Converts a degreee to a Radian
 		public double degreeToRadians(double angle) {
 			return (Math.PI * angle / 180f);
@@ -539,7 +503,6 @@ public class genomeHandler : MonoBehaviour {
 		public float distance(float x1, float x2, float y1, float y2){
 			return ((float)(Math.Sqrt(Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2))));
 		}
-
 
 		public T[,] To2D<T>(T[][] source) {
 			// try{
@@ -556,20 +519,16 @@ public class genomeHandler : MonoBehaviour {
 			// 	 throw new InvalidOperationException("The given jagged array is not rectangular.");
 			// }
 		} 
-	
 
 	}
 
-
-
 	////// STRUCT: createParams
-	// 	This structure represents a single generation, or a collection of genomes (individuals).
+	// 	This structure houses the functions for creating a set of neural network parameters provided
+	//  a connection matrix created in the G->P processing struct.
 	// 	Functions:
-	// 		setGenerationParameters() : specifies number of genes.
-	// 			INPUT: (int meanNumberOfGenes, int meanStandardDeviationOfGenes, int numberOfIndividualsInGeneration)
-	//			OUTPUT: assigns the generation's parameters.
-	//		createStartGeneration() : creates a generation given the parameters set above.
-	// 		createNumberOfGenes() : creates the number of genes for a given genome in the generation.
+	// 		passConnectomeMatrix() : passes the matrix created in the G->P struct.
+	//		setNodeLayerNumbers() : sets the proper num input, hidden, and outputs nodes for the neural network.
+	// 		motorIndexes() : creates the number of genes for a given genome in the generation.
 	public struct createParams {
 
 		public genome paramsGenome; 
@@ -614,7 +573,6 @@ public class genomeHandler : MonoBehaviour {
 
 		// int[] rmiVal;
 		// int[] lmiVal;	
-
 
 		// Passes the current genome and its resulting connection matrix.
 		public void passConnectionMatrix(List<int[]> vConnect, genome thisGenome) {
@@ -687,7 +645,6 @@ public class genomeHandler : MonoBehaviour {
 			}
 			usedList = new List<int>();
 		}
-
 
 
 		public void motorIndexes() {
@@ -951,6 +908,20 @@ public class genomeHandler : MonoBehaviour {
 			output_to_hidden = To2D(outputToHidden.ToArray());
 		}
 
+
+		// CONVERTING JAGGED TO 2D ARRAY.
+		public T[,] To2D<T>(T[][] source) {
+	
+			T[,] result = new T[source.Length, source.Max(x => x.Length)];
+			for(var i = 0; i < source.Length; i++){
+			    for(var j = 0; j < source[i].Length; j++){
+			        result[i, j] = source[i][j];
+			    }
+			}
+			return result;
+		} 
+
+		// PRINTING DEBUG FUNCTIONS.
 		public void printParamsContents() {
 			string printString = "PARAMTERS CONTENTS: ";
 			printString += "Input to output: " + print2Darrays(input_to_output) + ". ";
@@ -967,11 +938,9 @@ public class genomeHandler : MonoBehaviour {
 			printString1 += "|| Num input: " + NUM_INPUT;
 			printString1 += "|| Num hidden: " + NUM_HIDDEN;
 			printString1 += "|| Num output: " + NUM_OUTPUT;
-
 			Debug.Log(printString);
 			Debug.Log(printString1);
 		}
-
 		public string listIntArrayToString(List<int[]> arr) {
 			string specialString = "";
 			foreach(var item in arr) {
@@ -982,7 +951,6 @@ public class genomeHandler : MonoBehaviour {
 			}
 			return specialString;
 		}
-
 		public string intArrayToString(int[] arr) {
 			string specialString = "";
 			foreach (var item in arr) {
@@ -990,8 +958,6 @@ public class genomeHandler : MonoBehaviour {
 			}
 			return specialString;
 		}
-
-
 		public string listFloatArrayToString(List<float[]> arr) {
 			string specialString = "";
 			foreach(var item in arr) {
@@ -1002,70 +968,17 @@ public class genomeHandler : MonoBehaviour {
 			}
 			return specialString;
 		}
-
 		public string print2Darrays(float[,] arr) {
 			int rowLength = arr.GetLength(0);
 	        int colLength = arr.GetLength(1);
-
 	        string outputString = "";
-
 	        for (int i = 0; i < rowLength; i++) {
 	            for (int j = 0; j < colLength; j++)	{
-	                // Debug.Log(string.Format("{0} ", arr[i, j]));
 	                outputString += arr[i, j] + ", ";
-	            }
-	            // Debug.Log(Environment.NewLine + Environment.NewLine);
+	            } 
 	        }
 	        return outputString;
 		}
-
-		public void testingContains() {
-
-			List<int[]> testarr = new List<int[]>();
-			int[] test = new int[] {0, 1};
-
-			testarr.Add(test);
-			if (testarr.Contains(test)) {
-				Debug.Log("ITS IN THERE");
-			}
-		}
-
-
-		// This function converts a jagged array into a 2D array.
-		public T[,] To2D<T>(T[][] source) {
-			// try{
-				// int FirstDim = source.Length;
-				// int SecondDim = source.GroupBy(row => row.Length).Single().Key;
-				// var result = new T[FirstDim, SecondDim];
-				// for (int i = 0; i < FirstDim; i++) {
-				// 	for (int j = 0; j < SecondDim; j++) {
-				// 		result[i,j] = source[i][j];
-				// 	}
-				// }
-				// return result;
-			// } catch (InvalidOperationException) {
-			// 	 throw new InvalidOperationException("The given jagged array is not rectangular.");
-			// }
-
-
-
-				// string[] filelines = File.ReadAllLines("file.txt");
-				// string[][] arr = new string[filelines.Length][];
-				// for (int i = 0; i < filelines.Length; i++) {
-				//     arr[i] = filelines[i].Split(',');       // Note: no need for .ToArray()
-				// }
-
-				// now convert
-			T[,] result = new T[source.Length, source.Max(x => x.Length)];
-			for(var i = 0; i < source.Length; i++){
-			    for(var j = 0; j < source[i].Length; j++){
-			        result[i, j] = source[i][j];
-			    }
-			}
-			return result;
-		} 
-
-
 	}
 
 
@@ -1104,33 +1017,23 @@ public class genomeHandler : MonoBehaviour {
 		float changePercent = 0.15f;
 
 
-
-		// GENOME STRUCT
+		// GENOME STRUCT - G->P STRUCT - PARAMS STRUCT
 		genome testGenome = new genome();
-		// G->P STRUCT
 		genomeToPhenotype testGtoP = new genomeToPhenotype();
-		// PARAMS STRUCT
 		createParams testParams = new createParams();
 
 		// CREATING A GENOME:
-		// Creates an instance of the random function.
 		testGenome.createRandomFunction();
-		// Set the genome parameters.
 		testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
-		// Create the whole genome with the provided gene params.
 		testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
-		// Print the contents of the genome.
 		testGenome.printGenomeContents();
 
 		// RUNNING THE G-->P PROCESS:
-		// Passes the current genome into G-->P struct.
 		testGtoP.passGenome(testGenome);
-		// Simulate graphics.
 		testGtoP.runDevoGraphics();
-		// Check to see what connections are made.
 		testGtoP.makeConnectome();
-
 		testGtoP.printConnectomeContents();
+
 		// CREATING NEURAL NETWORK PARAMETERS
 		testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
 		testParams.setNodeLayerNumbers();
@@ -1143,6 +1046,7 @@ public class genomeHandler : MonoBehaviour {
 		testParams.createOutputToHidden();
 		testParams.finalToArray();
 		testParams.printParamsContents();
+
 
 		// string specialString = "";
 		// foreach(var item in testParams.hidden_to_output) {
