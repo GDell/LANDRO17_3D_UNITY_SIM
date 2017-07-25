@@ -953,16 +953,16 @@ public class genomeHandler : MonoBehaviour {
 
 		public void printParamsContents() {
 			string printString = "PARAMTERS CONTENTS: ";
-			// printString += "Input to output: " + arrayToString(input_to_output) + ". ";
-			// printString += "Input to hidden: " + arrayToString(input_to_hidden) + ". ";
-			// printString += "Hidden to hidden: " + arrayToString(hidden_to_hidden) + ". ";
-			// printString += "Hidden to output: " + arrayToString(hidden_to_output) + ". ";
-			// printString += "Output to hidden: " + arrayToString(output_to_hidden) + ". ";
-			printString += "Input to output: " + arrayToString(inputToOutput) + ". ";
-			printString += "Input to hidden: " + arrayToString(inputToHidden) + ". ";
-			printString += "Hidden to hidden: " + arrayToString(hiddenToHidden) + ". ";
-			printString += "Hidden to output: " + arrayToString(hiddenToOutput) + ". ";
-			printString += "Output to hidden: " + arrayToString(outputToHidden) + ". ";
+			printString += "Input to output: " + print2Darrays(input_to_output) + ". ";
+			printString += "Input to hidden: " + print2Darrays(input_to_hidden) + ". ";
+			printString += "Hidden to hidden: " + print2Darrays(hidden_to_hidden) + ". ";
+			printString += "Hidden to output: " + print2Darrays(hidden_to_output) + ". ";
+			printString += "Output to hidden: " + print2Darrays(output_to_hidden) + ". ";
+			// printString += "Input to output: " + arrayToString(inputToOutput) + ". ";
+			// printString += "Input to hidden: " + arrayToString(inputToHidden) + ". ";
+			// printString += "Hidden to hidden: " + arrayToString(hiddenToHidden) + ". ";
+			// printString += "Hidden to output: " + arrayToString(hiddenToOutput) + ". ";
+			// printString += "Output to hidden: " + arrayToString(outputToHidden) + ". ";
 			string printString1 = "NODE NUMBERS: ";
 			printString1 += "|| Num input: " + NUM_INPUT;
 			printString1 += "|| Num hidden: " + NUM_HIDDEN;
@@ -1003,7 +1003,21 @@ public class genomeHandler : MonoBehaviour {
 			return specialString;
 		}
 
+		public string print2Darrays(float[,] arr) {
+			int rowLength = arr.GetLength(0);
+	        int colLength = arr.GetLength(1);
 
+	        string outputString = "";
+
+	        for (int i = 0; i < rowLength; i++) {
+	            for (int j = 0; j < colLength; j++)	{
+	                // Debug.Log(string.Format("{0} ", arr[i, j]));
+	                outputString += arr[i, j] + ", ";
+	            }
+	            // Debug.Log(Environment.NewLine + Environment.NewLine);
+	        }
+	        return outputString;
+		}
 
 		public void testingContains() {
 
@@ -1128,7 +1142,7 @@ public class genomeHandler : MonoBehaviour {
 		testParams.createInputToOutput();
 		testParams.createOutputToHidden();
 		testParams.finalToArray();
-		// testParams.printParamsContents();
+		testParams.printParamsContents();
 
 		// string specialString = "";
 		// foreach(var item in testParams.hidden_to_output) {
