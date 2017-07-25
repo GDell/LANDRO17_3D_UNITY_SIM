@@ -91,7 +91,7 @@ public class genomeHandler : MonoBehaviour {
 
 		// Creates the specified genome after setting parameters.
 		public void createWholeGenome(int maxSpawn, int vMax, int vDurationMin, int vDurationMax, int gMax, int gDurationMin, int gDurationMax) {
-			Debug.Log("Number of genes: " +numberOfGenes);
+			// Debug.Log("Number of genes: " +numberOfGenes);
 			for (int j = 0; j < numberOfGenes; j++) {
 				int partType = rand.Next(0,4);
 				int angle = rand.Next(0, 360);
@@ -118,7 +118,7 @@ public class genomeHandler : MonoBehaviour {
 					countOfnonDeleted = countOfnonDeleted + 1;
 				} else {
 					numDeleted = numDeleted + 1;
-					Debug.Log("THERE HAS BEEN A DELETION, num: " + numDeleted + ", index: " + item.index);
+					// Debug.Log("THERE HAS BEEN A DELETION, num: " + numDeleted + ", index: " + item.index);
 				} 
 			};
 
@@ -126,7 +126,7 @@ public class genomeHandler : MonoBehaviour {
 				if (rand.NextDouble() <= dupeRate) {
 					numberOfDuplications = numberOfDuplications + 1;
 					geneDuplicatedAndNotDeleted.Add(geneDuplicatedAndNotDeleted[k]);
-					Debug.Log("THERE HAS BEEN A DUPLICATION, num dups: " + numberOfDuplications);
+					// Debug.Log("THERE HAS BEEN A DUPLICATION, num dups: " + numberOfDuplications);
 					if (firstDupe) {
 						dupeRate = 0.5f;
 						firstDupe = false;
@@ -148,7 +148,7 @@ public class genomeHandler : MonoBehaviour {
 			
 			int listCount =  geneDuplicatedAndNotDeleted.Count();
 			numberOfGenes = listCount;
-			Debug.Log("SIZE OF LIST: "+listCount);
+			// Debug.Log("SIZE OF LIST: "+listCount);
 			// arrayOfGenes = geneDuplicatedAndNotDeleted.ToArray();
 			arrayOfGenes = new gene[listCount];
 			arrayOfGenes = geneDuplicatedAndNotDeleted.ToArray();
@@ -162,11 +162,11 @@ public class genomeHandler : MonoBehaviour {
 		// Mutates the genes in the genome.
 		public void mutate() {
 			int lengthOfArray = arrayOfGenes.Length;
-			Debug.Log("MUTE RATE: "+ muteRate);
+			// Debug.Log("MUTE RATE: "+ muteRate);
 			for (int j = 0; j < lengthOfArray; j++) {
 				for (int i = 0; i < 7; i++) {
 					if (rand.NextDouble() <= muteRate) {
-						Debug.Log("THERE HAS BEEN A MUTATION");
+						// Debug.Log("THERE HAS BEEN A MUTATION");
 						if (i == 0) {
 							arrayOfGenes[j].partType = rand.Next(0,4);
 							// Debug.Log("THERE HAS BEEN A MUTATION");
@@ -190,7 +190,7 @@ public class genomeHandler : MonoBehaviour {
 								arrayOfGenes[j].growthTime = arrayOfGenes[j].growthTime + arrayOfGenes[j].growthTime*changePercent;
 								// Debug.Log("THERE HAS BEEN A MUTATION");
 							} else if (i == 7) {
-								Debug.Log(arrayOfGenes[j].index);
+								// Debug.Log(arrayOfGenes[j].index);
 							}
 						}
 					}
@@ -366,7 +366,7 @@ public class genomeHandler : MonoBehaviour {
 			
 			// for (count = 0; count < 500; count++) {
 				for (int j = 0; j < genomeLength; j++) {
-					Debug.Log("IN DEVO GRAPHICS");
+					// Debug.Log("IN DEVO GRAPHICS");
 					if (givenGenome.arrayOfGenes[j].startTime <= count) {
 						if ((givenGenome.arrayOfGenes[j].travelTime + givenGenome.arrayOfGenes[j].startTime) >= count) {
 							x = center[0] + givenGenome.arrayOfGenes[j].velocity * (count - givenGenome.arrayOfGenes[j].startTime)*Math.Cos(degreeToRadians(givenGenome.arrayOfGenes[j].angle));
@@ -390,7 +390,7 @@ public class genomeHandler : MonoBehaviour {
 						// givenGenome.arrayOfGenes[j].x = x;
 						// givenGenome.arrayOfGenes[j].y = y;
 						// givenGenome.arrayOfGenes[j].size = size;
-						Debug.Log(tempArray[0]);
+						// Debug.Log(tempArray[0]);
 						currentArrayList.Add(tempArray);
 
 					}
@@ -456,8 +456,11 @@ public class genomeHandler : MonoBehaviour {
 				float size2 = ((givenGenome.arrayOfGenes[finalConnections[i][1]].growthRate)) * ((givenGenome.arrayOfGenes[finalConnections[i][1]].growthTime));
 				if (size1 > size2) {
 					sortedConnects.Add(finalConnections[i]);
+					// Debug.Log("THIS IS BEING ADDED TO THE SORTED CONNECTS: " + finalConnections[i]);
 				} else if(size2 > size1) {
 					tempIntArray[0] = finalConnections[i][1];
+					// Debug.Log("THIS IS BEING ADDED TO THE SORTED CONNECTS: " + finalConnections[i][0]);
+					// Debug.Log("THIS IS BEING ADDED TO THE SORTED CONNECTS: " + finalConnections[i][1]);
 					tempIntArray[1] = finalConnections[i][0];
 					sortedConnects.Add(tempIntArray);
 				} else {
@@ -493,11 +496,37 @@ public class genomeHandler : MonoBehaviour {
 			}
 
 
+
+
 			// foreach(var link in sortedConnects) {
 
 			// }
 
 
+		}
+
+
+		public void printConnectomeContents() {
+			int[,] sortedConnectsArray = To2D(sortedConnects.ToArray());
+			int lengthOfArrayRow = sortedConnectsArray.GetLength(0);
+			int lengthOfArrayCol = sortedConnectsArray.GetLength(1);
+			string printString = "CONNECTOME: ";
+			for (int j = 0; j < lengthOfArrayRow; j++) {
+				for (int i = 0; i < lengthOfArrayCol; i++) {
+				printString += sortedConnectsArray[j,i] + ", ";
+
+				// Debug.Log("PART TYPE: "+arrayOfGenes[j].partType);// 1
+				// Debug.Log("ANGLE: "+arrayOfGenes[j].angle);// 2
+				// Debug.Log("START TIME: "+arrayOfGenes[j].startTime);// 3
+				// Debug.Log("VELOCITY: "+arrayOfGenes[j].velocity);// 4
+				// Debug.Log("TRAVEL TIME: "+arrayOfGenes[j].travelTime);// 5
+				// Debug.Log("GROWTH RATE: "+arrayOfGenes[j].growthRate);// 6
+				// Debug.Log("GROWTH TIME: "+arrayOfGenes[j].growthTime);// 7
+				// Debug.Log("INDEX: "+arrayOfGenes[j].index);// 8
+				}
+	
+			}
+			Debug.Log(printString);
 		}
 
 		// HELPER FUNCTIONS:
@@ -510,6 +539,23 @@ public class genomeHandler : MonoBehaviour {
 		public float distance(float x1, float x2, float y1, float y2){
 			return ((float)(Math.Sqrt(Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2))));
 		}
+
+
+		public T[,] To2D<T>(T[][] source) {
+			// try{
+				int FirstDim = source.Length;
+				int SecondDim = source.GroupBy(row => row.Length).Single().Key;
+				var result = new T[FirstDim, SecondDim];
+				for (int i = 0; i < FirstDim; i++) {
+					for (int j = 0; j < SecondDim; j++) {
+						result[i,j] = source[i][j];
+					}
+				}
+				return result;
+			// } catch (InvalidOperationException) {
+			// 	 throw new InvalidOperationException("The given jagged array is not rectangular.");
+			// }
+		} 
 	
 
 	}
@@ -572,6 +618,7 @@ public class genomeHandler : MonoBehaviour {
 
 		// Passes the current genome and its resulting connection matrix.
 		public void passConnectionMatrix(List<int[]> vConnect, genome thisGenome) {
+			connectionMatrix = new List<int[]>();
 			connectionMatrix = vConnect;
 			paramsGenome = thisGenome;
 
@@ -611,12 +658,15 @@ public class genomeHandler : MonoBehaviour {
 					if ((paramsGenome.arrayOfGenes[item[0]].partType == 0) || (paramsGenome.arrayOfGenes[item[0]].partType == 1)) {
 						NUM_INPUT = NUM_INPUT + 1;
 						inputIndexes.Add(item[0]);
+						// Debug.Log("Set node layer input indexes: "+item[0]);
 					} else if (paramsGenome.arrayOfGenes[item[0]].partType == 2) {
 						NUM_HIDDEN = NUM_HIDDEN + 1;
 						hiddenIndexes.Add(item[0]);
+						// Debug.Log("Set node layer hidden indexes: "+item[0]);
 					} else if ((paramsGenome.arrayOfGenes[item[0]].partType == 3) || (paramsGenome.arrayOfGenes[item[0]].partType == 4)) {
 						NUM_OUTPUT = NUM_OUTPUT + 1;
 						outputIndexes.Add(item[0]);
+						// Debug.Log("Set node layer output indexes: "+item[0]);
 					}
 					usedList.Add(item[0]);
 				}
@@ -625,9 +675,11 @@ public class genomeHandler : MonoBehaviour {
 					if (paramsGenome.arrayOfGenes[item[1]].partType == 2) {
 						NUM_HIDDEN = NUM_HIDDEN + 1;
 						hiddenIndexes.Add(item[1]);
+						// Debug.Log("Set node layer hidden indexes: "+item[1]);
 					} else if ((paramsGenome.arrayOfGenes[item[1]].partType == 3) || (paramsGenome.arrayOfGenes[item[1]].partType == 4)) {
 						NUM_OUTPUT = NUM_OUTPUT + 1;
 						outputIndexes.Add(item[1]);
+						// Debug.Log("Set node layer output indexes: "+item[1]);
 					}
 					usedList.Add(item[1]);
 				}
@@ -673,10 +725,12 @@ public class genomeHandler : MonoBehaviour {
 					if (paramsGenome.arrayOfGenes[con[0]].partType == 0) {
 						float tempOutput = (float)((((paramsGenome.arrayOfGenes[con[0]].angle)+22.5)/45)%8) * 2;
 						senseToInput.Add(tempOutput);
+						// Debug.Log("SENSE TO INPUT: "+ tempOutput);
 					}
 					if (paramsGenome.arrayOfGenes[con[0]].partType == 1) {
 						float tempOutput = (float)(((((paramsGenome.arrayOfGenes[con[0]].angle))/45)%8) * 2) + 1;
 						senseToInput.Add(tempOutput);
+						// Debug.Log("SENSE TO INPUT: "+ tempOutput);
 					}
 					usedList.Add(con[0]);
 				}
@@ -695,29 +749,43 @@ public class genomeHandler : MonoBehaviour {
 
 		// Creates the input to hidden connections.
 		public void createInputToHidden() {
+			// Debug.Log(listIntArrayToString(connectionMatrix));
 			for (int i = 0; i < NUM_INPUT; i++) {
 				List<float> tempInput = new List<float>();
 				for (int j = 0; j < NUM_HIDDEN; j++) {
-					int[] currentTempArray = new int[2];
-					currentTempArray[0] = inputIndexes[i];
-					currentTempArray[1] = hiddenIndexes[j];
 
-					if (connectionMatrix.Contains(currentTempArray)) {
+					int[] currentTempArray = new int[] {inputIndexes[i], hiddenIndexes[j]};
+					bool exists = false;
+					foreach (var item in connectionMatrix) {
+						// Debug.Log("Item: "+ intArrayToString(item));
+						// Debug.Log("Temp array: "+ intArrayToString(currentTempArray));
+						if ((item[0] == currentTempArray[0]) && item[1] == currentTempArray[1]) {
+							// Debug.Log("WE HAVE A MATCH!!");
+							exists = true;
+						} else {
+							// Debug.Log("NO MATCH");
+						}
+					}
+
+					if (exists) {
+						// Debug.Log("IT CONTAINS!!!!!!!!!!!!!");
 						gene sensor = paramsGenome.arrayOfGenes[inputIndexes[i]];
 						gene hidden = paramsGenome.arrayOfGenes[hiddenIndexes[j]];
 						float strength = (float)(((sensor.velocity) * (sensor.travelTime) + (hidden.velocity) * (hidden.travelTime)) / 250.0);
-
+						// Debug.Log("Strength being added to input to hidden: "+strength);
 						if ((((sensor.angle) + 180)%360) < hidden.angle) {
 							strength = strength * -1;
 						}
 						tempInput.Add(strength);
-
+						// Debug.Log("Strength was actually added: "+strength);
 					} else {
 						tempInput.Add(0);
+						// Debug.Log("Only a zero was added from input to hidden.");
 					}
 				}
 				inputToHidden.Add(tempInput.ToArray());
 			}
+			Debug.Log("Input to Hidden: "+listFloatArrayToString(inputToHidden));
 		}
 
 
@@ -725,11 +793,21 @@ public class genomeHandler : MonoBehaviour {
 			for (int i = 0; i < NUM_HIDDEN; i++) {
 				List<float> tempHidden = new List<float>();
 				for (int j = 0; j < NUM_HIDDEN; j++) {
-					int[] currentTempArray = new int[2];
-					currentTempArray[0] = hiddenIndexes[i];
-					currentTempArray[1] = hiddenIndexes[j];
 
-					if (connectionMatrix.Contains(currentTempArray)) {
+					int[] currentTempArray = new int[] {hiddenIndexes[i], hiddenIndexes[j]};
+					bool exists = false;
+					foreach (var item in connectionMatrix) {
+						// Debug.Log("Item: "+ intArrayToString(item));
+						// Debug.Log("Temp array: "+ intArrayToString(currentTempArray));
+						if ((item[0] == currentTempArray[0]) && item[1] == currentTempArray[1]) {
+							// Debug.Log("WE HAVE A MATCH!!");
+							exists = true;
+						} else {
+							// Debug.Log("NO MATCH");
+						}
+					}
+
+					if (exists) {
 						gene hidden1 = paramsGenome.arrayOfGenes[hiddenIndexes[i]];
 						gene hidden2 = paramsGenome.arrayOfGenes[hiddenIndexes[j]];
 						float strength = (float)(((hidden1.velocity * hidden1.travelTime) + (hidden2.velocity * hidden2.travelTime)) / 250.0);
@@ -745,7 +823,7 @@ public class genomeHandler : MonoBehaviour {
 				}
 				hiddenToHidden.Add(tempHidden.ToArray());
 			}
-
+			Debug.Log("Hidden to Hidden: "+listFloatArrayToString(hiddenToHidden));
 		}
 
 
@@ -754,11 +832,21 @@ public class genomeHandler : MonoBehaviour {
 			for (int i = 0; i < NUM_HIDDEN; i++) {
 				List<float> tempOutput = new List<float>();
 				for (int j = 0; j < NUM_OUTPUT; j++) {
-					int[] currentTempArray = new int[2];
-					currentTempArray[0] = hiddenIndexes[i];
-					currentTempArray[1] = outputIndexes[j];
 
-					if (connectionMatrix.Contains(currentTempArray)) {
+					int[] currentTempArray = new int[] {hiddenIndexes[i], outputIndexes[j]};
+					bool exists = false;
+					foreach (var item in connectionMatrix) {
+						// Debug.Log("Item: "+ intArrayToString(item));
+						// Debug.Log("Temp array: "+ intArrayToString(currentTempArray));
+						if ((item[0] == currentTempArray[0]) && item[1] == currentTempArray[1]) {
+							// Debug.Log("WE HAVE A MATCH!!");
+							exists = true;
+						} else {
+							// Debug.Log("NO MATCH");
+						}
+					}
+
+					if (exists) {
 						gene hidden = paramsGenome.arrayOfGenes[hiddenIndexes[i]];
 						gene output = paramsGenome.arrayOfGenes[outputIndexes[j]];
 						float strength = (float)(((hidden.velocity * hidden.travelTime) + (output.velocity * output.travelTime)) / 250.0);
@@ -774,7 +862,7 @@ public class genomeHandler : MonoBehaviour {
 				}
 				hiddenToOutput.Add(tempOutput.ToArray());
 			}
-
+			Debug.Log("Hidden to Output: "+listFloatArrayToString(hiddenToOutput));
 		}
 
 		// Creates input to output.
@@ -782,11 +870,22 @@ public class genomeHandler : MonoBehaviour {
 			for (int i = 0; i < NUM_INPUT; i++) {
 				List<float> tempOutput = new List<float>();
 				for (int j = 0; j < NUM_OUTPUT; j++) {
-					int[] currentTempArray = new int[2];
-					currentTempArray[0] = inputIndexes[i];
-					currentTempArray[1] = outputIndexes[j];
 
-					if (connectionMatrix.Contains(currentTempArray)) {
+					int[] currentTempArray = new int[] {inputIndexes[i], outputIndexes[j]};
+					bool exists = false;
+					foreach (var item in connectionMatrix) {
+						// Debug.Log("Item: "+ intArrayToString(item));
+						// Debug.Log("Temp array: "+ intArrayToString(currentTempArray));
+						if ((item[0] == currentTempArray[0]) && item[1] == currentTempArray[1]) {
+							// Debug.Log("WE HAVE A MATCH!!");
+							exists = true;
+						} else {
+							// Debug.Log("NO MATCH");
+						}
+					}
+
+
+					if (exists) {
 						gene sensor = paramsGenome.arrayOfGenes[inputIndexes[i]];
 						gene output = paramsGenome.arrayOfGenes[outputIndexes[j]];
 						float strength = (float)(((sensor.velocity * sensor.travelTime) + (output.velocity * output.travelTime)) / 250.0);
@@ -802,7 +901,7 @@ public class genomeHandler : MonoBehaviour {
 				}
 				inputToOutput.Add(tempOutput.ToArray());
 			}
-
+			Debug.Log("Input to Output: "+listFloatArrayToString(inputToOutput));
 		}
 
 
@@ -811,10 +910,21 @@ public class genomeHandler : MonoBehaviour {
 			for (int i = 0; i < NUM_OUTPUT; i++) {
 				List<float> tempOutput = new List<float>();
 				for (int j = 0; j < NUM_HIDDEN; j++) {
-					int[] currentTempArray = new int[2];
-					currentTempArray[0] = outputIndexes[i];
-					currentTempArray[1] = hiddenIndexes[j];
-					if (connectionMatrix.Contains(currentTempArray)) {
+
+					int[] currentTempArray = new int[] {outputIndexes[i], hiddenIndexes[j]};
+					bool exists = false;
+					foreach (var item in connectionMatrix) {
+						// Debug.Log("Item: "+ intArrayToString(item));
+						// Debug.Log("Temp array: "+ intArrayToString(currentTempArray));
+						if ((item[0] == currentTempArray[0]) && item[1] == currentTempArray[1]) {
+							// Debug.Log("WE HAVE A MATCH!!");
+							exists = true;
+						} else {
+							// Debug.Log("NO MATCH");
+						}
+					}
+
+					if (exists) {
 						gene output = paramsGenome.arrayOfGenes[outputIndexes[i]];
 						gene hidden = paramsGenome.arrayOfGenes[hiddenIndexes[j]];
 						float strength = (float)(((output.velocity * output.travelTime) + (hidden.velocity * hidden.travelTime)) / 250.0);
@@ -828,6 +938,7 @@ public class genomeHandler : MonoBehaviour {
 				}
 				outputToHidden.Add(tempOutput.ToArray());
 			}
+			Debug.Log("Ouput to Hidden: "+listFloatArrayToString(outputToHidden));
 		}
 
 		// Turns the generated lists into jagged arrays and then into 2D arrays such that they
@@ -840,23 +951,106 @@ public class genomeHandler : MonoBehaviour {
 			output_to_hidden = To2D(outputToHidden.ToArray());
 		}
 
+		public void printParamsContents() {
+			string printString = "PARAMTERS CONTENTS: ";
+			// printString += "Input to output: " + arrayToString(input_to_output) + ". ";
+			// printString += "Input to hidden: " + arrayToString(input_to_hidden) + ". ";
+			// printString += "Hidden to hidden: " + arrayToString(hidden_to_hidden) + ". ";
+			// printString += "Hidden to output: " + arrayToString(hidden_to_output) + ". ";
+			// printString += "Output to hidden: " + arrayToString(output_to_hidden) + ". ";
+			printString += "Input to output: " + arrayToString(inputToOutput) + ". ";
+			printString += "Input to hidden: " + arrayToString(inputToHidden) + ". ";
+			printString += "Hidden to hidden: " + arrayToString(hiddenToHidden) + ". ";
+			printString += "Hidden to output: " + arrayToString(hiddenToOutput) + ". ";
+			printString += "Output to hidden: " + arrayToString(outputToHidden) + ". ";
+			string printString1 = "NODE NUMBERS: ";
+			printString1 += "|| Num input: " + NUM_INPUT;
+			printString1 += "|| Num hidden: " + NUM_HIDDEN;
+			printString1 += "|| Num output: " + NUM_OUTPUT;
+
+			Debug.Log(printString);
+			Debug.Log(printString1);
+		}
+
+		public string listIntArrayToString(List<int[]> arr) {
+			string specialString = "";
+			foreach(var item in arr) {
+				specialString += "||||";
+				foreach (var thing in item) {
+					specialString +=  thing.ToString() + ", ";
+				}
+			}
+			return specialString;
+		}
+
+		public string intArrayToString(int[] arr) {
+			string specialString = "";
+			foreach (var item in arr) {
+				specialString += item.ToString() + ", ";
+			}
+			return specialString;
+		}
+
+
+		public string listFloatArrayToString(List<float[]> arr) {
+			string specialString = "";
+			foreach(var item in arr) {
+				specialString += "||||";
+				foreach (var thing in item) {
+					specialString +=  thing.ToString() + ", ";
+				}
+			}
+			return specialString;
+		}
+
+
+
+		public void testingContains() {
+
+			List<int[]> testarr = new List<int[]>();
+			int[] test = new int[] {0, 1};
+
+			testarr.Add(test);
+			if (testarr.Contains(test)) {
+				Debug.Log("ITS IN THERE");
+			}
+		}
+
 
 		// This function converts a jagged array into a 2D array.
 		public T[,] To2D<T>(T[][] source) {
-			try{
-				int FirstDim = source.Length;
-				int SecondDim = source.GroupBy(row => row.Length).Single().Key;
-				var result = new T[FirstDim, SecondDim];
-				for (int i = 0; i < FirstDim; i++) {
-					for (int j = 0; j < SecondDim; j++) {
-						result[i,j] = source[i][j];
-					}
-				}
-				return result;
-			} catch (InvalidOperationException) {
-				 throw new InvalidOperationException("The given jagged array is not rectangular.");
+			// try{
+				// int FirstDim = source.Length;
+				// int SecondDim = source.GroupBy(row => row.Length).Single().Key;
+				// var result = new T[FirstDim, SecondDim];
+				// for (int i = 0; i < FirstDim; i++) {
+				// 	for (int j = 0; j < SecondDim; j++) {
+				// 		result[i,j] = source[i][j];
+				// 	}
+				// }
+				// return result;
+			// } catch (InvalidOperationException) {
+			// 	 throw new InvalidOperationException("The given jagged array is not rectangular.");
+			// }
+
+
+
+				// string[] filelines = File.ReadAllLines("file.txt");
+				// string[][] arr = new string[filelines.Length][];
+				// for (int i = 0; i < filelines.Length; i++) {
+				//     arr[i] = filelines[i].Split(',');       // Note: no need for .ToArray()
+				// }
+
+				// now convert
+			T[,] result = new T[source.Length, source.Max(x => x.Length)];
+			for(var i = 0; i < source.Length; i++){
+			    for(var j = 0; j < source[i].Length; j++){
+			        result[i, j] = source[i][j];
+			    }
 			}
+			return result;
 		} 
+
 
 	}
 
@@ -884,7 +1078,8 @@ public class genomeHandler : MonoBehaviour {
 		int gDurationMin = 1;
 		int gDurationMax = 100;
 
-		int numberOfGenes = 8;
+		int numberOfGenes = 20;
+		// 8
 
 		float dupeRate = 0.5f;
 		// .05
@@ -921,6 +1116,7 @@ public class genomeHandler : MonoBehaviour {
 		// Check to see what connections are made.
 		testGtoP.makeConnectome();
 
+		testGtoP.printConnectomeContents();
 		// CREATING NEURAL NETWORK PARAMETERS
 		testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
 		testParams.setNodeLayerNumbers();
@@ -932,8 +1128,14 @@ public class genomeHandler : MonoBehaviour {
 		testParams.createInputToOutput();
 		testParams.createOutputToHidden();
 		testParams.finalToArray();
+		// testParams.printParamsContents();
 
+		// string specialString = "";
+		// foreach(var item in testParams.hidden_to_output) {
+		// 	specialString +=  item.ToString() + ", ";
+		// }
 
+		// Debug.Log("OUTPUT STRING: " + specialString);
 
 		// MUTATE AND DELETE.
 		// testGenome.mutate();
