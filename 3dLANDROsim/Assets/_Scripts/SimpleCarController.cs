@@ -5,25 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.SceneManagement;
 
-// AXLE CLASS: creates accessible Wheel classes in order to control movement. 
-[System.Serializable]
-public class AxleInfo {
-    public WheelCollider leftWheel;
-    public WheelCollider rightWheel;
-    public bool motor;
-    public bool steering;
-}
-
-public class SimpleCarController : MonoBehaviour {
-
-
-	public readonly int NUM_INPUT;
-	public readonly int NUM_HIDDEN;
-	public readonly int NUM_OUTPUT;
-
-    public List<AxleInfo> axleInfos; 
-
-    
+public class SimpleCarController : MonoBehaviour {    
 
 	GameObject wheelColliders;
     List<WheelCollider> wheels = new List<WheelCollider>();
@@ -40,12 +22,8 @@ public class SimpleCarController : MonoBehaviour {
     // BOOLEANS: Toggle to change further function behaviors.
     	// True if you want to print IR and LDR data.
     public bool displayFitnessInfo;
-    	// True if you want to use exampleXORnetwork, otherwise uses others.
-    public bool exampleXORnetwork;
     	// True if you want to use network, false for default IR/Light behavior.
 	public bool useNetwork;
-		// True if you want neural network debug info.
-	// public bool debugNeuralNetwork;
 		// True if you want bumper debug info.
 	public bool debugBumper;
 
@@ -66,7 +44,6 @@ public class SimpleCarController : MonoBehaviour {
     private BumpSensor[] bump_sensors;
     private BumpSensorBack[] backBump_sensors;
     // public NeuralNetwork neuralNet;
-
 
 	public int[] irReadingArray;
 	public float[] ldrReadingArray;
@@ -121,11 +98,67 @@ public class SimpleCarController : MonoBehaviour {
    	public float meanIRscore;
    	public float meanLDRscore;
 
+
+	// GENOME STRUCT - G->P STRUCT - PARAMS STRUCT
+	public genomeHandler.genome testGenome = new genomeHandler.genome();
+	public genomeHandler.genomeToPhenotype testGtoP = new genomeHandler.genomeToPhenotype();
+	public genomeHandler.createParams testParams = new genomeHandler.createParams();
+	public NeuralNetworkHandler.NeuralNetworkParameters testNeuralStruct = new NeuralNetworkHandler.NeuralNetworkParameters();
+
+
     // INITIALIZE SIMULATION.
     public void Start(){
-    	wheelColliders = GameObject.Find("WheelColliders");
 
-		// VECTORS FOR PLACING SENSORS.///////////////
+		int maxSpawn = 100;
+		int vMax = 5;
+		int vDurationMin = 1;
+		int vDurationMax = 100;
+		int gMax = 3;
+		int gDurationMin = 1;
+		int gDurationMax = 100;
+
+		int numberOfGenes = 20;
+		float dupeRate = 0.5f;
+		float muteRate = 0.05f;
+		float delRate = 0.01f;
+		float changePercent = 0.15f;
+
+		// CREATING A GENOME:
+		testGenome.createRandomFunction();
+		testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
+		testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
+		testGenome.printGenomeContents();
+
+		// RUNNING THE G-->P PROCESS:
+		testGtoP.passGenome(testGenome);
+		testGtoP.runDevoGraphics();
+		testGtoP.makeConnectome();
+		testGtoP.printConnectomeContents();
+
+		// CREATING NEURAL NETWORK PARAMETERS
+		testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
+		testParams.setNodeLayerNumbers();
+		testParams.motorIndexes();
+		testParams.sensorToInputs();
+		testParams.createInputToHidden();
+		testParams.createHiddenToHidden();
+		testParams.createHiddenToOutput();
+		testParams.createInputToOutput();
+		testParams.createOutputToHidden();
+		testParams.finalToArray();
+		testParams.printParamsContents();
+
+		// CREATING THE NEURAL NETWORK.
+		testNeuralStruct.setStartVariables(1,1,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
+		int[] rmiVal = new int[1] {0};
+		int[] lmiVal = new int[1] {1};
+		testNeuralStruct.setStartingArrays(rmiVal, lmiVal);
+		testNeuralStruct.setConnections(testParams.input_to_output,testParams.input_to_hidden,testParams.hidden_to_hidden, testParams.hidden_to_output, testParams.output_to_hidden);
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    	wheelColliders = GameObject.Find("WheelColliders");
+		// VECTORS FOR PLACING SENSORS.
 		Quaternion backBump_rotation = new Quaternion();
 		Vector3 backBump_position = new Vector3();
 		/////
@@ -143,15 +176,10 @@ public class SimpleCarController : MonoBehaviour {
 		displayFitnessInfo = false;
 			// T: use network, F: auto movement.
 		useNetwork = true;
-			// T: use the example neural network.
-		exampleXORnetwork = true;
-			// T: enable print statements in neural network function.
-		// debugNeuralNetwork = false;
 			// T: enable print statements for bumper functions.
 		debugBumper = false;
 
 		firstRun = 0;
-
 		// TIMING VARIABLES.
 		// Time set is the length of a trial (in seconds).
 		timeTrial = 60f;
@@ -198,12 +226,11 @@ public class SimpleCarController : MonoBehaviour {
 		hIRlLDRfitnessScore = 0;
         lIRhLDRfitnessScore = 0; 
 
-
 		leftMotor.motorTorque = rightWheelTorque;
 		rightMotor.motorTorque = leftWheelTorque;
 
-		// Selected sensors for input into neural network function.
-		chosenSensorArray = new int[4] {2,3,13,14}; 
+		// // Selected sensors for input into neural network function.
+		// chosenSensorArray = new int[4] {2,3,13,14}; 
 
 		//////////////////////////// PLACING SENSORS ON LANDRO BODY //////////////////////////// 
 		// PLACE FRONT BUMP SENSORS.
@@ -260,7 +287,7 @@ public class SimpleCarController : MonoBehaviour {
 
 			ldrSensorNumber = ldrSensorNumber + 1;
 		}
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+		/////////////////////////////////////////////////////////////////////////
 
 		// ALLOCATE SPACE IN SENSOR DATA ARRAYS.
 		irCollisionDataArray = new float[irSensorNumber];
@@ -268,12 +295,12 @@ public class SimpleCarController : MonoBehaviour {
 		rawirDataArray = new float[irSensorNumber];
 		irDataArray = new float[irSensorNumber];
 		ldrDataArray = new float[ldrSensorNumber];
+
     }
-
-
  
     public void FixedUpdate() {	
     	timeCurrent = Time.timeSinceLevelLoad;
+
     	// GATHERING IR DATA INFO.
     	int i = 0;
     	foreach(IR ir_sensor in ir_sensors) {
@@ -291,8 +318,11 @@ public class SimpleCarController : MonoBehaviour {
     		// print((photoScale(ldr_sensor.clacLightScore)).ToString());
     		j++;	
     	}
+
+
 		showArrayInformation(ldrDataArray, false);
 		showArrayInformation(irDataArray, false);
+		
 		//////////////////////COLLECT IR DATA.//////////////////////////////////////
 		foreach(IR ir_sensor in ir_sensors){
 			if((ir_sensor.hitWall == true) && (ir_sensor.name.Contains("FRONT"))) {
@@ -418,22 +448,18 @@ public class SimpleCarController : MonoBehaviour {
 			}
 		}
 
-		print("Front Bump Type: "+frontBumpType);
-		print("Back Bump Type: "+backBumpType);
-		
 		// DISPLAY FITNESS VALUES.
 		if (displayFitnessInfo){
 			print("IR collection score: "+numberCollidedIR);
 			print("LDR collection score: "+fitnessLDRscore);
 		}
+
 		irReadingArray = new int[4] {numberCollidedFrontIR, numberCollidedLeftIR, numberCollidedRightIR, 
 						  numberCollidedBackIR};
 		ldrReadingArray = new float[5] {LEFTfrontLDRreadings, RIGHTfrontLDRreadings, backLDRreadings, leftLDRreadings, rightLDRreadings};
 
 		maxOfLDRArray = ldrReadingArray.Max();
-		// print("Max of array is: "+ maxOfLDRArray);
  		maxLDRIndex = ldrReadingArray.ToList().IndexOf(maxOfLDRArray);
- 		// print("Max index is: " + maxLDRIndex);
 
  		if (timeCurrent >= (timeSet)) {	
 			finalFitnessCalculation();
@@ -444,21 +470,25 @@ public class SimpleCarController : MonoBehaviour {
 			if (timeCurrent <  timeSet) {	
 				evaluateTrialFitness(rawldrDataArray, rawirDataArray, chosenSensorArray);
  				// RUN THE NEURAL NETWORK: powers motors based on neural network calculation using provided params.h.
- 				NeuralNetwork.neuralNetwork(ldrDataArray, irDataArray, chosenSensorArray, frontBumpType, backBumpType, 4, 6, 2);
- 				// timeSet = (timeSet - timeCurrent);
- 				// print("TIME SET: " + timeCurrent);
+ 				// test.neuralNetwork(ldrDataArray, irDataArray, chosenSensorArray, frontBumpType, backBumpType, 4, 6, 2);
+				testNeuralStruct.beginNeuralNet(ldrDataArray, irDataArray, testParams.chosenSensorArray);
+				
+				testNeuralStruct.updateMotorValues();
+
  			} else if (timeCurrent >= timeSet){
  				stopMovement();
- 				reset();
- 				// Application.LoadLevel(0);
+ 				// reset();
  			}
  		} else {
  			// RUN MOVEMENT FUNCTION: powers motors based user input and fixed IR/Light calculations.
 			autoMovement(numberCollidedFrontIR, numberCollidedLeftIR, numberCollidedRightIR, numberCollidedBackIR, maxLDRIndex, ldrReadingArray, frontBumpType, backBumpType);
  		}
+
+ 		
  		// backBumpType = "";
  		frontBumpType = "";
     }
+
     // PRINTS INFORMATION ABOUT AN ARRAY.
     void showArrayInformation (Array arr, bool showORnah) {
     	if (showORnah) {
@@ -625,11 +655,6 @@ public class SimpleCarController : MonoBehaviour {
 		return (mapVal);
 	}
 
-
-    void mutate() {
-
-    }
-
     // Allows the user to control Landro using the arrow keys. Good for debugging and testing purposes.
     void arrowMove() {
     	WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
@@ -657,16 +682,6 @@ public class SimpleCarController : MonoBehaviour {
 	}
 
 
-
-
-    void generateBeginningGeneration() {
-
-    	
-
-    }
-
-    
-
-
+   
 
 }

@@ -1,15 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System;
-// using System.Math;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
-// using microsoft.xna.framework.dll;
 
-public class genomeHandler : MonoBehaviour {
-
-	System.Random rand = new System.Random();
+public class genomeHandler {
+System.Random rand = new System.Random();
 
 	////// STRUCT: gene
 	// 	This structure represents a single gene.
@@ -519,6 +516,7 @@ public class genomeHandler : MonoBehaviour {
 			// 	 throw new InvalidOperationException("The given jagged array is not rectangular.");
 			// }
 		} 
+
 	}
 
 	////// STRUCT: createParams
@@ -532,7 +530,8 @@ public class genomeHandler : MonoBehaviour {
 
 		public genome paramsGenome; 
 
-		public List<float> senseToInput;
+		public List<int> senseToInput;
+		public int[] chosenSensorArray;
 
 		public List<float[]> inputToHidden;
 		public List<float[]> hiddenToHidden;
@@ -581,6 +580,8 @@ public class genomeHandler : MonoBehaviour {
 
 			usedList = new List<int>();
 
+
+
 			inputIndexes = new List<int>();
 			hiddenIndexes = new List<int>();
 			outputIndexes = new List<int>();
@@ -591,7 +592,7 @@ public class genomeHandler : MonoBehaviour {
 			inputToOutput = new List<float[]>();
 			outputToHidden = new List<float[]>();
 
-			senseToInput = new List<float>();
+			senseToInput = new List<int>();
 
 			RMI = new List<int>();
 			LMI = new List<int>();
@@ -679,12 +680,12 @@ public class genomeHandler : MonoBehaviour {
 				if (!(usedList.Contains(con[0]))) {
 					if (paramsGenome.arrayOfGenes[con[0]].partType == 0) {
 						float tempOutput = (float)((((paramsGenome.arrayOfGenes[con[0]].angle)+22.5)/45)%8) * 2;
-						senseToInput.Add(tempOutput);
+						senseToInput.Add((int)tempOutput);
 						// Debug.Log("SENSE TO INPUT: "+ tempOutput);
 					}
 					if (paramsGenome.arrayOfGenes[con[0]].partType == 1) {
 						float tempOutput = (float)(((((paramsGenome.arrayOfGenes[con[0]].angle))/45)%8) * 2) + 1;
-						senseToInput.Add(tempOutput);
+						senseToInput.Add((int)tempOutput);
 						// Debug.Log("SENSE TO INPUT: "+ tempOutput);
 					}
 					usedList.Add(con[0]);
@@ -903,6 +904,7 @@ public class genomeHandler : MonoBehaviour {
 			hidden_to_hidden = To2D(hiddenToHidden.ToArray());
 			hidden_to_output = To2D(hiddenToOutput.ToArray());
 			output_to_hidden = To2D(outputToHidden.ToArray());
+			chosenSensorArray = senseToInput.ToArray();
 		}
 
 
@@ -982,66 +984,76 @@ public class genomeHandler : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-		Debug.Log("START");
+		// Debug.Log("START");
 
-		int maxSpawn = 100;
-		int vMax = 5;
-		int vDurationMin = 1;
-		int vDurationMax = 100;
-		int gMax = 3;
-		int gDurationMin = 1;
-		int gDurationMax = 100;
+		// // float[,] TESTinput_to_output = new float[4,2] {{0,0},{0,0},{0,0},{0,0}};
+		// // float[,] TESTinput_to_hidden = new float[4,6] {{0,0,1,-1,0,0},{0,0,-1,1,0,0},{1,-1,0,0,0,0},{-1,1,0,0,0,0}};
+		// // float[,] TESThidden_to_hidden = new float[6,6] {{0,0,0,0,1,0},{0,0,0,0,1,0},{0,0,0,0,0,1},{0,0,0,0,0,1},{0,0,0,0,0,0},{0,0,0,0,0,0}};
+		// // float[,] TESThidden_to_output = new float[6,2] {{0,0},{0,0},{0,0},{0,0},{1,-0.5f},{-0.5f,1}};
+		// // float[,] TESToutput_to_hidden = new float[2,6] {{0,0,0,0,0,0},{0,0,0,0,0,0}};
 
-		int numberOfGenes = 20;
-		// 8
+		// int maxSpawn = 100;
+		// int vMax = 5;
+		// int vDurationMin = 1;
+		// int vDurationMax = 100;
+		// int gMax = 3;
+		// int gDurationMin = 1;
+		// int gDurationMax = 100;
 
-		float dupeRate = 0.5f;
-		// .05
-		float muteRate = 0.05f;
-		// .05
-		float delRate = 0.01f;
-		// .01
-		float changePercent = 0.15f;
+		// int numberOfGenes = 20;
+		// // 8
 
-		// GENOME STRUCT - G->P STRUCT - PARAMS STRUCT
-		genome testGenome = new genome();
-		genomeToPhenotype testGtoP = new genomeToPhenotype();
-		createParams testParams = new createParams();
+		// float dupeRate = 0.5f;
+		// // .05
+		// float muteRate = 0.05f;
+		// // .05
+		// float delRate = 0.01f;
+		// // .01
+		// float changePercent = 0.15f;
 
-		// CREATING A GENOME:
-		testGenome.createRandomFunction();
-		testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
-		testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
-		testGenome.printGenomeContents();
+		// // GENOME STRUCT - G->P STRUCT - PARAMS STRUCT
+		// genome testGenome = new genome();
+		// genomeToPhenotype testGtoP = new genomeToPhenotype();
+		// createParams testParams = new createParams();
 
-		// RUNNING THE G-->P PROCESS:
-		testGtoP.passGenome(testGenome);
-		testGtoP.runDevoGraphics();
-		testGtoP.makeConnectome();
-		testGtoP.printConnectomeContents();
+		// // CREATING A GENOME:
+		// testGenome.createRandomFunction();
+		// testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
+		// testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
+		// testGenome.printGenomeContents();
 
-		// CREATING NEURAL NETWORK PARAMETERS
-		testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
-		testParams.setNodeLayerNumbers();
-		testParams.motorIndexes();
-		testParams.sensorToInputs();
-		testParams.createInputToHidden();
-		testParams.createHiddenToHidden();
-		testParams.createHiddenToOutput();
-		testParams.createInputToOutput();
-		testParams.createOutputToHidden();
-		testParams.finalToArray();
-		testParams.printParamsContents();
+		// // RUNNING THE G-->P PROCESS:
+		// testGtoP.passGenome(testGenome);
+		// testGtoP.runDevoGraphics();
+		// testGtoP.makeConnectome();
+		// testGtoP.printConnectomeContents();
+
+		// // CREATING NEURAL NETWORK PARAMETERS
+		// testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
+		// testParams.setNodeLayerNumbers();
+		// testParams.motorIndexes();
+		// testParams.sensorToInputs();
+		// testParams.createInputToHidden();
+		// testParams.createHiddenToHidden();
+		// testParams.createHiddenToOutput();
+		// testParams.createInputToOutput();
+		// testParams.createOutputToHidden();
+		// testParams.finalToArray();
+		// testParams.printParamsContents();
 
 
-		// DECLARE INSTANCE OF NEURAL NETWORK.
-		neuralNetworkHandler.NeuralNetworkParameters testNeuralStruct = new neuralNetworkHandler.NeuralNetworkParameters();
-		// int rmi, int lmi, int numIn, int numHid, int numOut
-		testNeuralStruct.setStartVariables(1,1,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
-		int[] rmiVal = new int[1] {0};
-		int[] lmiVal = new int[1] {1};
-		testNeuralStruct.setStartingArrays(rmiVal, lmiVal);
-		testNeuralStruct.setConnections(testParams.input_to_output,testParams.input_to_hidden,testParams.hidden_to_hidden, testParams.hidden_to_output, testParams.output_to_hidden);
+		// // DECLARE INSTANCE OF NEURAL NETWORK.
+		// neuralNetworkHandler.NeuralNetworkParameters testNeuralStruct = new neuralNetworkHandler.NeuralNetworkParameters();
+		// // int rmi, int lmi, int numIn, int numHid, int numOut
+		// testNeuralStruct.setStartVariables(1,1,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
+		// int[] rmiVal = new int[1] {0};
+		// int[] lmiVal = new int[1] {1};
+		// testNeuralStruct.setStartingArrays(rmiVal, lmiVal);
+		// testNeuralStruct.setConnections(testParams.input_to_output,testParams.input_to_hidden,testParams.hidden_to_hidden, testParams.hidden_to_output, testParams.output_to_hidden);
+
+
+		////  HERERERERERER
+
 
 		// MUTATE AND DELETE.
 		// testGenome.mutate();

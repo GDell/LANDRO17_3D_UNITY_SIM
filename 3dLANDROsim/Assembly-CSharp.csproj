@@ -50,8 +50,9 @@
      <Compile Include="Assets\BumpSensorBack.cs" />
      <Compile Include="Assets\_Scripts\IR.cs" />
      <Compile Include="Assets\_Scripts\LDR.cs" />
-     <Compile Include="Assets\_Scripts\NeuralNetwork.cs" />
+     <Compile Include="Assets\_Scripts\NeuralNetworkHandler.cs" />
      <Compile Include="Assets\_Scripts\SimpleCarController.cs" />
+     <Compile Include="Assets\_Scripts\genomeHandler.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
