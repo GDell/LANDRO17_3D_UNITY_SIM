@@ -87,7 +87,7 @@ System.Random rand = new System.Random();
 		public void createWholeGenome(int maxSpawn, int vMax, int vDurationMin, int vDurationMax, int gMax, int gDurationMin, int gDurationMax) {
 			// Debug.Log("Number of genes: " +numberOfGenes);
 			for (int j = 0; j < numberOfGenes; j++) {
-				int partType = rand.Next(0,4);
+				int partType = rand.Next(0,5);
 				int angle = rand.Next(0, 360);
 				int startTime =  rand.Next(0, maxSpawn);
 				int velocity = rand.Next(1, vMax);
@@ -553,6 +553,7 @@ System.Random rand = new System.Random();
 			foreach (var item in connectionMatrix) {
 
 				if (!(usedList.Contains(item[0]))) {
+					// Debug.Log("CONTAINS WORKS!!!!!!!!!!!!!");
 					if ((paramsGenome.arrayOfGenes[item[0]].partType == 0) || (paramsGenome.arrayOfGenes[item[0]].partType == 1)) {
 						NUM_INPUT = NUM_INPUT + 1;
 						inputIndexes.Add(item[0]);
@@ -570,6 +571,7 @@ System.Random rand = new System.Random();
 				}
 
 				if (!(usedList.Contains(item[1]))) {
+					// Debug.Log("CONTAINS WORKS!!!!!!!!!!!!!");
 					if (paramsGenome.arrayOfGenes[item[1]].partType == 2) {
 						NUM_HIDDEN = NUM_HIDDEN + 1;
 						hiddenIndexes.Add(item[1]);
@@ -588,28 +590,38 @@ System.Random rand = new System.Random();
 
 		public void motorIndexes() {
 			foreach (var connection in connectionMatrix) {
-
-				if ((!(usedList.Contains(connection[0]))) || (!(usedList.Contains(connection[1]))))  {
+				if ((!(usedList.Contains(connection[0])))) {
 
 					if (paramsGenome.arrayOfGenes[connection[0]].partType == 3) {
+						RMIlength = RMIlength + 1;
+						Debug.Log("RMI LENGHT INCREASED!");
+						RMI.Add(motorCount);
 						motorCount = motorCount + 1;
 					} 
 					if (paramsGenome.arrayOfGenes[connection[0]].partType == 4) {
+						LMIlength = LMIlength + 1;
+						Debug.Log("LMI LENGHT INCREASED!");
+						LMI.Add(motorCount);
 						motorCount = motorCount + 1;
 					}
+					usedList.Add(connection[0]);
+				} 
+				if (!(usedList.Contains(connection[1]))) {
+
 					if (paramsGenome.arrayOfGenes[connection[1]].partType == 3) {
 						RMIlength = RMIlength + 1;
+						Debug.Log("RMI LENGHT INCREASED!");
 						RMI.Add(motorCount);
 						motorCount = motorCount + 1;
 					}
 					if (paramsGenome.arrayOfGenes[connection[1]].partType == 4) {
 						LMIlength = LMIlength + 1;
+						Debug.Log("LMI LENGHT INCREASED!");
 						LMI.Add(motorCount);
 						motorCount = motorCount + 1;
 					}
-					usedList.Add(connection[0]);
 					usedList.Add(connection[1]);
-				}
+				}		
 			}
 			usedList = new List<int>();
 		}
@@ -847,12 +859,15 @@ System.Random rand = new System.Random();
 			chosenSensorArray = senseToInput.ToArray();
 			finalRMI = RMI.ToArray();
 			finalLMI = LMI.ToArray();
+
+			// LMIlength = finalLMI.Length;
+			// RMIlength = finalRMI.Length;
 		}
 
 
 		// CONVERTING JAGGED TO 2D ARRAY.
 		public T[,] To2D<T>(T[][] source) {
-	
+
 			T[,] result = new T[source.Length, source.Max(x => x.Length)];
 			for(var i = 0; i < source.Length; i++){
 			    for(var j = 0; j < source[i].Length; j++){
@@ -944,11 +959,11 @@ System.Random rand = new System.Random();
 		int meanNumberOfGenes;
 		int meanStandardDeviationOfGenes;
 
-		public void setGenerationParameters(int meanNumberOfGenes, int meanStandardDeviationOfGenes, int numberOfIndividualsInGeneration) {
+		public void setGenerationParameters(int meanNumberOfG, int meanStandardDeviationOfG, int numberOfInd) {
 			rand = new System.Random(); 
-			meanNumberOfGenes = meanNumberOfGenes;
-			meanStandardDeviationOfGenes = meanStandardDeviationOfGenes;
-			numberOfIndividualsInGeneration = numberOfIndividualsInGeneration;
+			meanNumberOfGenes = meanNumberOfG;
+			meanStandardDeviationOfGenes = meanStandardDeviationOfG;
+			numberOfIndividualsInGeneration = numberOfInd;
 		}
 
 		// testGenome.createRandomFunction();
@@ -989,13 +1004,14 @@ System.Random rand = new System.Random();
 			paramsCollection = new createParams[numberOfIndividualsInGeneration];
 		    neuralNetCollection = new NeuralNetworkHandler.NeuralNetworkParameters[numberOfIndividualsInGeneration];
 
+		    
+		    Debug.Log(numberOfIndividualsInGeneration);
 			int numGenes;
 			for (int i = 0; i < numberOfIndividualsInGeneration; i++) {
-				numGenes = createNumberOfGenes();
-				// 	public const float dupeRate = 0.05f;
-				// 	public const float muteRate = 0.05f;
-				// 	public const float delRate = 0.01f;
-				// 	public const float changePercent = 0.15f;
+
+				Debug.Log("IN THE FUNCTION!!!!");
+
+				// numGenes = createNumberOfGenes();
 
 				int maxSpawn = 100;
 				int vMax = 5;
@@ -1010,14 +1026,16 @@ System.Random rand = new System.Random();
 				float delRate = 0.01f;
 				float changePercent = 0.15f;
 
-				startGenerationGenomeCollection[i].createRandomFunction();
 
-				startGenerationGenomeCollection[i].setGenomeParameters(numGenes, dupeRate, muteRate, delRate, changePercent);
+				startGenerationGenomeCollection[i].createRandomFunction();
+				startGenerationGenomeCollection[i].setGenomeParameters(meanNumberOfGenes, dupeRate, muteRate, delRate, changePercent);
 				startGenerationGenomeCollection[i].createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
+				startGenerationGenomeCollection[i].printGenomeContents();
 
 				GtoPCollection[i].passGenome(startGenerationGenomeCollection[i]);
 				GtoPCollection[i].runDevoGraphics();
 				GtoPCollection[i].makeConnectome();
+				GtoPCollection[i].printConnectomeContents();
 
 				paramsCollection[i].passConnectionMatrix(GtoPCollection[i].sortedConnects, startGenerationGenomeCollection[i]);
 				paramsCollection[i].setNodeLayerNumbers();
@@ -1029,6 +1047,7 @@ System.Random rand = new System.Random();
 				paramsCollection[i].createInputToOutput();
 				paramsCollection[i].createOutputToHidden();
 				paramsCollection[i].finalToArray();
+				paramsCollection[i].printParamsContents();
 
 				neuralNetCollection[i].setStartVariables(paramsCollection[i].RMIlength, paramsCollection[i].LMIlength, paramsCollection[i].NUM_INPUT, paramsCollection[i].NUM_HIDDEN, paramsCollection[i].NUM_OUTPUT);
 				neuralNetCollection[i].setStartingArrays(paramsCollection[i].finalRMI, paramsCollection[i].finalLMI);
@@ -1038,10 +1057,10 @@ System.Random rand = new System.Random();
 			}
 		}
 
-		// This function will mutate and duplicate genomes in a generation.
-		public void mutateAndDuplicateGeneration() {
+		// // This function will mutate and duplicate genomes in a generation.
+		// public void mutateAndDuplicateGeneration() {
 
-		}
+		// }
 
 		// HELPER FUNCTIONS.
 		public int normalizeRandom(int minVal, int maxVal) {

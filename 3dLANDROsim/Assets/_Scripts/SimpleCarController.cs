@@ -105,6 +105,7 @@ public class SimpleCarController : MonoBehaviour {
 	public genomeHandler.createParams testParams = new genomeHandler.createParams();
 	public NeuralNetworkHandler.NeuralNetworkParameters testNeuralStruct = new NeuralNetworkHandler.NeuralNetworkParameters();
 
+	public genomeHandler.generation testGeneration = new genomeHandler.generation();
 
     // INITIALIZE SIMULATION.
     public void Start(){
@@ -122,6 +123,10 @@ public class SimpleCarController : MonoBehaviour {
 		float muteRate = 0.05f;
 		float delRate = 0.01f;
 		float changePercent = 0.15f;
+
+		// mean number of genes, number of standard deviations, number of individuals in a generation.
+		// testGeneration.setGenerationParameters(10, 2, 20); 
+		// testGeneration.createStartGeneration();
 
 		// CREATING A GENOME:
 		testGenome.createRandomFunction();
@@ -146,13 +151,13 @@ public class SimpleCarController : MonoBehaviour {
 		testParams.createInputToOutput();
 		testParams.createOutputToHidden();
 		testParams.finalToArray();
-		testParams.printParamsContents();
+		// testParams.printParamsContents();
 
 		// CREATING THE NEURAL NETWORK.
-		testNeuralStruct.setStartVariables(1,1,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
+		testNeuralStruct.setStartVariables(testParams.RMIlength,testParams.LMIlength,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
 		int[] rmiVal = new int[1] {0};
 		int[] lmiVal = new int[1] {1};
-		testNeuralStruct.setStartingArrays(rmiVal, lmiVal);
+		testNeuralStruct.setStartingArrays(testParams.finalRMI, testParams.finalLMI);
 		testNeuralStruct.setConnections(testParams.input_to_output,testParams.input_to_hidden,testParams.hidden_to_hidden, testParams.hidden_to_output, testParams.output_to_hidden);
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -679,7 +684,5 @@ public class SimpleCarController : MonoBehaviour {
     	}
 	}
 
-
-   
 
 }

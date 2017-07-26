@@ -201,25 +201,38 @@ public class NeuralNetworkHandler {
 		// GRAB AND UPDATE MOTOR OUTPUT VALUES. //
 		// Updates both nonScaled and scaled motor value arrays.
     	public void updateMotorValues() {
+
+    		string outputString = "RMI Length: " + RMI.Length + "Ouput length: " + output.Length + ". Contents: ";
+
+    		for (int i = 0; i < output.Length; i++) {
+    			outputString += output[i] + ", ";
+    		}
+
+    		Debug.Log("HERE IS LEFT MOTOR LENGth: " + LMILength);
+
+    		for(int i = 0; i < LMILength; i++){
+				nonScaledLMspeed += output[LMI[i]];
+				lmSpeed = motorScale(nonScaledLMspeed);
+				leftMotor.motorTorque = lmSpeed;
+				Debug.Log("LEFT MOTOR SPEED: " + lmSpeed);
+				// print("LM SPEED: "+ motorScale(lmSpeed));
+			 	// leftMotor.motorTorque = lmSpeed;
+				scaledMotorValsLR[0] = lmSpeed;
+				motorValsLR[0] = nonScaledLMspeed;
+			}
+
 			for(int i = 0; i < RMILength; i++){
 				nonScaledRMspeed += output[RMI[i]];
 				rmSpeed = motorScale(nonScaledRMspeed);
 				rightMotor.motorTorque = rmSpeed;
+				Debug.Log("RIGHT MOTOR TORQUE: " + rmSpeed);
 				// print("RM SPEED: "+ motorScale(rmSpeed));
 				// rightMotor.motorTorque = rmSpeed;
 				scaledMotorValsLR[1] = rmSpeed;
 				motorValsLR[1] = nonScaledRMspeed;
 			}
 			// CALCULATE LM SPEED FROM OUTPUT.
-			for(int i = 0; i < LMILength; i++){
-				nonScaledLMspeed += output[LMI[i]];
-				lmSpeed = motorScale(nonScaledLMspeed);
-				leftMotor.motorTorque = lmSpeed;
-				// print("LM SPEED: "+ motorScale(lmSpeed));
-			 	// leftMotor.motorTorque = lmSpeed;
-				scaledMotorValsLR[0] = lmSpeed;
-				motorValsLR[0] = nonScaledLMspeed;
-			}
+			
     	}
 	
     	// HELPER FUNCTIONS. \\
