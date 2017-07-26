@@ -6,9 +6,8 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 
 public class NeuralNetworkHandler {
-
    	
-// STRUCTURE FOR BUILDING AND RUNNING A NEURAL NET. \\
+	// STRUCTURE FOR BUILDING AND RUNNING A NEURAL NET. \\
 	public struct NeuralNetworkParameters {
 		public int RMILength; 
 		public int LMILength; 
@@ -43,13 +42,14 @@ public class NeuralNetworkHandler {
 		public WheelCollider leftMotor;
 
 		// Sets the starting input, hidden, and outut variables.
+		// Also grabs the right and left Landro motors such that the nueral network
+		// outputs can be used to drive them.
 		public void setStartVariables(int rmi, int lmi, int numIn, int numHid, int numOut) {
 			RMILength = rmi;
 			LMILength = lmi;
 			NUM_INPUT = numIn;
 			NUM_HIDDEN = numHid;
 			NUM_OUTPUT = numOut;
-
 
 			RMI = new int[RMILength];
 			LMI = new int[LMILength];
@@ -66,17 +66,16 @@ public class NeuralNetworkHandler {
 			rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
 		}
 
-		// Sets the beginning connection and node arrays, allocating the correct data sizes.
+		// Sets the beginning connection and node arrays, allocating the correct data sizes as
+		// generated through the g->p process (set in the setVariables function).
 		public void setStartingArrays(int[] rmiVal, int[] lmiVal) {
 			hidden = new float[NUM_HIDDEN]; 
 			old_hidden = new float[NUM_HIDDEN];
 			old_output = new float[NUM_OUTPUT];
 			output = new float[NUM_OUTPUT];
 
-
 			RMI = rmiVal;
 			LMI = lmiVal;
-
 
 			input_to_output = new float[NUM_INPUT, NUM_OUTPUT];
 			input_to_hidden = new float[NUM_INPUT, NUM_HIDDEN];
@@ -95,9 +94,8 @@ public class NeuralNetworkHandler {
 			output_to_hidden = outToHid;
 		}
 
-
-
-
+		// This function propagates information through a neural network. 
+		// Its outputs can then be used in the updateMotorValues function to drive landro's motors.
 		public void beginNeuralNet(float[] ldrSensorArray, float[] irSensorArray, int[] selectedSensors) {
 			int selectedArraySize = selectedSensors.Length;
 	    	int h, p, o, i;
@@ -206,7 +204,6 @@ public class NeuralNetworkHandler {
 			for(int i = 0; i < RMILength; i++){
 				nonScaledRMspeed += output[RMI[i]];
 				rmSpeed = motorScale(nonScaledRMspeed);
-
 				rightMotor.motorTorque = rmSpeed;
 				// print("RM SPEED: "+ motorScale(rmSpeed));
 				// rightMotor.motorTorque = rmSpeed;
@@ -217,7 +214,6 @@ public class NeuralNetworkHandler {
 			for(int i = 0; i < LMILength; i++){
 				nonScaledLMspeed += output[LMI[i]];
 				lmSpeed = motorScale(nonScaledLMspeed);
-
 				leftMotor.motorTorque = lmSpeed;
 				// print("LM SPEED: "+ motorScale(lmSpeed));
 			 	// leftMotor.motorTorque = lmSpeed;
@@ -226,7 +222,6 @@ public class NeuralNetworkHandler {
 			}
     	}
 	
-
     	// HELPER FUNCTIONS. \\
     	// Tanh activation function.
 		public float activation(float val) {

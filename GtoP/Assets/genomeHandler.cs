@@ -1012,13 +1012,13 @@ public class genomeHandler : MonoBehaviour {
 		testGenome.createRandomFunction();
 		testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
 		testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
-		testGenome.printGenomeContents();
+		// testGenome.printGenomeContents();
 
 		// RUNNING THE G-->P PROCESS:
 		testGtoP.passGenome(testGenome);
 		testGtoP.runDevoGraphics();
 		testGtoP.makeConnectome();
-		testGtoP.printConnectomeContents();
+		// testGtoP.printConnectomeContents();
 
 		// CREATING NEURAL NETWORK PARAMETERS
 		testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
@@ -1031,7 +1031,7 @@ public class genomeHandler : MonoBehaviour {
 		testParams.createInputToOutput();
 		testParams.createOutputToHidden();
 		testParams.finalToArray();
-		testParams.printParamsContents();
+		// testParams.printParamsContents();
 
 
 		// DECLARE INSTANCE OF NEURAL NETWORK.

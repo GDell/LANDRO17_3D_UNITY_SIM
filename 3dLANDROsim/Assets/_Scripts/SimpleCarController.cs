@@ -319,7 +319,6 @@ public class SimpleCarController : MonoBehaviour {
     		j++;	
     	}
 
-
 		showArrayInformation(ldrDataArray, false);
 		showArrayInformation(irDataArray, false);
 		
@@ -484,7 +483,6 @@ public class SimpleCarController : MonoBehaviour {
 			autoMovement(numberCollidedFrontIR, numberCollidedLeftIR, numberCollidedRightIR, numberCollidedBackIR, maxLDRIndex, ldrReadingArray, frontBumpType, backBumpType);
  		}
 
- 		
  		// backBumpType = "";
  		frontBumpType = "";
     }
