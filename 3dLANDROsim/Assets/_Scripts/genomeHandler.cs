@@ -16,10 +16,12 @@ System.Random rand = new System.Random();
 	//			INPUT: int maxSpawn,  int vMax, int vDurationMin, int vDurationMax, int gMax, int gDurationMin, int gDurationMax, int index
 	//			OUTPUT: a gene with --> (partType, angle, startTime, velocity, traveltime, growthRate, growthTime, index).
 	public struct gene {
+		// G-P Process information.
 		public double x;
 		public double y;
 		public float size;
 
+		// Gene properties.
 		public float partType;// # 0 = Part Type (0 = IR, 1 = Photo, 2 = Neuron, 3 = R Motor, 4 = L Motor)
 		public float angle;// # 1 = Angle
 		public float startTime;// # 2 = Start Time
@@ -255,7 +257,7 @@ System.Random rand = new System.Random();
 
 		public float size;
 
-		// Passes a genome into an instance of this struct.
+		// Passes a genome into an instance of this struct and sets G-P variables.
 		public void passGenome(genome thisGenome) {
 			givenGenome = thisGenome;
 			center = new float[2] {375,325};
@@ -518,8 +520,6 @@ System.Random rand = new System.Random();
 			paramsGenome = thisGenome;
 
 			usedList = new List<int>();
-
-
 
 			inputIndexes = new List<int>();
 			hiddenIndexes = new List<int>();
@@ -938,6 +938,7 @@ System.Random rand = new System.Random();
 	}
 
 
+
 		////// STRUCT: generation
 	// 	This structure represents a single generation, or a collection of genomes (individuals).
 	// 	Functions:
@@ -948,70 +949,40 @@ System.Random rand = new System.Random();
 	// 		createNumberOfGenes() : creates the number of genes for a given genome in the generation.
 	public struct generation {
 		System.Random rand;
+
+		// A generation is a set of individuals.
+		individual[] collectionOfIndividuals;
+
 		public int numberOfIndividualsInGeneration;
+		public int meanNumberOfGenes;
+		public int meanStandardDeviationOfGenes;
 
-		genome[] startGenerationGenomeCollection;
-		genomeToPhenotype[] GtoPCollection;
-		createParams[] paramsCollection;
-		NeuralNetworkHandler.NeuralNetworkParameters[] neuralNetCollection;
-
-		int numberOfGenes;
-		int meanNumberOfGenes;
-		int meanStandardDeviationOfGenes;
-
+		// FUNCTION: setGenerationParamters()
+		// This function sets a generations mean/sd regarding number of genes in each genome/individual of the generation.
+		// It also determines teh number of individuals in the generation.
 		public void setGenerationParameters(int meanNumberOfG, int meanStandardDeviationOfG, int numberOfInd) {
 			rand = new System.Random(); 
-			meanNumberOfGenes = meanNumberOfG;
+			// numberOfGenes = meanNumberOfG;
 			meanStandardDeviationOfGenes = meanStandardDeviationOfG;
 			numberOfIndividualsInGeneration = numberOfInd;
+			collectionOfIndividuals = new individual[numberOfInd];
 		}
 
-		// testGenome.createRandomFunction();
-		// testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
-		// testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
-		// testGenome.printGenomeContents();
-
-		// // RUNNING THE G-->P PROCESS:
-		// testGtoP.passGenome(testGenome);
-		// testGtoP.runDevoGraphics();
-		// testGtoP.makeConnectome();
-		// testGtoP.printConnectomeContents();
-
-		// // CREATING NEURAL NETWORK PARAMETERS
-		// testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
-		// testParams.setNodeLayerNumbers();
-		// testParams.motorIndexes();
-		// testParams.sensorToInputs();
-		// testParams.createInputToHidden();
-		// testParams.createHiddenToHidden();
-		// testParams.createHiddenToOutput();
-		// testParams.createInputToOutput();
-		// testParams.createOutputToHidden();
-		// testParams.finalToArray();
-		// testParams.printParamsContents();
-
-		// // CREATING THE NEURAL NETWORK.
-		// testNeuralStruct.setStartVariables(1,1,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
-		// int[] rmiVal = new int[1] {0};
-		// int[] lmiVal = new int[1] {1};
-		// testNeuralStruct.setStartingArrays(rmiVal, lmiVal);
-		// testNeuralStruct.setConnections(testParams.input_to_output,testParams.input_to_hidden,testParams.hidden_to_hidden, testParams.hidden_to_output, testParams.output_to_hidden);
-
-		//////////////////////////////////////////////
+		
+		// FUNCTION: createStartGeneratio()
+		// This function creates a start generation the size of which is determined in 
+		// the function setGenerationParameters().
 		public void createStartGeneration() {
-			startGenerationGenomeCollection = new genome[numberOfIndividualsInGeneration];
-			GtoPCollection = new genomeToPhenotype[numberOfIndividualsInGeneration];
-			paramsCollection = new createParams[numberOfIndividualsInGeneration];
-		    neuralNetCollection = new NeuralNetworkHandler.NeuralNetworkParameters[numberOfIndividualsInGeneration];
+	
+		    int generationLength = collectionOfIndividuals.Length;
+		    Debug.Log("Number of individuals in a generation: " + generationLength);
 
-		    
-		    Debug.Log(numberOfIndividualsInGeneration);
-			int numGenes;
-			for (int i = 0; i < numberOfIndividualsInGeneration; i++) {
 
-				Debug.Log("IN THE FUNCTION!!!!");
+			for (int i = 0; i < generationLength; i++) {
+				collectionOfIndividuals[i].createIndividualStructs();
+			}
 
-				// numGenes = createNumberOfGenes();
+			for (int i = 0; i < generationLength; i++) {
 
 				int maxSpawn = 100;
 				int vMax = 5;
@@ -1021,41 +992,49 @@ System.Random rand = new System.Random();
 				int gDurationMin = 1;
 				int gDurationMax = 100;
 
-				float dupeRate = 0.05f;
+				int numberOfGenes = 20;
+
+				float dupeRate = 0.5f;
 				float muteRate = 0.05f;
 				float delRate = 0.01f;
 				float changePercent = 0.15f;
 
+				// Creates a genome for each individual.
+				collectionOfIndividuals[i].genomeCollection.createRandomFunction();
+				collectionOfIndividuals[i].genomeCollection.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
+				collectionOfIndividuals[i].genomeCollection.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
+				collectionOfIndividuals[i].genomeCollection.printGenomeContents();
 
-				startGenerationGenomeCollection[i].createRandomFunction();
-				startGenerationGenomeCollection[i].setGenomeParameters(meanNumberOfGenes, dupeRate, muteRate, delRate, changePercent);
-				startGenerationGenomeCollection[i].createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
-				startGenerationGenomeCollection[i].printGenomeContents();
+				// Runs the G->P process on each individual's genome.
+				collectionOfIndividuals[i].GtoPCollection.passGenome(collectionOfIndividuals[i].genomeCollection);
+				collectionOfIndividuals[i].GtoPCollection.runDevoGraphics();
+				collectionOfIndividuals[i].GtoPCollection.makeConnectome();
+				collectionOfIndividuals[i].GtoPCollection.printConnectomeContents();
 
-				GtoPCollection[i].passGenome(startGenerationGenomeCollection[i]);
-				GtoPCollection[i].runDevoGraphics();
-				GtoPCollection[i].makeConnectome();
-				GtoPCollection[i].printConnectomeContents();
+				// Creates neural net parameters for each individual.
+				collectionOfIndividuals[i].paramsCollection.passConnectionMatrix(collectionOfIndividuals[i].GtoPCollection.sortedConnects, collectionOfIndividuals[i].genomeCollection);
+				collectionOfIndividuals[i].paramsCollection.setNodeLayerNumbers();
+				collectionOfIndividuals[i].paramsCollection.motorIndexes();
+				collectionOfIndividuals[i].paramsCollection.sensorToInputs();
+				collectionOfIndividuals[i].paramsCollection.createInputToHidden();
+				collectionOfIndividuals[i].paramsCollection.createHiddenToHidden();
+				collectionOfIndividuals[i].paramsCollection.createHiddenToOutput();
+				collectionOfIndividuals[i].paramsCollection.createInputToOutput();
+				collectionOfIndividuals[i].paramsCollection.createOutputToHidden();
+				collectionOfIndividuals[i].paramsCollection.finalToArray();
 
-				paramsCollection[i].passConnectionMatrix(GtoPCollection[i].sortedConnects, startGenerationGenomeCollection[i]);
-				paramsCollection[i].setNodeLayerNumbers();
-				paramsCollection[i].motorIndexes();
-				paramsCollection[i].sensorToInputs();
-				paramsCollection[i].createInputToHidden();
-				paramsCollection[i].createHiddenToHidden();
-				paramsCollection[i].createHiddenToOutput();
-				paramsCollection[i].createInputToOutput();
-				paramsCollection[i].createOutputToHidden();
-				paramsCollection[i].finalToArray();
-				paramsCollection[i].printParamsContents();
-
-				neuralNetCollection[i].setStartVariables(paramsCollection[i].RMIlength, paramsCollection[i].LMIlength, paramsCollection[i].NUM_INPUT, paramsCollection[i].NUM_HIDDEN, paramsCollection[i].NUM_OUTPUT);
-				neuralNetCollection[i].setStartingArrays(paramsCollection[i].finalRMI, paramsCollection[i].finalLMI);
-				neuralNetCollection[i].setConnections(paramsCollection[i].input_to_output, paramsCollection[i].input_to_hidden, paramsCollection[i].hidden_to_hidden, paramsCollection[i].hidden_to_output, paramsCollection[i].output_to_hidden);
-
+				// Creates a neural network for each individual.
+				collectionOfIndividuals[i].neuralNetCollection.setStartVariables(collectionOfIndividuals[i].paramsCollection.RMIlength, collectionOfIndividuals[i].paramsCollection.LMIlength, collectionOfIndividuals[i].paramsCollection.NUM_INPUT, collectionOfIndividuals[i].paramsCollection.NUM_HIDDEN, collectionOfIndividuals[i].paramsCollection.NUM_OUTPUT);
+				collectionOfIndividuals[i].neuralNetCollection.setStartingArrays(collectionOfIndividuals[i].paramsCollection.finalRMI, collectionOfIndividuals[i].paramsCollection.finalLMI);
+				collectionOfIndividuals[i].neuralNetCollection.setConnections(collectionOfIndividuals[i].paramsCollection.input_to_output, collectionOfIndividuals[i].paramsCollection.input_to_hidden, collectionOfIndividuals[i].paramsCollection.hidden_to_hidden, collectionOfIndividuals[i].paramsCollection.hidden_to_output, collectionOfIndividuals[i].paramsCollection.output_to_hidden);
 
 			}
+
 		}
+
+
+
+
 
 		// // This function will mutate and duplicate genomes in a generation.
 		// public void mutateAndDuplicateGeneration() {
@@ -1063,16 +1042,107 @@ System.Random rand = new System.Random();
 		// }
 
 		// HELPER FUNCTIONS.
-		public int normalizeRandom(int minVal, int maxVal) {
-			int mean = (minVal  + maxVal) /2;
-			int sigma = (maxVal = mean) / 3;
-			return rand.Next(mean, sigma);
+		// public int normalizeRandom(int minVal, int maxVal) {
+		// 	int mean = (minVal  + maxVal) /2;
+		// 	int sigma = (maxVal = mean) / 3;
+		// 	return rand.Next(mean, sigma);
+		// }
+
+		// public int createNumberOfGenes() {
+		// 	numberOfGenes = normalizeRandom(4,16);
+		// 	return numberOfGenes;
+		// }
+	}
+
+
+
+	public struct individual {
+		System.Random rand;
+
+		public genome genomeCollection;
+		public genomeToPhenotype GtoPCollection;
+		public createParams paramsCollection;
+		public NeuralNetworkHandler.NeuralNetworkParameters neuralNetCollection;
+
+		int numberOfGenes;
+		int meanNumberOfGenes;
+		int maxSpawn;
+		int vMax;
+		int vDurationMin;
+		int vDurationMax;
+		int gMax;
+		int gDurationMin;
+		int gDurationMax;
+		float dupeRate;
+		float muteRate;
+		float delRate;
+		float changePercent;
+
+
+		public void createIndividualStructs() {
+			// numberOfGenes = numGenes;
+			// maxSpawn = 100;
+			// vMax = 5;
+			// vDurationMin = 1;
+			// vDurationMax = 100;
+			// gMax = 3;
+			// gDurationMin = 1;
+			// gDurationMax = 100;
+
+			// dupeRate = 0.05f;
+			// muteRate = 0.05f;
+			// delRate = 0.01f;
+			// changePercent = 0.15f;
+			genomeCollection = new genome();
+			GtoPCollection = new genomeToPhenotype();
+			paramsCollection = new createParams();
+			neuralNetCollection = new NeuralNetworkHandler.NeuralNetworkParameters();
 		}
 
-		public int createNumberOfGenes() {
-			numberOfGenes = normalizeRandom(4,16);
-			return numberOfGenes;
+		public void createIndividual() {
+
+			makeIndividualGenome();
+			runGtoProcess();
+			createIndividualParams();
+			// makeIndividualNeuralNet();
 		}
+
+
+		public void makeIndividualGenome() {
+			genomeCollection.createRandomFunction();
+			genomeCollection.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
+			genomeCollection.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
+			genomeCollection.printGenomeContents();
+		}
+
+		public void runGtoProcess() {
+			GtoPCollection.passGenome(genomeCollection);
+			GtoPCollection.runDevoGraphics();
+			GtoPCollection.makeConnectome();
+			GtoPCollection.printConnectomeContents();
+		}
+
+		public void createIndividualParams() {
+			paramsCollection.passConnectionMatrix(GtoPCollection.sortedConnects, genomeCollection);
+			paramsCollection.setNodeLayerNumbers();
+			paramsCollection.motorIndexes();
+			paramsCollection.sensorToInputs();
+			paramsCollection.createInputToHidden();
+			paramsCollection.createHiddenToHidden();
+			paramsCollection.createHiddenToOutput();
+			paramsCollection.createInputToOutput();
+			paramsCollection.createOutputToHidden();
+			paramsCollection.finalToArray();
+			// paramsCollection.printParamsContents();
+		}
+
+		public void makeIndividualNeuralNet() {
+			neuralNetCollection.setStartVariables(paramsCollection.RMIlength, paramsCollection.LMIlength, paramsCollection.NUM_INPUT, paramsCollection.NUM_HIDDEN, paramsCollection.NUM_OUTPUT);
+			neuralNetCollection.setStartingArrays(paramsCollection.finalRMI, paramsCollection.finalLMI);
+			neuralNetCollection.setConnections(paramsCollection.input_to_output, paramsCollection.input_to_hidden, paramsCollection.hidden_to_hidden, paramsCollection.hidden_to_output, paramsCollection.output_to_hidden);
+		}
+
+
 	}
 
 	// Use this for initialization

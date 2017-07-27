@@ -98,13 +98,11 @@ public class SimpleCarController : MonoBehaviour {
    	public float meanIRscore;
    	public float meanLDRscore;
 
-
-	// GENOME STRUCT - G->P STRUCT - PARAMS STRUCT
+   	// TEST 
 	public genomeHandler.genome testGenome = new genomeHandler.genome();
 	public genomeHandler.genomeToPhenotype testGtoP = new genomeHandler.genomeToPhenotype();
 	public genomeHandler.createParams testParams = new genomeHandler.createParams();
 	public NeuralNetworkHandler.NeuralNetworkParameters testNeuralStruct = new NeuralNetworkHandler.NeuralNetworkParameters();
-
 	public genomeHandler.generation testGeneration = new genomeHandler.generation();
 
     // INITIALIZE SIMULATION.
@@ -125,7 +123,7 @@ public class SimpleCarController : MonoBehaviour {
 		float changePercent = 0.15f;
 
 		// mean number of genes, number of standard deviations, number of individuals in a generation.
-		// testGeneration.setGenerationParameters(10, 2, 20); 
+		// testGeneration.setGenerationParameters(20, 2, 20); 
 		// testGeneration.createStartGeneration();
 
 		// CREATING A GENOME:
@@ -155,8 +153,6 @@ public class SimpleCarController : MonoBehaviour {
 
 		// CREATING THE NEURAL NETWORK.
 		testNeuralStruct.setStartVariables(testParams.RMIlength,testParams.LMIlength,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
-		int[] rmiVal = new int[1] {0};
-		int[] lmiVal = new int[1] {1};
 		testNeuralStruct.setStartingArrays(testParams.finalRMI, testParams.finalLMI);
 		testNeuralStruct.setConnections(testParams.input_to_output,testParams.input_to_hidden,testParams.hidden_to_hidden, testParams.hidden_to_output, testParams.output_to_hidden);
 
@@ -471,13 +467,16 @@ public class SimpleCarController : MonoBehaviour {
 
  		// NEURALNETWORK && MOVEMENT CONTROL.
  		if(useNetwork) {
+
 			if (timeCurrent <  timeSet) {	
 				evaluateTrialFitness(rawldrDataArray, rawirDataArray, chosenSensorArray);
- 				// RUN THE NEURAL NETWORK: powers motors based on neural network calculation using provided params.h.
- 				// test.neuralNetwork(ldrDataArray, irDataArray, chosenSensorArray, frontBumpType, backBumpType, 4, 6, 2);
+ 			// 	RUN THE NEURAL NETWORK: powers motors based on neural network calculation using provided params.h.
+ 			// 	test.neuralNetwork(ldrDataArray, irDataArray, chosenSensorArray, frontBumpType, backBumpType, 4, 6, 2);
+			
 				testNeuralStruct.beginNeuralNet(ldrDataArray, irDataArray, testParams.chosenSensorArray);
 				
 				testNeuralStruct.updateMotorValues();
+
 
  			} else if (timeCurrent >= timeSet){
  				stopMovement();
