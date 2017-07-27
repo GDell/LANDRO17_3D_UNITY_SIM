@@ -43,6 +43,10 @@ public class SimpleCarController : MonoBehaviour {
     private LDR[] ldr_sensors;
     private BumpSensor[] bump_sensors;
     private BumpSensorBack[] backBump_sensors;
+
+	public WheelCollider rightMotor;
+	public WheelCollider leftMotor;
+
     // public NeuralNetwork neuralNet;
 
 	public int[] irReadingArray;
@@ -123,38 +127,38 @@ public class SimpleCarController : MonoBehaviour {
 		float changePercent = 0.15f;
 
 		// mean number of genes, number of standard deviations, number of individuals in a generation.
-		// testGeneration.setGenerationParameters(20, 2, 20); 
-		// testGeneration.createStartGeneration();
+		testGeneration.setGenerationParameters(20, 2, 20); 
+		testGeneration.createStartGeneration();
 
 		// CREATING A GENOME:
-		testGenome.createRandomFunction();
-		testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
-		testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
-		testGenome.printGenomeContents();
+		// testGenome.createRandomFunction();
+		// testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
+		// testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
+		// testGenome.printGenomeContents();
 
-		// RUNNING THE G-->P PROCESS:
-		testGtoP.passGenome(testGenome);
-		testGtoP.runDevoGraphics();
-		testGtoP.makeConnectome();
-		testGtoP.printConnectomeContents();
+		// // RUNNING THE G-->P PROCESS:
+		// testGtoP.passGenome(testGenome);
+		// testGtoP.runDevoGraphics();
+		// testGtoP.makeConnectome();
+		// testGtoP.printConnectomeContents();
 
-		// CREATING NEURAL NETWORK PARAMETERS
-		testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
-		testParams.setNodeLayerNumbers();
-		testParams.motorIndexes();
-		testParams.sensorToInputs();
-		testParams.createInputToHidden();
-		testParams.createHiddenToHidden();
-		testParams.createHiddenToOutput();
-		testParams.createInputToOutput();
-		testParams.createOutputToHidden();
-		testParams.finalToArray();
-		// testParams.printParamsContents();
+		// // CREATING NEURAL NETWORK PARAMETERS
+		// testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
+		// testParams.setNodeLayerNumbers();
+		// testParams.motorIndexes();
+		// testParams.sensorToInputs();
+		// testParams.createInputToHidden();
+		// testParams.createHiddenToHidden();
+		// testParams.createHiddenToOutput();
+		// testParams.createInputToOutput();
+		// testParams.createOutputToHidden();
+		// testParams.finalToArray();
+		// // testParams.printParamsContents();
 
-		// CREATING THE NEURAL NETWORK.
-		testNeuralStruct.setStartVariables(testParams.RMIlength,testParams.LMIlength,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
-		testNeuralStruct.setStartingArrays(testParams.finalRMI, testParams.finalLMI);
-		testNeuralStruct.setConnections(testParams.input_to_output,testParams.input_to_hidden,testParams.hidden_to_hidden, testParams.hidden_to_output, testParams.output_to_hidden);
+		// // CREATING THE NEURAL NETWORK.
+		// testNeuralStruct.setStartVariables(testParams.RMIlength,testParams.LMIlength,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
+		// testNeuralStruct.setStartingArrays(testParams.finalRMI, testParams.finalLMI);
+		// testNeuralStruct.setConnections(testParams.input_to_output,testParams.input_to_hidden,testParams.hidden_to_hidden, testParams.hidden_to_output, testParams.output_to_hidden);
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -176,7 +180,7 @@ public class SimpleCarController : MonoBehaviour {
     	// BOOLEAN TOGGLES.
 		displayFitnessInfo = false;
 			// T: use network, F: auto movement.
-		useNetwork = true;
+		useNetwork = false;
 			// T: enable print statements for bumper functions.
 		debugBumper = false;
 
@@ -300,6 +304,10 @@ public class SimpleCarController : MonoBehaviour {
     }
  
     public void FixedUpdate() {	
+
+    	leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
+		rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
+
     	timeCurrent = Time.timeSinceLevelLoad;
 
     	// GATHERING IR DATA INFO.
@@ -449,10 +457,10 @@ public class SimpleCarController : MonoBehaviour {
 		}
 
 		// DISPLAY FITNESS VALUES.
-		if (displayFitnessInfo){
-			print("IR collection score: "+numberCollidedIR);
-			print("LDR collection score: "+fitnessLDRscore);
-		}
+		// if (displayFitnessInfo){
+		// 	print("IR collection score: "+numberCollidedIR);
+		// 	print("LDR collection score: "+fitnessLDRscore);
+		// }
 
 		irReadingArray = new int[4] {numberCollidedFrontIR, numberCollidedLeftIR, numberCollidedRightIR, 
 						  numberCollidedBackIR};
@@ -467,16 +475,73 @@ public class SimpleCarController : MonoBehaviour {
 
  		// NEURALNETWORK && MOVEMENT CONTROL.
  		if(useNetwork) {
+ 			float turnTime = 20000f;
 
 			if (timeCurrent <  timeSet) {	
 				evaluateTrialFitness(rawldrDataArray, rawirDataArray, chosenSensorArray);
  			// 	RUN THE NEURAL NETWORK: powers motors based on neural network calculation using provided params.h.
  			// 	test.neuralNetwork(ldrDataArray, irDataArray, chosenSensorArray, frontBumpType, backBumpType, 4, 6, 2);
 			
-				testNeuralStruct.beginNeuralNet(ldrDataArray, irDataArray, testParams.chosenSensorArray);
+				// testNeuralStruct.beginNeuralNet(ldrDataArray, irDataArray, testParams.chosenSensorArray);
 				
-				testNeuralStruct.updateMotorValues();
+				if ((backBumpType == "") && (frontBumpType == "")) {
 
+					// testNeuralStruct.updateMotorValues();
+
+				} else if (frontBumpType == "leftFront") {
+					float time = 0f;
+					Debug.Log(frontBumpType);
+					while (time < turnTime) {
+						leftMotor.motorTorque = 5725;
+						rightMotor.motorTorque = -6000;
+						time = time + Time.deltaTime;
+					}
+				} else if (frontBumpType == "rightFront") {
+					float time = 0f;
+					Debug.Log(frontBumpType);
+					while (time < turnTime) {
+						leftMotor.motorTorque =	-6000;
+						rightMotor.motorTorque = 5725;
+						time = time + Time.deltaTime;
+					}
+				} else if (frontBumpType == "middleFront") {
+					float time = 0f;
+					Debug.Log(frontBumpType);
+					while (time < turnTime) {
+						leftMotor.motorTorque = 4500;
+						rightMotor.motorTorque = -4725;
+						time = time + Time.deltaTime;
+					} 
+				} else if (backBumpType == "middleBack") {
+					float time = 0f;
+					Debug.Log(backBumpType);
+					while (time < turnTime) {
+						leftMotor.motorTorque = 2000;
+						rightMotor.motorTorque = 2000;
+						time = time + Time.deltaTime;
+					}
+					backBumpType = "";
+				} else if (backBumpType == "rightBack") {
+					float time = 0f;
+					Debug.Log(backBumpType);
+					while (time < turnTime) {
+						leftMotor.motorTorque = -1000;
+						rightMotor.motorTorque = 725;
+						time = time + Time.deltaTime;
+					}
+					backBumpType = "";
+				} else if (backBumpType == "leftBack") {
+					float time = 0f;
+					Debug.Log(backBumpType);
+					while (time < turnTime) {
+						leftMotor.motorTorque = 725;
+						rightMotor.motorTorque = -1000;
+						time = time + Time.deltaTime;
+					}
+					backBumpType = "";
+				}
+
+				arrowMove();
 
  			} else if (timeCurrent >= timeSet){
  				stopMovement();

@@ -72,6 +72,7 @@ System.Random rand = new System.Random();
 			rand = new System.Random();
 		}
 
+		// FUNCTION: setGenomeParameters()
 		// Function to set the genome parameters.
 		public void setGenomeParameters(int numberOfGenesInGenome, float dupR, float muteR, float delR, float changeP) {
 			numberOfGenes = numberOfGenesInGenome;
@@ -85,6 +86,7 @@ System.Random rand = new System.Random();
 			// Debug.Log("PARAMETERS SET");
 		}
 
+		// FUNCTION: createWholeGenome()
 		// Creates the specified genome after setting parameters.
 		public void createWholeGenome(int maxSpawn, int vMax, int vDurationMin, int vDurationMax, int gMax, int gDurationMin, int gDurationMax) {
 			// Debug.Log("Number of genes: " +numberOfGenes);
@@ -99,10 +101,10 @@ System.Random rand = new System.Random();
 				// maxSpawn,  int vMax, int vDurationMin, int vDurationMax, int gMax, int gDurationMin, int gDurationMax, int geneNumber
 				arrayOfGenes[j].setGeneParameters(partType, angle, startTime, velocity, travelTime, growthRate, growthTime, j);
 			}
-			// Debug.Log("GENOME CREATED");
 		}
 
-		// Duplicates and deletes the different genes in a genome.
+		// FUNCTION: duplicateAndDelete()
+		// This function duplicates and deletes the different genes in a genome.
 		public void duplicateAndDelete() {
 			int numDeleted = 0;
 			// Int i for indexing which gene is doubled.
@@ -135,13 +137,6 @@ System.Random rand = new System.Random();
 				}
 			};
 				
-
-			// foreach (var item in arrayOfGenes) {
-
-			// 	// i = i +1;
-			// }
-
-			
 			int listCount =  geneDuplicatedAndNotDeleted.Count();
 			numberOfGenes = listCount;
 			// Debug.Log("SIZE OF LIST: "+listCount);
@@ -155,7 +150,8 @@ System.Random rand = new System.Random();
 
 		}
 
-		// Mutates the genes in the genome.
+		// FUNCTION: mutate()
+		// This function mutates all of the genes within a genome.
 		public void mutate() {
 			int lengthOfArray = arrayOfGenes.Length;
 			// Debug.Log("MUTE RATE: "+ muteRate);
@@ -194,6 +190,9 @@ System.Random rand = new System.Random();
 			}
 		}
 
+		// FUNCTION: printGenomeContents()
+		// This debugging function prints all of the genes in a genome 
+		// in addition to their contents/properties.
 		public void printGenomeContents() {
 			int lengthOfArray = numberOfGenes;
 			string printString = "";
@@ -206,15 +205,6 @@ System.Random rand = new System.Random();
 				printString += ", Travel time: "+arrayOfGenes[j].travelTime;
 				printString += ", Growth rate: "+arrayOfGenes[j].growthRate;
 				printString += ", Growth time: "+arrayOfGenes[j].growthTime;
-
-				// Debug.Log("PART TYPE: "+arrayOfGenes[j].partType);// 1
-				// Debug.Log("ANGLE: "+arrayOfGenes[j].angle);// 2
-				// Debug.Log("START TIME: "+arrayOfGenes[j].startTime);// 3
-				// Debug.Log("VELOCITY: "+arrayOfGenes[j].velocity);// 4
-				// Debug.Log("TRAVEL TIME: "+arrayOfGenes[j].travelTime);// 5
-				// Debug.Log("GROWTH RATE: "+arrayOfGenes[j].growthRate);// 6
-				// Debug.Log("GROWTH TIME: "+arrayOfGenes[j].growthTime);// 7
-				// Debug.Log("INDEX: "+arrayOfGenes[j].index);// 8
 			}
 			Debug.Log(printString);
 		}
@@ -415,14 +405,6 @@ System.Random rand = new System.Random();
 			for (int j = 0; j < lengthOfArrayRow; j++) {
 				for (int i = 0; i < lengthOfArrayCol; i++) {
 				printString += sortedConnectsArray[j,i] + ", ";
-				// Debug.Log("PART TYPE: "+arrayOfGenes[j].partType);// 1
-				// Debug.Log("ANGLE: "+arrayOfGenes[j].angle);// 2
-				// Debug.Log("START TIME: "+arrayOfGenes[j].startTime);// 3
-				// Debug.Log("VELOCITY: "+arrayOfGenes[j].velocity);// 4
-				// Debug.Log("TRAVEL TIME: "+arrayOfGenes[j].travelTime);// 5
-				// Debug.Log("GROWTH RATE: "+arrayOfGenes[j].growthRate);// 6
-				// Debug.Log("GROWTH TIME: "+arrayOfGenes[j].growthTime);// 7
-				// Debug.Log("INDEX: "+arrayOfGenes[j].index);// 8
 				}
 			}
 			Debug.Log(printString);
@@ -467,6 +449,7 @@ System.Random rand = new System.Random();
 
 		public genome paramsGenome; 
 
+		// Arrays that hold input information and what nodes to assign sensor input to.
 		public List<int> senseToInput;
 		public int[] chosenSensorArray;
 
@@ -476,9 +459,7 @@ System.Random rand = new System.Random();
 		public List<float[]> inputToOutput;
 		public List<float[]> outputToHidden;
 
-
 		public List<int[]> connectionMatrix;
-
 		public List<int> usedList;
 
 		public List<int> inputIndexes;
@@ -491,13 +472,10 @@ System.Random rand = new System.Random();
 		public int[] finalRMI;
 		public int[] finalLMI;
 
-
-
 		public int motorCount;
 
 		public int RMIlength;
 		public int LMIlength;
-
 
 		// Final resulting Params
 		public float[,] input_to_output;
@@ -509,9 +487,6 @@ System.Random rand = new System.Random();
 		public int NUM_INPUT;
 		public int NUM_HIDDEN;
 		public int NUM_OUTPUT;
-
-		// int[] rmiVal;
-		// int[] lmiVal;	
 
 		// Passes the current genome and its resulting connection matrix.
 		public void passConnectionMatrix(List<int[]> vConnect, genome thisGenome) {
@@ -588,19 +563,18 @@ System.Random rand = new System.Random();
 			usedList = new List<int>();
 		}
 
+		// Calculating which motor nodes to aggregate data from in order to drive the left and right motors.
 		public void motorIndexes() {
 			foreach (var connection in connectionMatrix) {
 				if ((!(usedList.Contains(connection[0])))) {
 
 					if (paramsGenome.arrayOfGenes[connection[0]].partType == 3) {
 						RMIlength = RMIlength + 1;
-						Debug.Log("RMI LENGHT INCREASED!");
 						RMI.Add(motorCount);
 						motorCount = motorCount + 1;
 					} 
 					if (paramsGenome.arrayOfGenes[connection[0]].partType == 4) {
 						LMIlength = LMIlength + 1;
-						Debug.Log("LMI LENGHT INCREASED!");
 						LMI.Add(motorCount);
 						motorCount = motorCount + 1;
 					}
@@ -610,13 +584,11 @@ System.Random rand = new System.Random();
 
 					if (paramsGenome.arrayOfGenes[connection[1]].partType == 3) {
 						RMIlength = RMIlength + 1;
-						Debug.Log("RMI LENGHT INCREASED!");
 						RMI.Add(motorCount);
 						motorCount = motorCount + 1;
 					}
 					if (paramsGenome.arrayOfGenes[connection[1]].partType == 4) {
 						LMIlength = LMIlength + 1;
-						Debug.Log("LMI LENGHT INCREASED!");
 						LMI.Add(motorCount);
 						motorCount = motorCount + 1;
 					}
@@ -644,15 +616,6 @@ System.Random rand = new System.Random();
 				}
 			}
 		}
-
-		//0 public float partType;// # 0 = Part Type (0 = IR, 1 = Photo, 2 = Neuron, 3 = R Motor, 4 = L Motor)
-		//1 public float angle;// # 1 = Angle
-		//2 public float startTime;// # 2 = Start Time
-		//3 public float velocity;// # 3 = Velocity
-		//4 public float travelTime;// # 4 = Travel Time
-		//5 public float growthRate;// # 5 = Growth Rate
-		//6 public float growthTime;// # 6 = Growth Time
-		//7 public float index;// # 7 = Index
 
 		// Creates the input to hidden connections.
 		public void createInputToHidden() {
@@ -690,8 +653,20 @@ System.Random rand = new System.Random();
 						// Debug.Log("Only a zero was added from input to hidden.");
 					}
 				}
+
+				// // NOT SURE IF CORRECT
+				// if (NUM_HIDDEN == 0) {
+				// 	tempInput.Add(0);
+				// }
+
 				inputToHidden.Add(tempInput.ToArray());
 			}
+
+			if (NUM_INPUT == 0) {
+				List<float> tempInput = new List<float>();
+				inputToHidden.Add(tempInput.ToArray());
+			}
+
 			Debug.Log("Input to Hidden: "+listFloatArrayToString(inputToHidden));
 		}
 
@@ -728,8 +703,20 @@ System.Random rand = new System.Random();
 						tempHidden.Add(0);
 					}
 				}
+
+				// // NOT SURE IF CORRECT
+				// if (NUM_HIDDEN == 0) {
+				// 	tempHidden.Add(0);
+				// }
+
 				hiddenToHidden.Add(tempHidden.ToArray());
 			}
+
+			if (NUM_HIDDEN == 0) {
+				List<float> tempHidden = new List<float>();
+				hiddenToHidden.Add(tempHidden.ToArray());
+			}	
+
 			Debug.Log("Hidden to Hidden: "+listFloatArrayToString(hiddenToHidden));
 		}
 
@@ -767,8 +754,20 @@ System.Random rand = new System.Random();
 						tempOutput.Add(0);
 					}
 				}
+
+				// // NOT SURE IF CORRECT
+				// if (NUM_OUTPUT == 0) {
+				// 	tempOutput.Add(0);
+				// }
+
 				hiddenToOutput.Add(tempOutput.ToArray());
 			}
+
+			if (NUM_HIDDEN == 0) {
+				List<float> tempOutput = new List<float>();
+				hiddenToOutput.Add(tempOutput.ToArray());
+			}
+
 			Debug.Log("Hidden to Output: "+listFloatArrayToString(hiddenToOutput));
 		}
 
@@ -806,8 +805,20 @@ System.Random rand = new System.Random();
 						tempOutput.Add(0);
 					}
 				}
+
+				// // NOT SURE IF CORRECT
+				// if (NUM_OUTPUT == 0) {
+				// 	tempOutput.Add(0);
+				// }
+
 				inputToOutput.Add(tempOutput.ToArray());
 			}
+
+			if (NUM_INPUT == 0) {
+				List<float> tempOutput = new List<float>();
+				inputToOutput.Add(tempOutput.ToArray());
+			}
+
 			Debug.Log("Input to Output: "+listFloatArrayToString(inputToOutput));
 		}
 
@@ -843,41 +854,69 @@ System.Random rand = new System.Random();
 						tempOutput.Add(0);
 					}
 				}
+
 				outputToHidden.Add(tempOutput.ToArray());
 			}
+
+			if (NUM_OUTPUT == 0) {
+				List<float> tempOutput = new List<float>();
+				outputToHidden.Add(tempOutput.ToArray());
+			}
+
 			Debug.Log("Ouput to Hidden: "+listFloatArrayToString(outputToHidden));
 		}
 
 		// Turns the generated lists into jagged arrays and then into 2D arrays such that they
 		// may be fed into the neural network.
 		public void finalToArray() {
+			Debug.Log("IN TO OUT: "+listFloatArrayToString(inputToOutput));
 			input_to_output = To2D(inputToOutput.ToArray());
+
+			Debug.Log("IN TO HID: "+listFloatArrayToString(inputToHidden));
 			input_to_hidden = To2D(inputToHidden.ToArray());
+
+			Debug.Log("HID TO HID: "+listFloatArrayToString(hiddenToHidden));
 			hidden_to_hidden = To2D(hiddenToHidden.ToArray());
+
+			Debug.Log("HID TO OUT: "+listFloatArrayToString(hiddenToOutput));
 			hidden_to_output = To2D(hiddenToOutput.ToArray());
+
+			Debug.Log("OUT TO HID: "+listFloatArrayToString(outputToHidden));
 			output_to_hidden = To2D(outputToHidden.ToArray());
+
 			chosenSensorArray = senseToInput.ToArray();
 			finalRMI = RMI.ToArray();
 			finalLMI = LMI.ToArray();
-
-			// LMIlength = finalLMI.Length;
-			// RMIlength = finalRMI.Length;
 		}
 
 
-		// CONVERTING JAGGED TO 2D ARRAY.
+		// FUNCTION: To2D()
+		// This function takes a jagged array[][] and transforms it into a 
+		// 2Dimensional array[,]. 
 		public T[,] To2D<T>(T[][] source) {
-
-			T[,] result = new T[source.Length, source.Max(x => x.Length)];
-			for(var i = 0; i < source.Length; i++){
-			    for(var j = 0; j < source[i].Length; j++){
-			        result[i, j] = source[i][j];
-			    }
-			}
-			return result;
+			// T[,] result = new T[source.Length, source.Max(x => x.Length)];
+			// for(var i = 0; i < source.Length; i++){
+			//     for(var j = 0; j < source[i].Length; j++){
+			//         result[i, j] = source[i][j];
+			//     }
+			// }
+			// return result;
+			int FirstDim = source.Length;
+			int SecondDim = source.GroupBy(row => row.Length).Single().Key;
+				var result = new T[FirstDim, SecondDim];
+				for (int i = 0; i < FirstDim; i++) {
+					for (int j = 0; j < SecondDim; j++) {
+						result[i,j] = source[i][j];
+					}
+				}
+				return result;
 		} 
 
-		// PRINTING DEBUG FUNCTIONS.
+	
+
+		// FUNCTION: printParamsContents()
+		// This function prints the paramters generated by the create 
+		// params struct and its methods.
 		public void printParamsContents() {
 			string printString = "PARAMTERS CONTENTS: ";
 			printString += "Input to output: " + print2Darrays(input_to_output) + ". ";
@@ -885,11 +924,6 @@ System.Random rand = new System.Random();
 			printString += "Hidden to hidden: " + print2Darrays(hidden_to_hidden) + ". ";
 			printString += "Hidden to output: " + print2Darrays(hidden_to_output) + ". ";
 			printString += "Output to hidden: " + print2Darrays(output_to_hidden) + ". ";
-			// printString += "Input to output: " + arrayToString(inputToOutput) + ". ";
-			// printString += "Input to hidden: " + arrayToString(inputToHidden) + ". ";
-			// printString += "Hidden to hidden: " + arrayToString(hiddenToHidden) + ". ";
-			// printString += "Hidden to output: " + arrayToString(hiddenToOutput) + ". ";
-			// printString += "Output to hidden: " + arrayToString(outputToHidden) + ". ";
 			string printString1 = "NODE NUMBERS: ";
 			printString1 += "|| Num input: " + NUM_INPUT;
 			printString1 += "|| Num hidden: " + NUM_HIDDEN;
@@ -968,8 +1002,7 @@ System.Random rand = new System.Random();
 			collectionOfIndividuals = new individual[numberOfInd];
 		}
 
-		
-		// FUNCTION: createStartGeneratio()
+		// FUNCTION: createStartGeneration()
 		// This function creates a start generation the size of which is determined in 
 		// the function setGenerationParameters().
 		public void createStartGeneration() {
@@ -1032,14 +1065,15 @@ System.Random rand = new System.Random();
 
 		}
 
-
-
-
-
-		// // This function will mutate and duplicate genomes in a generation.
-		// public void mutateAndDuplicateGeneration() {
-
-		// }
+		// FUNCTION: mutateAndDuplicateGeneration()
+		// This function will mutate and duplicate all of the genomes/individuals in a generation.
+		public void mutateAndDuplicateGeneration() {
+			int generationLength = collectionOfIndividuals.Length;
+			for (int i = 0; i < generationLength; i++) {
+				collectionOfIndividuals[i].genomeCollection.duplicateAndDelete();
+				collectionOfIndividuals[i].genomeCollection.mutate();
+			}
+		}
 
 		// HELPER FUNCTIONS.
 		// public int normalizeRandom(int minVal, int maxVal) {
@@ -1079,70 +1113,55 @@ System.Random rand = new System.Random();
 		float changePercent;
 
 
-		public void createIndividualStructs() {
-			// numberOfGenes = numGenes;
-			// maxSpawn = 100;
-			// vMax = 5;
-			// vDurationMin = 1;
-			// vDurationMax = 100;
-			// gMax = 3;
-			// gDurationMin = 1;
-			// gDurationMax = 100;
-
-			// dupeRate = 0.05f;
-			// muteRate = 0.05f;
-			// delRate = 0.01f;
-			// changePercent = 0.15f;
+		 public void createIndividualStructs() {
 			genomeCollection = new genome();
 			GtoPCollection = new genomeToPhenotype();
 			paramsCollection = new createParams();
 			neuralNetCollection = new NeuralNetworkHandler.NeuralNetworkParameters();
 		}
 
-		public void createIndividual() {
+		// public void createIndividual() {
 
-			makeIndividualGenome();
-			runGtoProcess();
-			createIndividualParams();
-			// makeIndividualNeuralNet();
-		}
-
-
-		public void makeIndividualGenome() {
-			genomeCollection.createRandomFunction();
-			genomeCollection.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
-			genomeCollection.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
-			genomeCollection.printGenomeContents();
-		}
-
-		public void runGtoProcess() {
-			GtoPCollection.passGenome(genomeCollection);
-			GtoPCollection.runDevoGraphics();
-			GtoPCollection.makeConnectome();
-			GtoPCollection.printConnectomeContents();
-		}
-
-		public void createIndividualParams() {
-			paramsCollection.passConnectionMatrix(GtoPCollection.sortedConnects, genomeCollection);
-			paramsCollection.setNodeLayerNumbers();
-			paramsCollection.motorIndexes();
-			paramsCollection.sensorToInputs();
-			paramsCollection.createInputToHidden();
-			paramsCollection.createHiddenToHidden();
-			paramsCollection.createHiddenToOutput();
-			paramsCollection.createInputToOutput();
-			paramsCollection.createOutputToHidden();
-			paramsCollection.finalToArray();
-			// paramsCollection.printParamsContents();
-		}
-
-		public void makeIndividualNeuralNet() {
-			neuralNetCollection.setStartVariables(paramsCollection.RMIlength, paramsCollection.LMIlength, paramsCollection.NUM_INPUT, paramsCollection.NUM_HIDDEN, paramsCollection.NUM_OUTPUT);
-			neuralNetCollection.setStartingArrays(paramsCollection.finalRMI, paramsCollection.finalLMI);
-			neuralNetCollection.setConnections(paramsCollection.input_to_output, paramsCollection.input_to_hidden, paramsCollection.hidden_to_hidden, paramsCollection.hidden_to_output, paramsCollection.output_to_hidden);
-		}
+		// 	makeIndividualGenome();
+		// 	runGtoProcess();
+		// 	createIndividualParams();
+		// 	// makeIndividualNeuralNet();
+		// }
 
 
+		// public void makeIndividualGenome() {
+		// 	genomeCollection.createRandomFunction();
+		// 	genomeCollection.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
+		// 	genomeCollection.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
+		// 	genomeCollection.printGenomeContents();
+		// }
+
+		// public void runGtoProcess() {
+		// 	GtoPCollection.passGenome(genomeCollection);
+		// 	GtoPCollection.runDevoGraphics();
+		// 	GtoPCollection.makeConnectome();
+		// 	GtoPCollection.printConnectomeContents();
+		// }
+
+		// public void createIndividualParams() {
+		// 	paramsCollection.passConnectionMatrix(GtoPCollection.sortedConnects, genomeCollection);
+		// 	paramsCollection.setNodeLayerNumbers();
+		// 	paramsCollection.motorIndexes();
+		// 	paramsCollection.sensorToInputs();
+		// 	paramsCollection.createInputToHidden();
+		// 	paramsCollection.createHiddenToHidden();
+		// 	paramsCollection.createHiddenToOutput();
+		// 	paramsCollection.createInputToOutput();
+		// 	paramsCollection.createOutputToHidden();
+		// 	paramsCollection.finalToArray();
+		// 	// paramsCollection.printParamsContents();
+		// }
+
+		// public void makeIndividualNeuralNet() {
+		// 	neuralNetCollection.setStartVariables(paramsCollection.RMIlength, paramsCollection.LMIlength, paramsCollection.NUM_INPUT, paramsCollection.NUM_HIDDEN, paramsCollection.NUM_OUTPUT);
+		// 	neuralNetCollection.setStartingArrays(paramsCollection.finalRMI, paramsCollection.finalLMI);
+		// 	neuralNetCollection.setConnections(paramsCollection.input_to_output, paramsCollection.input_to_hidden, paramsCollection.hidden_to_hidden, paramsCollection.hidden_to_output, paramsCollection.output_to_hidden);
+		// }
 	}
 
 	// Use this for initialization

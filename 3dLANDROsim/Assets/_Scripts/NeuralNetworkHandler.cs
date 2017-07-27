@@ -208,13 +208,12 @@ public class NeuralNetworkHandler {
     			outputString += output[i] + ", ";
     		}
 
-    		Debug.Log("HERE IS LEFT MOTOR LENGth: " + LMILength);
 
     		for(int i = 0; i < LMILength; i++){
 				nonScaledLMspeed += output[LMI[i]];
 				lmSpeed = motorScale(nonScaledLMspeed);
 				leftMotor.motorTorque = lmSpeed;
-				Debug.Log("LEFT MOTOR SPEED: " + lmSpeed);
+				// Debug.Log("LEFT MOTOR SPEED: " + lmSpeed);
 				// print("LM SPEED: "+ motorScale(lmSpeed));
 			 	// leftMotor.motorTorque = lmSpeed;
 				scaledMotorValsLR[0] = lmSpeed;
@@ -225,7 +224,7 @@ public class NeuralNetworkHandler {
 				nonScaledRMspeed += output[RMI[i]];
 				rmSpeed = motorScale(nonScaledRMspeed);
 				rightMotor.motorTorque = rmSpeed;
-				Debug.Log("RIGHT MOTOR TORQUE: " + rmSpeed);
+				// Debug.Log("RIGHT MOTOR TORQUE: " + rmSpeed);
 				// print("RM SPEED: "+ motorScale(rmSpeed));
 				// rightMotor.motorTorque = rmSpeed;
 				scaledMotorValsLR[1] = rmSpeed;
