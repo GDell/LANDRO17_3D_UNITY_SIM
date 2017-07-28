@@ -1047,9 +1047,12 @@ System.Random rand = new System.Random();
 		individual[] collectionOfIndividuals;
 
 		public int numberOfIndividualsInGeneration;
-		public int meanNumberOfGenes;
+		public int numberOfGenes;
 		public int meanStandardDeviationOfGenes;
+
 		public int individualIndex;
+
+		bool done;
 
 		// FUNCTION: setGenerationParamters()
 		// This function sets a generations mean/sd regarding number of genes in each genome/individual of the generation.
@@ -1061,6 +1064,7 @@ System.Random rand = new System.Random();
 			numberOfIndividualsInGeneration = numberOfInd;
 			collectionOfIndividuals = new individual[numberOfInd];
 			individualIndex = 0;
+			done = false;
 		}
 
 		// FUNCTION: createStartGeneration()
@@ -1088,7 +1092,7 @@ System.Random rand = new System.Random();
 				int gDurationMin = 1;
 				int gDurationMax = 100;
 
-				int numberOfGenes = 20;
+				numberOfGenes = 20;
 
 				float dupeRate = 0.5f;
 				float muteRate = 0.05f;
@@ -1126,6 +1130,8 @@ System.Random rand = new System.Random();
 			}
 		}
 
+		
+
 
 		// FUNCTION: nextIndividual() 
 		// This function iterates the individualIndex number as long as it is 
@@ -1136,6 +1142,7 @@ System.Random rand = new System.Random();
 				individualIndex = individualIndex + 1;
 			} else {
 				Debug.Log("ENTIRE GENERATION HAS BEEN RUN");
+				done = true;
 			}
 		}
 

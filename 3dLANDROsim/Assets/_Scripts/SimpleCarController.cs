@@ -102,6 +102,10 @@ public class SimpleCarController : MonoBehaviour {
    	public float meanIRscore;
    	public float meanLDRscore;
 
+
+   	public int currentIndex;
+   	public int numberOfindividuals;
+
    	/////  TEST STRUCTURES
    	// Genome
 	public genomeHandler.genome testGenome = new genomeHandler.genome();
@@ -134,7 +138,8 @@ public class SimpleCarController : MonoBehaviour {
 		// Test for creating a generation.
 		testGeneration.setGenerationParameters(20, 2, 20); 
 		testGeneration.createStartGeneration();
-
+		// currrentInd = testGeneration.individualIndex;
+		// individualLength = testGeneration.collectionOfIndividuals.Length;
 		// CREATING A GENOME:
 		// testGenome.createRandomFunction();
 		// testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
@@ -689,7 +694,18 @@ public class SimpleCarController : MonoBehaviour {
     	overallFitnessScore = 0;
     	timeCurrent = 0;
     	timeSet = timeTrial;
-    	SceneManager.LoadScene("Experiment");
+    	currentIndex = testGeneration.individualIndex;
+    	numberOfindividuals = testGeneration.numberOfIndividualsInGeneration;
+
+    	if (currentIndex < numberOfindividuals) {
+    		testGeneration.nextIndividual();
+    		currentIndex = testGeneration.individualIndex;
+    		SceneManager.LoadScene("Experiment");
+   		} else {
+   			Debug.Log("End of generation");
+   		}
+
+
     }
     // Use to stop all movement of Landro.
     void stopMovement() {
