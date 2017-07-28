@@ -50,6 +50,7 @@
      <Compile Include="Assets\BumpSensorBack.cs" />
      <Compile Include="Assets\_Scripts\IR.cs" />
      <Compile Include="Assets\_Scripts\LDR.cs" />
+     <Compile Include="Assets\_Scripts\MainMenu.cs" />
      <Compile Include="Assets\_Scripts\NeuralNetworkHandler.cs" />
      <Compile Include="Assets\_Scripts\SimpleCarController.cs" />
      <Compile Include="Assets\_Scripts\genomeHandler.cs" />

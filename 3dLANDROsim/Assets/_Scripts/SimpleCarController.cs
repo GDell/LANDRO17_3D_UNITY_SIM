@@ -102,11 +102,16 @@ public class SimpleCarController : MonoBehaviour {
    	public float meanIRscore;
    	public float meanLDRscore;
 
-   	// TEST 
+   	/////  TEST STRUCTURES
+   	// Genome
 	public genomeHandler.genome testGenome = new genomeHandler.genome();
+	// G-->P
 	public genomeHandler.genomeToPhenotype testGtoP = new genomeHandler.genomeToPhenotype();
+	// Parameters 
 	public genomeHandler.createParams testParams = new genomeHandler.createParams();
+	// Neural Network
 	public NeuralNetworkHandler.NeuralNetworkParameters testNeuralStruct = new NeuralNetworkHandler.NeuralNetworkParameters();
+	// Generation
 	public genomeHandler.generation testGeneration = new genomeHandler.generation();
 
     // INITIALIZE SIMULATION.
@@ -126,7 +131,7 @@ public class SimpleCarController : MonoBehaviour {
 		float delRate = 0.01f;
 		float changePercent = 0.15f;
 
-		// mean number of genes, number of standard deviations, number of individuals in a generation.
+		// Test for creating a generation.
 		testGeneration.setGenerationParameters(20, 2, 20); 
 		testGeneration.createStartGeneration();
 
@@ -456,12 +461,6 @@ public class SimpleCarController : MonoBehaviour {
 			}
 		}
 
-		// DISPLAY FITNESS VALUES.
-		// if (displayFitnessInfo){
-		// 	print("IR collection score: "+numberCollidedIR);
-		// 	print("LDR collection score: "+fitnessLDRscore);
-		// }
-
 		irReadingArray = new int[4] {numberCollidedFrontIR, numberCollidedLeftIR, numberCollidedRightIR, 
 						  numberCollidedBackIR};
 		ldrReadingArray = new float[5] {LEFTfrontLDRreadings, RIGHTfrontLDRreadings, backLDRreadings, leftLDRreadings, rightLDRreadings};
@@ -475,70 +474,74 @@ public class SimpleCarController : MonoBehaviour {
 
  		// NEURALNETWORK && MOVEMENT CONTROL.
  		if(useNetwork) {
- 			float turnTime = 20000f;
+ 			float turnTime = 10000f;
 
 			if (timeCurrent <  timeSet) {	
+
 				evaluateTrialFitness(rawldrDataArray, rawirDataArray, chosenSensorArray);
+
  			// 	RUN THE NEURAL NETWORK: powers motors based on neural network calculation using provided params.h.
- 			// 	test.neuralNetwork(ldrDataArray, irDataArray, chosenSensorArray, frontBumpType, backBumpType, 4, 6, 2);
-			
+ 			
 				// testNeuralStruct.beginNeuralNet(ldrDataArray, irDataArray, testParams.chosenSensorArray);
 				
 				if ((backBumpType == "") && (frontBumpType == "")) {
 
-					// testNeuralStruct.updateMotorValues();
+					testNeuralStruct.updateMotorValues();
 
 				} else if (frontBumpType == "leftFront") {
+					Debug.Log("FORCE APPLIED FOR BRAKES");
 					float time = 0f;
 					Debug.Log(frontBumpType);
 					while (time < turnTime) {
-						leftMotor.motorTorque = 5725;
-						rightMotor.motorTorque = -6000;
+						leftMotor.motorTorque = 118725;
+						rightMotor.motorTorque = -119000;
 						time = time + Time.deltaTime;
 					}
 				} else if (frontBumpType == "rightFront") {
+					Debug.Log("FORCE APPLIED FOR BRAKES");
 					float time = 0f;
 					Debug.Log(frontBumpType);
 					while (time < turnTime) {
-						leftMotor.motorTorque =	-6000;
-						rightMotor.motorTorque = 5725;
+						leftMotor.motorTorque =	-119000;
+						rightMotor.motorTorque = 118725;
 						time = time + Time.deltaTime;
 					}
 				} else if (frontBumpType == "middleFront") {
+					Debug.Log("FORCE APPLIED FOR BRAKES");
 					float time = 0f;
 					Debug.Log(frontBumpType);
 					while (time < turnTime) {
-						leftMotor.motorTorque = 4500;
-						rightMotor.motorTorque = -4725;
+						leftMotor.motorTorque = 117500;
+						rightMotor.motorTorque = -117725;
 						time = time + Time.deltaTime;
 					} 
 				} else if (backBumpType == "middleBack") {
+					Debug.Log("FORCE APPLIED FOR BRAKES");
 					float time = 0f;
 					Debug.Log(backBumpType);
 					while (time < turnTime) {
-						leftMotor.motorTorque = 2000;
-						rightMotor.motorTorque = 2000;
+						leftMotor.motorTorque = 115000;
+						rightMotor.motorTorque = 115000;
 						time = time + Time.deltaTime;
 					}
-					backBumpType = "";
 				} else if (backBumpType == "rightBack") {
+					Debug.Log("FORCE APPLIED FOR BRAKES");
 					float time = 0f;
 					Debug.Log(backBumpType);
 					while (time < turnTime) {
-						leftMotor.motorTorque = -1000;
-						rightMotor.motorTorque = 725;
+						leftMotor.motorTorque = -114000;
+						rightMotor.motorTorque = 113725;
 						time = time + Time.deltaTime;
 					}
-					backBumpType = "";
 				} else if (backBumpType == "leftBack") {
+					Debug.Log("FORCE APPLIED FOR BRAKES");
 					float time = 0f;
 					Debug.Log(backBumpType);
 					while (time < turnTime) {
-						leftMotor.motorTorque = 725;
-						rightMotor.motorTorque = -1000;
+						leftMotor.motorTorque = 113725;
+						rightMotor.motorTorque = -114000;
 						time = time + Time.deltaTime;
 					}
-					backBumpType = "";
 				}
 
 				arrowMove();
@@ -553,6 +556,7 @@ public class SimpleCarController : MonoBehaviour {
  		}
 
  		// backBumpType = "";
+ 		backBumpType = "";
  		frontBumpType = "";
     }
 
@@ -676,10 +680,7 @@ public class SimpleCarController : MonoBehaviour {
 		}
 		arrowMove();
     }
-    // Use to record the data collected from a specific trial.
-    void recordTrial() {
-    	// THRESHOLDS AND FITNESS FUNCTION
-    }
+   
     // Use to reset timing variables between trial runs.
     void reset() {
     	hIRlLDRfitnessScore = 0;
