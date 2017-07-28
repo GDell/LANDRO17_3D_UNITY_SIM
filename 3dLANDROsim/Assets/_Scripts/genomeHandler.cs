@@ -7,7 +7,7 @@ using System.Linq;
 
 public class genomeHandler {
 	
-System.Random rand = new System.Random();
+    System.Random rand = new System.Random();
 
 	////// STRUCT: gene
 	// 	This structure represents a single gene.
@@ -1006,7 +1006,7 @@ System.Random rand = new System.Random();
 		public createParams paramsCollection;
 		public NeuralNetworkHandler.NeuralNetworkParameters neuralNetCollection;
 
-		float fitnessScore;
+		public float fitnessScore;
 
 		int numberOfGenes;
 		int meanNumberOfGenes;

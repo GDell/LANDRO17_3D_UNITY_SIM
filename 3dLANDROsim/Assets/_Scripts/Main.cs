@@ -215,7 +215,7 @@ public class Main : MonoBehaviour {
 
 		// Else if we have reached the end of a trial, stop Landro, iterate to the next individual, and reload the experiment.
 		} else if (timeCurrent >= trialTime){
-			finalFitnessCalculation();
+			testGeneration.collectionOfIndividuals[currentIndex].fitnessScore = finalFitnessCalculation();
 			SimpleCarController.stopMovement();
 			testGeneration.nextIndividual();
 			reset();
