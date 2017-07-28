@@ -62,8 +62,6 @@ public class NeuralNetworkHandler {
 
 			motorValsLR = new float[2];
 			scaledMotorValsLR = new float[2];
-			leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
-			rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
 		}
 
 		// Sets the beginning connection and node arrays, allocating the correct data sizes as
@@ -202,36 +200,22 @@ public class NeuralNetworkHandler {
 		// Updates both nonScaled and scaled motor value arrays.
     	public void updateMotorValues() {
 
+    		
     		string outputString = "RMI Length: " + RMI.Length + "Ouput length: " + output.Length + ". Contents: ";
 
     		for (int i = 0; i < output.Length; i++) {
     			outputString += output[i] + ", ";
     		}
 
-
     		for(int i = 0; i < LMILength; i++){
 				nonScaledLMspeed += output[LMI[i]];
-				lmSpeed = motorScale(nonScaledLMspeed);
-				leftMotor.motorTorque = lmSpeed;
-				// Debug.Log("LEFT MOTOR SPEED: " + lmSpeed);
-				// print("LM SPEED: "+ motorScale(lmSpeed));
-			 	// leftMotor.motorTorque = lmSpeed;
-				scaledMotorValsLR[0] = lmSpeed;
-				motorValsLR[0] = nonScaledLMspeed;
-			}
 
+			}
 			for(int i = 0; i < RMILength; i++){
 				nonScaledRMspeed += output[RMI[i]];
-				rmSpeed = motorScale(nonScaledRMspeed);
-				rightMotor.motorTorque = rmSpeed;
-				// Debug.Log("RIGHT MOTOR TORQUE: " + rmSpeed);
-				// print("RM SPEED: "+ motorScale(rmSpeed));
-				// rightMotor.motorTorque = rmSpeed;
-				scaledMotorValsLR[1] = rmSpeed;
-				motorValsLR[1] = nonScaledRMspeed;
 			}
-			// CALCULATE LM SPEED FROM OUTPUT.
-			
+
+			SimpleCarController.runMotors(nonScaledLMspeed, nonScaledRMspeed);	
     	}
 	
     	// HELPER FUNCTIONS. \\
@@ -241,20 +225,6 @@ public class NeuralNetworkHandler {
 	    	update_value = (float)(Math.Tanh(val - 2) + 1)/2.0f;
 	    	return update_value;
     	}
-    	// Motor scaling function.
-		public float motorScale(float val) {
-			float fromLow = -1;
-			float fromHigh = 1;
-			float toLow = -1000;
-			// 0
-			// -400 in arduino code.
-			float toHigh = 2000;
-			// 500
-			// 400 in arduino code.
-			float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
-			return (mapVal);
-		}
-
 	}
 
 	// Use this for initialization

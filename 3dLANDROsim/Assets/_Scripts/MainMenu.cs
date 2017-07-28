@@ -15,6 +15,7 @@ public class MainMenu : MonoBehaviour {
 
 	public void StartSimulation() {
 		SceneManager.LoadScene("Experiment");
+		Main.pastStartScreen = true;
 	}
 	public void QuitSimulation() {
 		Application.Quit();

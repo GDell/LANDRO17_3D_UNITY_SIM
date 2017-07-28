@@ -7,9 +7,25 @@ using UnityEngine.SceneManagement;
 
 public class SimpleCarController : MonoBehaviour {    
 
+
+	public struct sensorReadings {
+	    public float[] rawirDataArray;
+		public float[] irDataArray;
+	    public float[] rawldrDataArray;
+    	public float[] ldrDataArray;
+
+    	public void setSensorArrays() {
+			rawldrDataArray = new float[8];
+			rawirDataArray = new float[8];
+			irDataArray = new float[8];
+			ldrDataArray = new float[8];
+    	}
+	}
+
+
 	GameObject wheelColliders;
     List<WheelCollider> wheels = new List<WheelCollider>();
-    public Rigidbody rb;
+    public static Rigidbody rb;
 
     // Keeping track of number of LDR and IR sensors.
     public int LDRnumber = 0;
@@ -28,15 +44,8 @@ public class SimpleCarController : MonoBehaviour {
 	public bool debugBumper;
 
 	public int baseMovementRate;
-	public string frontBumpType;
-	public string backBumpType;
-
-	public float timeTrial;
-
-    public float timeNext;
-    public float timeSet;
-    public float timeCurrent;
-    public Light morningstar;
+	public static string frontBumpType;
+	public static string backBumpType;
 
     // SENSOR ARRAYS
     private IR[] ir_sensors;
@@ -54,8 +63,6 @@ public class SimpleCarController : MonoBehaviour {
 	public float maxOfLDRArray;
 	public int maxLDRIndex;
 
-	public float IRthreshold;
-	public float LDRthreshold;
 
 	// IR DATA COLLECTION VARIABLES 
 	public int rightMovemntValue;
@@ -69,11 +76,11 @@ public class SimpleCarController : MonoBehaviour {
     public int numberCollidedFrontIR;
     public int numberCollidedBackIR;
 
-    public float[] rawirDataArray;
-    public float[] irDataArray;
+    public static float[] rawirDataArray;
+    public static float[] irDataArray;
     public float[] irCollisionDataArray;
     public int irSensorNumber = 0;
-    public int[] chosenSensorArray;
+    public static int[] chosenSensorArray;
     public int[][] listOfChosenSensorArrays;
 
     // LDR DATA COLLECTION VARIABLES
@@ -83,8 +90,8 @@ public class SimpleCarController : MonoBehaviour {
     public float leftLDRreadings;
     public float backLDRreadings;
 
-    public float[] rawldrDataArray;
-    public float[] ldrDataArray;
+    public static float[] rawldrDataArray;
+    public static float[] ldrDataArray;
     public int ldrSensorNumber = 0;
 
 	public float fitnessLDRscore;
@@ -93,30 +100,7 @@ public class SimpleCarController : MonoBehaviour {
     public float rightWheelTorque;
     public float leftWheelTorque;
 
-    public int firstRun;
-    public int overallFitnessScore;
-    public int hIRlLDRfitnessScore;
-    public int lIRhLDRfitnessScore;
-    public int totalIterations;
 
-   	public float meanIRscore;
-   	public float meanLDRscore;
-
-
-   	public int currentIndex;
-   	public int numberOfindividuals;
-
-   	/////  TEST STRUCTURES
-   	// Genome
-	public genomeHandler.genome testGenome = new genomeHandler.genome();
-	// G-->P
-	public genomeHandler.genomeToPhenotype testGtoP = new genomeHandler.genomeToPhenotype();
-	// Parameters 
-	public genomeHandler.createParams testParams = new genomeHandler.createParams();
-	// Neural Network
-	public NeuralNetworkHandler.NeuralNetworkParameters testNeuralStruct = new NeuralNetworkHandler.NeuralNetworkParameters();
-	// Generation
-	public genomeHandler.generation testGeneration = new genomeHandler.generation();
 
     // INITIALIZE SIMULATION.
     public void Start(){
@@ -136,8 +120,8 @@ public class SimpleCarController : MonoBehaviour {
 		float changePercent = 0.15f;
 
 		// Test for creating a generation.
-		testGeneration.setGenerationParameters(20, 2, 20); 
-		testGeneration.createStartGeneration();
+		// testGeneration.setGenerationParameters(20, 2, 20); 
+		// testGeneration.createStartGeneration();
 		// currrentInd = testGeneration.individualIndex;
 		// individualLength = testGeneration.collectionOfIndividuals.Length;
 		// CREATING A GENOME:
@@ -194,19 +178,7 @@ public class SimpleCarController : MonoBehaviour {
 			// T: enable print statements for bumper functions.
 		debugBumper = false;
 
-		firstRun = 0;
-		// TIMING VARIABLES.
-		// Time set is the length of a trial (in seconds).
-		timeTrial = 60f;
-		timeSet  = timeTrial;
-		timeCurrent = 0;
 
-		// Threshold values for the fitness function. 
-        // Currently 25:75 ratio for good/bad XOR ratio in simulated arena.
-		IRthreshold = 200f;
-		LDRthreshold = 500f;
-
-    	//morningstar = GameObject.Find("Directional Light").GetComponent<Light>();
     	wheels.Add(wheelColliders.transform.Find("frontRight").GetComponent<WheelCollider>());
 		wheels.Add(wheelColliders.transform.Find("frontLeft").GetComponent<WheelCollider>());
 		WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
@@ -235,11 +207,7 @@ public class SimpleCarController : MonoBehaviour {
 		rightLDRreadings = 0;
 		baseMovementRate = 500;
 
-		overallFitnessScore = 0;
-		totalIterations = 0; 
 
-		hIRlLDRfitnessScore = 0;
-        lIRhLDRfitnessScore = 0; 
 
 		leftMotor.motorTorque = rightWheelTorque;
 		rightMotor.motorTorque = leftWheelTorque;
@@ -311,6 +279,9 @@ public class SimpleCarController : MonoBehaviour {
 		irDataArray = new float[irSensorNumber];
 		ldrDataArray = new float[ldrSensorNumber];
 
+		// sensorReadings currentReadings = new sensorReadings();
+		// currentReadings.setSensorArrays();
+
     }
  
     public void FixedUpdate() {	
@@ -318,7 +289,7 @@ public class SimpleCarController : MonoBehaviour {
     	leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
 		rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
 
-    	timeCurrent = Time.timeSinceLevelLoad;
+    	
 
     	// GATHERING IR DATA INFO.
     	int i = 0;
@@ -473,178 +444,101 @@ public class SimpleCarController : MonoBehaviour {
 		maxOfLDRArray = ldrReadingArray.Max();
  		maxLDRIndex = ldrReadingArray.ToList().IndexOf(maxOfLDRArray);
 
- 		if (timeCurrent >= (timeSet)) {	
-			finalFitnessCalculation();
-		}		
-
- 		// NEURALNETWORK && MOVEMENT CONTROL.
- 		if(useNetwork) {
- 			float turnTime = 10000f;
-
-			if (timeCurrent <  timeSet) {	
-
-				evaluateTrialFitness(rawldrDataArray, rawirDataArray, chosenSensorArray);
-
- 			// 	RUN THE NEURAL NETWORK: powers motors based on neural network calculation using provided params.h.
- 			
-				// testNeuralStruct.beginNeuralNet(ldrDataArray, irDataArray, testParams.chosenSensorArray);
-				
-				if ((backBumpType == "") && (frontBumpType == "")) {
-
-					testNeuralStruct.updateMotorValues();
-
-				} else if (frontBumpType == "leftFront") {
-					Debug.Log("FORCE APPLIED FOR BRAKES");
-					float time = 0f;
-					Debug.Log(frontBumpType);
-					while (time < turnTime) {
-						leftMotor.motorTorque = 118725;
-						rightMotor.motorTorque = -119000;
-						time = time + Time.deltaTime;
-					}
-				} else if (frontBumpType == "rightFront") {
-					Debug.Log("FORCE APPLIED FOR BRAKES");
-					float time = 0f;
-					Debug.Log(frontBumpType);
-					while (time < turnTime) {
-						leftMotor.motorTorque =	-119000;
-						rightMotor.motorTorque = 118725;
-						time = time + Time.deltaTime;
-					}
-				} else if (frontBumpType == "middleFront") {
-					Debug.Log("FORCE APPLIED FOR BRAKES");
-					float time = 0f;
-					Debug.Log(frontBumpType);
-					while (time < turnTime) {
-						leftMotor.motorTorque = 117500;
-						rightMotor.motorTorque = -117725;
-						time = time + Time.deltaTime;
-					} 
-				} else if (backBumpType == "middleBack") {
-					Debug.Log("FORCE APPLIED FOR BRAKES");
-					float time = 0f;
-					Debug.Log(backBumpType);
-					while (time < turnTime) {
-						leftMotor.motorTorque = 115000;
-						rightMotor.motorTorque = 115000;
-						time = time + Time.deltaTime;
-					}
-				} else if (backBumpType == "rightBack") {
-					Debug.Log("FORCE APPLIED FOR BRAKES");
-					float time = 0f;
-					Debug.Log(backBumpType);
-					while (time < turnTime) {
-						leftMotor.motorTorque = -114000;
-						rightMotor.motorTorque = 113725;
-						time = time + Time.deltaTime;
-					}
-				} else if (backBumpType == "leftBack") {
-					Debug.Log("FORCE APPLIED FOR BRAKES");
-					float time = 0f;
-					Debug.Log(backBumpType);
-					while (time < turnTime) {
-						leftMotor.motorTorque = 113725;
-						rightMotor.motorTorque = -114000;
-						time = time + Time.deltaTime;
-					}
-				}
-
-				arrowMove();
-
- 			} else if (timeCurrent >= timeSet){
- 				stopMovement();
- 				// reset();
- 			}
- 		} else {
- 			// RUN MOVEMENT FUNCTION: powers motors based user input and fixed IR/Light calculations.
-			autoMovement(numberCollidedFrontIR, numberCollidedLeftIR, numberCollidedRightIR, numberCollidedBackIR, maxLDRIndex, ldrReadingArray, frontBumpType, backBumpType);
- 		}
-
  		// backBumpType = "";
  		backBumpType = "";
  		frontBumpType = "";
     }
 
-    // PRINTS INFORMATION ABOUT AN ARRAY.
-    void showArrayInformation (Array arr, bool showORnah) {
-    	if (showORnah) {
-    		print("The length of array: " + arr.Length);
-    	}
+
+   	public static void runMotors(float leftMotorTorque, float rightMotorTorque) {	
+ 			float turnTime = 10000f;
+
+	     	WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
+			WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
+
+			if ((backBumpType == "") && (frontBumpType == "")) {
+
+				leftMotor.motorTorque = motorScale(leftMotorTorque);
+    			rightMotor.motorTorque = motorScale(rightMotorTorque);
+
+			} else if (frontBumpType == "leftFront") {
+				Debug.Log("FORCE APPLIED FOR BRAKES");
+				float time = 0f;
+				Debug.Log(frontBumpType);
+				while (time < turnTime) {
+					leftMotor.motorTorque = 118725;
+					rightMotor.motorTorque = -119000;
+					time = time + Time.deltaTime;
+				}
+			} else if (frontBumpType == "rightFront") {
+				Debug.Log("FORCE APPLIED FOR BRAKES");
+				float time = 0f;
+				Debug.Log(frontBumpType);
+				while (time < turnTime) {
+					leftMotor.motorTorque =	-119000;
+					rightMotor.motorTorque = 118725;
+					time = time + Time.deltaTime;
+				}
+			} else if (frontBumpType == "middleFront") {
+				Debug.Log("FORCE APPLIED FOR BRAKES");
+				float time = 0f;
+				Debug.Log(frontBumpType);
+				while (time < turnTime) {
+					leftMotor.motorTorque = 117500;
+					rightMotor.motorTorque = -117725;
+					time = time + Time.deltaTime;
+				} 
+			} else if (backBumpType == "middleBack") {
+				Debug.Log("FORCE APPLIED FOR BRAKES");
+				float time = 0f;
+				Debug.Log(backBumpType);
+				while (time < turnTime) {
+					leftMotor.motorTorque = 115000;
+					rightMotor.motorTorque = 115000;
+					time = time + Time.deltaTime;
+				}
+			} else if (backBumpType == "rightBack") {
+				Debug.Log("FORCE APPLIED FOR BRAKES");
+				float time = 0f;
+				Debug.Log(backBumpType);
+				while (time < turnTime) {
+					leftMotor.motorTorque = -114000;
+					rightMotor.motorTorque = 113725;
+					time = time + Time.deltaTime;
+				}
+			} else if (backBumpType == "leftBack") {
+				Debug.Log("FORCE APPLIED FOR BRAKES");
+				float time = 0f;
+				Debug.Log(backBumpType);
+				while (time < turnTime) {
+					leftMotor.motorTorque = 113725;
+					rightMotor.motorTorque = -114000;
+					time = time + Time.deltaTime;
+				}
+			}
+
+			arrowMove();
+
     }
 
-    void evaluateTrialFitness(float[] ldrSensorArray, float[] irSensorArray, int[] selectedSensors) {
-    	int selectedArraySize = selectedSensors.Length;
-    	bool exceededIRthreshold = false;
-    	bool exceededLDRthreshold = false;
-    	// Count total number of iterations.
-    	totalIterations = totalIterations + 1;
-    	// Find means of LDR and IR sensor values but only for those that are currently active/chosen.
-    	for (int runs = 0; runs < selectedArraySize; runs++){
-			if(selectedSensors[runs] == 0) {
-				meanIRscore = (meanIRscore + irSensorArray[0])/2;
-    		} else if(selectedSensors[runs] == 1) {
-    			meanLDRscore = (meanLDRscore + ldrSensorArray[2])/2;
-    		} else if(selectedSensors[runs] == 2) {
-    			meanIRscore = (meanIRscore + irSensorArray[1])/2;
-    		} else if(selectedSensors[runs] == 3) {
-    			meanLDRscore = (meanLDRscore + ldrSensorArray[3])/2;
-    		} else if(selectedSensors[runs] == 4) {
-    			meanIRscore = (meanIRscore + irSensorArray[2])/2;
-    		} else if(selectedSensors[runs] == 5) {
-    			meanLDRscore = (meanLDRscore + ldrSensorArray[4])/2;
-    		} else if(selectedSensors[runs] == 6) {
-    			meanIRscore = (meanIRscore + irSensorArray[3])/2;
-    		} else if(selectedSensors[runs] == 7) {
-    			meanLDRscore = (meanLDRscore + ldrSensorArray[5])/2;
-    		} else if(selectedSensors[runs] == 8) {
-    			meanIRscore = (meanIRscore + irSensorArray[4])/2;
-    		} else if(selectedSensors[runs] == 9) {
-    			meanLDRscore = (meanLDRscore + ldrSensorArray[6])/2;
-    		} else if(selectedSensors[runs] == 10) {
-    			meanIRscore = (meanIRscore + irSensorArray[5])/2;
-    		} else if(selectedSensors[runs] == 11) {
-    			meanLDRscore = (meanLDRscore + ldrSensorArray[7])/2;
-    		} else if(selectedSensors[runs] == 12) {
-    			meanIRscore = (meanIRscore + irSensorArray[6])/2;
-    		} else if(selectedSensors[runs] == 13) {
-    			meanLDRscore = (meanLDRscore + ldrSensorArray[0])/2;
-    		} else if(selectedSensors[runs] == 14) {
-    			meanIRscore = (meanIRscore + irSensorArray[7])/2;
-    		} else if(selectedSensors[runs] == 15) {
-    			meanLDRscore = (meanLDRscore + ldrSensorArray[1])/2;
-    		}
-    	}
-    	// Check if the thresholds have been reached for both IR and LDR.
-    	if (meanIRscore >= IRthreshold) {
-    		exceededIRthreshold = true;
-    	}
-    	if (meanLDRscore >= LDRthreshold) {
-    		exceededLDRthreshold = true;
-    	}
-    	// Check if Landro is in an XOR location.
-    	if(exceededLDRthreshold && exceededIRthreshold) {
-    		print("NOT FIT");
-    	} else if ((!exceededIRthreshold) && (!exceededLDRthreshold)) {
-    		print("NOT FIT");
-    	} else if(exceededIRthreshold && (!exceededLDRthreshold)) {
-    		hIRlLDRfitnessScore = hIRlLDRfitnessScore + 1;
-    		// print("hIRlLDRfitnessScore: " + hIRlLDRfitnessScore);
-    	} else if(exceededLDRthreshold && (!exceededIRthreshold)) {
-    		lIRhLDRfitnessScore = lIRhLDRfitnessScore + 1;
-    		// print("lIRhLDRfitnessScore: " + lIRhLDRfitnessScore);
-    	}
+
+    public static float[] returnRawLDRdata() {
+    	return rawldrDataArray;
+    } 
+
+    public static float[] returnRawIRdata() {
+    	return rawirDataArray;
     }
-    float finalFitnessCalculation() {
-    	overallFitnessScore = (((hIRlLDRfitnessScore/totalIterations)*100) + ((lIRhLDRfitnessScore/totalIterations)*100) + 
-    			((((hIRlLDRfitnessScore/totalIterations)*100) + 
-    				((lIRhLDRfitnessScore/totalIterations)*100))/10));
-    	// print("Total iterations!!!!!: " + totalIterations);
-    	// print("hIRlLDRfitnessScore!!!!!!!!: "+ hIRlLDRfitnessScore);
-    	// print("lIRhLDRfitnessScore!!!!!!!!: "+ lIRhLDRfitnessScore);
-    	// print("INTERMEDIATE: "+ ((hIRlLDRfitnessScore/totalIterations)*100));
-    	print("THE FINAL FITNESS: " + overallFitnessScore);
-    	return overallFitnessScore;
+
+    public static float[] returnLDRdata() {
+    	return ldrDataArray;
     }
+
+    public static float[] returnIRdata() {
+    	return irDataArray;
+    }
+
+
     void autoMovement(int frontIRreading, int leftIRreading, int rightIRreading, int backIRreading, int ldrIndex, float[] ldrArray, string frontBumpType, string backBumpType) {
     	// FIND WHEEL COLLIDERS AND LANDRO RIGID BODY.
     	print("AUTO MOVEMENT");
@@ -686,29 +580,8 @@ public class SimpleCarController : MonoBehaviour {
 		arrowMove();
     }
    
-    // Use to reset timing variables between trial runs.
-    void reset() {
-    	hIRlLDRfitnessScore = 0;
-        lIRhLDRfitnessScore = 0; 
-    	totalIterations = 0;
-    	overallFitnessScore = 0;
-    	timeCurrent = 0;
-    	timeSet = timeTrial;
-    	currentIndex = testGeneration.individualIndex;
-    	numberOfindividuals = testGeneration.numberOfIndividualsInGeneration;
-
-    	if (currentIndex < numberOfindividuals) {
-    		testGeneration.nextIndividual();
-    		currentIndex = testGeneration.individualIndex;
-    		SceneManager.LoadScene("Experiment");
-   		} else {
-   			Debug.Log("End of generation");
-   		}
-
-
-    }
-    // Use to stop all movement of Landro.
-    void stopMovement() {
+    
+    public static void stopMovement() {
     	WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
 		WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
 		rb = GameObject.Find("L16A").GetComponent<Rigidbody>();
@@ -721,7 +594,7 @@ public class SimpleCarController : MonoBehaviour {
     }
 
    	// SCALES IR VALUES GIVEN MIN AND MAX POSSIBLE IR VALUES.
-	float irScale(float val) {
+	public static float irScale(float val) {
 		float fromLow = 0;
 		float fromHigh = 409;
 		float toLow = 0;
@@ -730,7 +603,7 @@ public class SimpleCarController : MonoBehaviour {
 		return (mapVal);
 	}
 	// SCALES LDR VALUES GIVEN MIN AND MAX POSSIBLE IR VALUES.
-	float photoScale(float val) {
+	public static float photoScale(float val) {
 		float fromLow = 0;
 		float fromHigh = 1550f;
 		float toLow = 0;
@@ -739,8 +612,30 @@ public class SimpleCarController : MonoBehaviour {
 		return (mapVal);
 	}
 
+
+    public static float motorScale(float val) {
+		float fromLow = -1;
+		float fromHigh = 1;
+		float toLow = -1000;
+		// 0
+		// -400 in arduino code.
+		float toHigh = 2000;
+		// 500
+		// 400 in arduino code.
+		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
+		return (mapVal);
+	}
+
+    // PRINTS INFORMATION ABOUT AN ARRAY.
+    void showArrayInformation (Array arr, bool showORnah) {
+    	if (showORnah) {
+    		print("The length of array: " + arr.Length);
+    	}
+    }
+
+
     // Allows the user to control Landro using the arrow keys. Good for debugging and testing purposes.
-    void arrowMove() {
+    public static void arrowMove() {
     	WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
 		WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
     	 if (Input.GetKey(KeyCode.UpArrow)) {

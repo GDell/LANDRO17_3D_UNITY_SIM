@@ -1006,6 +1006,8 @@ System.Random rand = new System.Random();
 		public createParams paramsCollection;
 		public NeuralNetworkHandler.NeuralNetworkParameters neuralNetCollection;
 
+		float fitnessScore;
+
 		int numberOfGenes;
 		int meanNumberOfGenes;
 		int maxSpawn;
@@ -1023,7 +1025,8 @@ System.Random rand = new System.Random();
 		// FUNCTION: createIndividualStructs() 
 		// This function instantiates all of the structs each individual needs.
 		// A genome, G->P process, network parameters, and a neural network.
-		 public void createIndividualStructs() {
+		public void createIndividualStructs() {
+			fitnessScore = 0;
 			genomeCollection = new genome();
 			GtoPCollection = new genomeToPhenotype();
 			paramsCollection = new createParams();
@@ -1044,7 +1047,7 @@ System.Random rand = new System.Random();
 		System.Random rand;
 
 		// A generation is a set of individuals.
-		individual[] collectionOfIndividuals;
+		public individual[] collectionOfIndividuals;
 
 		public int numberOfIndividualsInGeneration;
 		public int numberOfGenes;
