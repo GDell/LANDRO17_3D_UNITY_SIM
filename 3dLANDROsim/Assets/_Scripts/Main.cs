@@ -8,7 +8,6 @@ using UnityEngine.SceneManagement;
 public class Main : MonoBehaviour {
 	public GameObject mainScript;
 
-
 	/////  TEST STRUCTURES
    	// Genome
 	public genomeHandler.genome testGenome = new genomeHandler.genome();
@@ -40,7 +39,7 @@ public class Main : MonoBehaviour {
 	public float delRate = 0.01f;
 	public float changePercent = 0.15f;
 
-	public float trialTime = 20f;
+	public float trialTime = 50f;
     public float timeCurrent;
 
 	// Threshold values for the fitness function. 
@@ -189,6 +188,8 @@ public class Main : MonoBehaviour {
     	}
     }
 
+
+    // This function begins running the individual at the current index.
 
     void beginRun() {
 

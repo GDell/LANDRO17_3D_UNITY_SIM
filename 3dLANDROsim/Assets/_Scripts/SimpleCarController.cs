@@ -29,25 +29,21 @@ public class SimpleCarController : MonoBehaviour {
 	public bool debugBumper;
 
 	public int baseMovementRate;
-	public static string frontBumpType;
-	public static string backBumpType;
 
     // SENSOR ARRAYS
-    private IR[] ir_sensors;
-    private LDR[] ldr_sensors;
-    private BumpSensor[] bump_sensors;
-    private BumpSensorBack[] backBump_sensors;
+    public IR[] ir_sensors;
+    public LDR[] ldr_sensors;
+    // public BumpSensor[] bump_sensors;
+    // public BumpSensorBack[] backBump_sensors;
 
 	public WheelCollider rightMotor;
 	public WheelCollider leftMotor;
 
     // public NeuralNetwork neuralNet;
-
 	public int[] irReadingArray;
 	public float[] ldrReadingArray;
 	public float maxOfLDRArray;
 	public int maxLDRIndex;
-
 
 	// IR DATA COLLECTION VARIABLES 
 	public int rightMovemntValue;
@@ -85,10 +81,18 @@ public class SimpleCarController : MonoBehaviour {
     public float rightWheelTorque;
     public float leftWheelTorque;
 
+	BumpSensor[] bump_sensorsPOSITION;
+	BumpSensorBack[] backBump_sensorsPOSITION;
 
+	public static BumpSensor[] bump_sensors;
+	public static BumpSensorBack[] backBump_sensors;
 
     // INITIALIZE SIMULATION.
     public void Start(){
+
+    	bump_sensors =  GameObject.FindObjectsOfType<BumpSensor>();
+    	backBump_sensors = GameObject.FindObjectsOfType<BumpSensorBack>();
+
 
 		int maxSpawn = 100;
 		int vMax = 5;
@@ -174,8 +178,8 @@ public class SimpleCarController : MonoBehaviour {
 		// neuralNet = GetComponent<NeuralNetwork>();
 		ir_sensors = GameObject.FindObjectsOfType<IR>();
 		ldr_sensors = GameObject.FindObjectsOfType<LDR>();
-		bump_sensors = GameObject.FindObjectsOfType<BumpSensor>();
-		backBump_sensors = GameObject.FindObjectsOfType<BumpSensorBack>();
+		bump_sensorsPOSITION = GameObject.FindObjectsOfType<BumpSensor>();
+		backBump_sensorsPOSITION = GameObject.FindObjectsOfType<BumpSensorBack>();
 
 		// IR DATA VARIABLE INITIALIZATION.
 		numberCollidedIR = 0;
@@ -203,7 +207,7 @@ public class SimpleCarController : MonoBehaviour {
 		//////////////////////////// PLACING SENSORS ON LANDRO BODY //////////////////////////// 
 		// PLACE FRONT BUMP SENSORS.
 		int i = 0;
-		foreach(BumpSensor bump_sensor in bump_sensors){
+		foreach(BumpSensor bump_sensor in bump_sensorsPOSITION){
 			bump_rotation = Quaternion.Euler(0, 45 * i, 180);
 			bump_position = this.transform.position;
 			bump_position.y = 40f;
@@ -216,7 +220,7 @@ public class SimpleCarController : MonoBehaviour {
 		//////////////////////////// 
 		// PLACE BACK BUMP SENSORS.
 		i = 4;
-		foreach(BumpSensorBack backBump_sensor in backBump_sensors){
+		foreach(BumpSensorBack backBump_sensor in backBump_sensorsPOSITION){
 			backBump_rotation = Quaternion.Euler(0, 45 * i, 180);
 			backBump_position = this.transform.position;
 			backBump_position.y = 40f;
@@ -385,42 +389,6 @@ public class SimpleCarController : MonoBehaviour {
 				backLDRreadings = backLDRreadings - 10;
 			}
 		}
-		// POLLING FRONT BUMP SENSORS:
-		// 	Checks to see i
-		foreach(BumpSensor bump_sensor in bump_sensors) {
-			if(bump_sensor.bumpWall == true) {
-				print(bump_sensor + " done DID hit the WALL!");
-				bump_sensor.bumpWall = false;
-				if (bump_sensor.name.Contains("leftFront")) {
-					frontBumpType = "leftFront";
-					print("FRONT HAS BEEN HIT!!");
-				}
-				if (bump_sensor.name.Contains("rightFront")) {
-					frontBumpType = "rightFront";
-					print("RIGHT HAS BEEN HIT!!");
-				}
-				if (bump_sensor.name.Contains("middleFront")) {
-					frontBumpType = "middleFront";
-					print("MIDDLE HAS BEEN HIT!!");
-				}
-			}
-		}
-		// POLLING BACK FRONT BUMP SENSORS.
-		foreach(BumpSensorBack bump_sensor in backBump_sensors) {
-			if(bump_sensor.bumpWall == true) {
-				print(bump_sensor + " done DID hit the WALL!");
-				bump_sensor.bumpWall = false;
-				if (bump_sensor.name.Contains("leftBack")) {
-					backBumpType = "leftBack";
-				}
-				if (bump_sensor.name.Contains("rightBack")) {
-					backBumpType = "rightBack";
-				}
-				if (bump_sensor.name.Contains("middleBack")) {
-					backBumpType = "middleBack";
-				} 
-			}
-		}
 
 		irReadingArray = new int[4] {numberCollidedFrontIR, numberCollidedLeftIR, numberCollidedRightIR, 
 						  numberCollidedBackIR};
@@ -428,100 +396,134 @@ public class SimpleCarController : MonoBehaviour {
 
 		maxOfLDRArray = ldrReadingArray.Max();
  		maxLDRIndex = ldrReadingArray.ToList().IndexOf(maxOfLDRArray);
-
- 		// backBumpType = "";
- 		backBumpType = "";
- 		frontBumpType = "";
     }
 
 
-   	public static void runMotors(float leftMotorTorque, float rightMotorTorque) {	
- 			float turnTime = 10000f;
+    // FUNCTION: runMotors() 
+    // This function takes two motor torque (left and right) values, checks the bumpers,
+    // and drives the motors with the given values unless if the bump sensors are active.
+   	public static void runMotors(float leftMotorTorque, float rightMotorTorque) {
+   		// Grab wheels in order to drive them.
+   		WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
+		WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
+		float turnTime = 100f;
 
-	     	WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
-			WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
+		string frontBumpType = "";
+		string backBumpType = "";
 
-			if ((backBumpType == "") && (frontBumpType == "")) {
-
-				leftMotor.motorTorque = motorScale(leftMotorTorque);
-    			rightMotor.motorTorque = motorScale(rightMotorTorque);
-
-			} else if (frontBumpType == "leftFront") {
-				Debug.Log("FORCE APPLIED FOR BRAKES");
-				float time = 0f;
-				Debug.Log(frontBumpType);
-				while (time < turnTime) {
-					leftMotor.motorTorque = 118725;
-					rightMotor.motorTorque = -119000;
-					time = time + Time.deltaTime;
-				}
-			} else if (frontBumpType == "rightFront") {
-				Debug.Log("FORCE APPLIED FOR BRAKES");
-				float time = 0f;
-				Debug.Log(frontBumpType);
-				while (time < turnTime) {
-					leftMotor.motorTorque =	-119000;
-					rightMotor.motorTorque = 118725;
-					time = time + Time.deltaTime;
-				}
-			} else if (frontBumpType == "middleFront") {
-				Debug.Log("FORCE APPLIED FOR BRAKES");
-				float time = 0f;
-				Debug.Log(frontBumpType);
-				while (time < turnTime) {
-					leftMotor.motorTorque = 117500;
-					rightMotor.motorTorque = -117725;
-					time = time + Time.deltaTime;
-				} 
-			} else if (backBumpType == "middleBack") {
-				Debug.Log("FORCE APPLIED FOR BRAKES");
-				float time = 0f;
-				Debug.Log(backBumpType);
-				while (time < turnTime) {
-					leftMotor.motorTorque = 115000;
-					rightMotor.motorTorque = 115000;
-					time = time + Time.deltaTime;
-				}
-			} else if (backBumpType == "rightBack") {
-				Debug.Log("FORCE APPLIED FOR BRAKES");
-				float time = 0f;
-				Debug.Log(backBumpType);
-				while (time < turnTime) {
-					leftMotor.motorTorque = -114000;
-					rightMotor.motorTorque = 113725;
-					time = time + Time.deltaTime;
-				}
-			} else if (backBumpType == "leftBack") {
-				Debug.Log("FORCE APPLIED FOR BRAKES");
-				float time = 0f;
-				Debug.Log(backBumpType);
-				while (time < turnTime) {
-					leftMotor.motorTorque = 113725;
-					rightMotor.motorTorque = -114000;
-					time = time + Time.deltaTime;
+		// Reading the front bumpers.
+		bool hasBumped = false;
+		for (int k = 0; k < 3; k++) {
+			if (bump_sensors[k].bumpWall == true) {
+				hasBumped = true;
+				bump_sensors[k].bumpWall = false;
+				if (bump_sensors[k].name.Contains("leftFront")) {
+					frontBumpType = "leftFront";
+					print("FRONT HAS BEEN HIT!!");
+				} else if (bump_sensors[k].name.Contains("rightFront")) {
+					frontBumpType = "rightFront";
+					print("RIGHT HAS BEEN HIT!!");
+				} else if (bump_sensors[k].name.Contains("middleFront")) {
+					frontBumpType = "middleFront";
+					print("MIDDLE HAS BEEN HIT!!");
 				}
 			}
+		}
+		if (hasBumped == false) {
+			frontBumpType = "";
+		}
 
-			arrowMove();
+		// Reading the back bumpers.
+		bool hasBumpedB = false;
+		for (int p = 0; p < 3; p++) {
+			if (backBump_sensors[p].bumpWall == true) {
+				hasBumpedB = true;
+				backBump_sensors[p].bumpWall = false;
+				if (backBump_sensors[p].name.Contains("leftBack")) {
+					backBumpType = "leftBack";
+				} else if (backBump_sensors[p].name.Contains("rightBack")) {
+					backBumpType = "rightBack";
+				} else if (backBump_sensors[p].name.Contains("middleBack")) {
+					backBumpType = "middleBack";
+				} 
+			}
+		}
+		if (hasBumpedB == false) {
+			backBumpType = "";
+		}
+
+		if ((backBumpType == "") && (frontBumpType == "")) {
+			Debug.Log("MOVEMENT FROM NEURAL NETWORK");
+
+			leftMotor.motorTorque = motorScale(leftMotorTorque);
+			rightMotor.motorTorque = motorScale(rightMotorTorque);
+
+		} else if (frontBumpType == "leftFront") {
+			// Debug.Log("FORCE APPLIED FOR BRAKES");
+			float time = 0f;
+			Debug.Log(frontBumpType);
+			// while (time < turnTime) {
+				leftMotor.motorTorque = -118725;
+				rightMotor.motorTorque = -119000;
+				time = time + Time.deltaTime;
+				Debug.Log("TURNING");
+			// } 
+		} else if (frontBumpType == "rightFront") {
+			// Debug.Log("FORCE APPLIED FOR BRAKES");
+			float time = 0f;
+			// Debug.Log(frontBumpReading);
+			// while (time < turnTime) {
+				leftMotor.motorTorque =	-119000;
+				rightMotor.motorTorque = -118725;
+				time = time + Time.deltaTime;
+				Debug.Log("TURNING");
+			// }
+		} else if (frontBumpType == "middleFront") {
+			// Debug.Log("FORCE APPLIED FOR BRAKES");
+			float time = 0f;
+			// Debug.Log(frontBumpReading);
+			// while (time < turnTime) {
+				leftMotor.motorTorque = -117500;
+				rightMotor.motorTorque = -117725;
+				time = time + Time.deltaTime;
+				Debug.Log("TURNING");
+			// } 
+		} else if (backBumpType == "middleBack") {
+			// Debug.Log("FORCE APPLIED FOR BRAKES");
+			float time = 0f;
+			Debug.Log(backBumpType);
+			while (time < turnTime) {
+				leftMotor.motorTorque = -115000;
+				rightMotor.motorTorque = -115000;
+				time = time + Time.deltaTime;
+				Debug.Log("TURNING");
+			}
+		} else if (backBumpType == "rightBack") {
+			// Debug.Log("FORCE APPLIED FOR BRAKES");
+			float time = 0f;
+			// Debug.Log(backBumpReading);
+			while (time < turnTime) {
+				leftMotor.motorTorque = -114000;
+				rightMotor.motorTorque = -113725;
+				time = time + Time.deltaTime;
+				Debug.Log("TURNING");
+			}
+		} else if (backBumpType == "leftBack") {
+			// Debug.Log("FORCE APPLIED FOR BRAKES");
+			float time = 0f;
+			// Debug.Log(backBumpReading);
+			while (time < turnTime) {
+				leftMotor.motorTorque = -113725;
+				rightMotor.motorTorque = -114000;
+				time = time + Time.deltaTime;
+				Debug.Log("TURNING");
+			}
+		}
+
+		arrowMove();
 
     }
 
-
-    public static float[] returnRawLDRdata() {
-    	return rawldrDataArray;
-    } 
-
-    public static float[] returnRawIRdata() {
-    	return rawirDataArray;
-    }
-
-    public static float[] returnLDRdata() {
-    	return ldrDataArray;
-    }
-
-    public static float[] returnIRdata() {
-    	return irDataArray;
-    }
 
 
     void autoMovement(int frontIRreading, int leftIRreading, int rightIRreading, int backIRreading, int ldrIndex, float[] ldrArray, string frontBumpType, string backBumpType) {
@@ -645,5 +647,20 @@ public class SimpleCarController : MonoBehaviour {
     	}
 	}
 
+    public static float[] returnRawLDRdata() {
+    	return rawldrDataArray;
+    } 
+
+    public static float[] returnRawIRdata() {
+    	return rawirDataArray;
+    }
+
+    public static float[] returnLDRdata() {
+    	return ldrDataArray;
+    }
+
+    public static float[] returnIRdata() {
+    	return irDataArray;
+    }
 
 }

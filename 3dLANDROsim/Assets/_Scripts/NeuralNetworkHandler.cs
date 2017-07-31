@@ -208,11 +208,11 @@ public class NeuralNetworkHandler {
     		}
 
     		for(int i = 0; i < LMILength; i++){
-				nonScaledLMspeed += output[LMI[i]];
+				nonScaledLMspeed = output[LMI[i]];
 
 			}
 			for(int i = 0; i < RMILength; i++){
-				nonScaledRMspeed += output[RMI[i]];
+				nonScaledRMspeed = output[RMI[i]];
 			}
 
 			SimpleCarController.runMotors(nonScaledLMspeed, nonScaledRMspeed);	
