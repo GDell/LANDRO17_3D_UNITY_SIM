@@ -8,21 +8,6 @@ using UnityEngine.SceneManagement;
 public class SimpleCarController : MonoBehaviour {    
 
 
-	public struct sensorReadings {
-	    public float[] rawirDataArray;
-		public float[] irDataArray;
-	    public float[] rawldrDataArray;
-    	public float[] ldrDataArray;
-
-    	public void setSensorArrays() {
-			rawldrDataArray = new float[8];
-			rawirDataArray = new float[8];
-			irDataArray = new float[8];
-			ldrDataArray = new float[8];
-    	}
-	}
-
-
 	GameObject wheelColliders;
     List<WheelCollider> wheels = new List<WheelCollider>();
     public static Rigidbody rb;

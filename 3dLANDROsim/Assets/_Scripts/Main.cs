@@ -40,7 +40,7 @@ public class Main : MonoBehaviour {
 	public float delRate = 0.01f;
 	public float changePercent = 0.15f;
 
-	public float trialTime = 60f;
+	public float trialTime = 20f;
     public float timeCurrent;
 
 	// Threshold values for the fitness function. 
@@ -115,7 +115,8 @@ public class Main : MonoBehaviour {
 
 		// if (timeCurrent >= (trialTime)) {	
 
-	
+		Debug.Log("RUNNING INDIVIDUAL: " + currentIndex);
+
 		if (pastStartScreen) {
 			if (!(firstGenerationRun)) {
 				beginRun();
@@ -217,7 +218,7 @@ public class Main : MonoBehaviour {
 		} else if (timeCurrent >= trialTime){
 			testGeneration.collectionOfIndividuals[currentIndex].fitnessScore = finalFitnessCalculation();
 			SimpleCarController.stopMovement();
-			testGeneration.nextIndividual();
+			// testGeneration.nextIndividual();
 			reset();
  		}
     }
@@ -242,7 +243,7 @@ public class Main : MonoBehaviour {
     	totalIterations = 0;
     	overallFitnessScore = 0;
     	timeCurrent = 0;
-    	currentIndex = testGeneration.individualIndex;
+    	// currentIndex = testGeneration.individualIndex;
     	numberOfindividuals = testGeneration.numberOfIndividualsInGeneration;
 
     	if (currentIndex < numberOfindividuals) {
