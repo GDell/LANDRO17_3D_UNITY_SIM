@@ -406,7 +406,7 @@ public class SimpleCarController : MonoBehaviour {
    		// Grab wheels in order to drive them.
    		WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
 		WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
-		float turnTime = 1f;
+		float turnTime = 10f;
 
 		string frontBumpType = "";
 		string backBumpType = "";

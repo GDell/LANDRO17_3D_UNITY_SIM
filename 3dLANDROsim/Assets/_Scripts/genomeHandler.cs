@@ -967,6 +967,7 @@ public class genomeHandler {
 		public NeuralNetworkHandler.NeuralNetworkParameters neuralNetCollection;
 
 		public float fitnessScore;
+		public int numberOfOffspring;
 
 		int numberOfGenes;
 		int meanNumberOfGenes;
@@ -987,10 +988,37 @@ public class genomeHandler {
 		// A genome, G->P process, network parameters, and a neural network.
 		public void createIndividualStructs() {
 			fitnessScore = 0;
+			numberOfOffspring = 0;
 			genomeCollection = new genome();
 			GtoPCollection = new genomeToPhenotype();
 			paramsCollection = new createParams();
 			neuralNetCollection = new NeuralNetworkHandler.NeuralNetworkParameters();
+		}
+		// FUNCTION: determineOffspring()
+		// This function takes in the population size and determines offspring based off of 
+		// the individuals fitness score.
+		public void determineOffspring(int populationSize) {
+				float lowerBase = 0.30f;
+				float highChance = 0.50f;
+				if ((fitnessScore < (20+populationSize)) && (rand.NextDouble() < lowerBase)) {
+					numberOfOffspring = 1;
+					Debug.Log("1 CHILD");
+				} else if ((fitnessScore >= (20+populationSize)) &&  (fitnessScore < (30+populationSize)) && (rand.NextDouble() < lowerBase + 0.1)) {
+					numberOfOffspring = 1;
+					Debug.Log("1 CHILD");
+				}  else if ((fitnessScore >= (30+populationSize)) &&  (fitnessScore < (40+populationSize)) && (rand.NextDouble() < lowerBase + 0.2)) {
+					numberOfOffspring = 1;
+					Debug.Log("1 CHILD");
+				}  else if ((fitnessScore >= (40+populationSize)) &&  (fitnessScore < (70+populationSize))) {
+					numberOfOffspring = 1;
+					Debug.Log("1 CHILD");
+				} else if (fitnessScore >= (70 + populationSize)) {
+					numberOfOffspring = 2;
+					Debug.Log("2 CHILDREN");
+				} else {
+					numberOfOffspring = 0;
+					Debug.Log("DEATH");
+				}
 		}
 	}
 
@@ -1014,6 +1042,7 @@ public class genomeHandler {
 		public int meanStandardDeviationOfGenes;
 
 		public int individualIndex;
+		public int numberOfTotalOffspring;
 
 		bool done;
 
@@ -1094,8 +1123,6 @@ public class genomeHandler {
 		}
 
 		
-
-
 		// FUNCTION: nextIndividual() 
 		// This function iterates the individualIndex number as long as it is 
 		// less than the number of individuals in the generation.
@@ -1108,7 +1135,6 @@ public class genomeHandler {
 				done = true;
 			}
 		}
-
 
 		// FUNCTION: runNeuralNetOnIndividual() 
 		// This function runs the neural net of an individual in the generation.
@@ -1130,10 +1156,47 @@ public class genomeHandler {
 		}
 
 		// FUNCTION: childrenAndNextGeneration()
-		// Calculates the number of children each individual in the generation gets 
-		// to pass on to the next generation.
-		public void childrenAndNextGeneration() {
+		//	Calculates the number of children each individual in the generation gets 
+		//	to pass on to the next generation.
+		public void determineOffspringForGeneration() {
+			numberOfTotalOffspring = 0;
+			int popSize = collectionOfIndividuals.Length;
+			int[] numberOfOffspringArray = new int[numberOfIndividualsInGeneration];
+			for (int i = 0; i < numberOfIndividualsInGeneration; i++) {
+				collectionOfIndividuals[i].determineOffspring(popSize);
+			}
+			for (int i = 0; i < numberOfIndividualsInGeneration; i++) {
+				numberOfTotalOffspring += collectionOfIndividuals[i].numberOfOffspring;
+			}
+		}
 
+		// FUNCTION: createNewGeneration() 
+		// 	Determines the number of offspring in the new gen.
+		//  Creates a new individual array of the offspring with mutated/duplicated/deleted genes.
+		public void createNewGeneration() {
+			// First, determine the offspring of the previous gen.
+			determineOffspringForGeneration();
+			// Reset the individual index.
+			individualIndex = 0;
+			// Create a new collection of individuals for the offspring.
+			collectionOfIndividuals = new individual[numberOfTotalOffspring];
+			// We'll aggregate the new individuals in a list.
+			List<individual> listOfNewOffspring = new List<individual>();
+			// Aggregate the offspring in the offspring list.
+			for (int i = 0; i < numberOfIndividualsInGeneration; i++) {
+				if (collectionOfIndividuals[i].numberOfOffspring == 0) {
+					Debug.Log("THIS INDIVIDUAL DID NOT REPRODUCE");
+				} else if (collectionOfIndividuals[i].numberOfOffspring == 1) {
+					listOfNewOffspring.Add(collectionOfIndividuals[i]);
+				} else if (collectionOfIndividuals[i].numberOfOffspring == 2) {
+					listOfNewOffspring.Add(collectionOfIndividuals[i]);
+					listOfNewOffspring.Add(collectionOfIndividuals[i]);
+				}
+			}
+			// Change the offspring list to an array of individuals.
+			collectionOfIndividuals = listOfNewOffspring.ToArray();
+			// Mutate and duplicate the new offspring, as they would in actual biology.
+			mutateAndDuplicateGeneration();
 		}
 
 		// HELPER FUNCTIONS.

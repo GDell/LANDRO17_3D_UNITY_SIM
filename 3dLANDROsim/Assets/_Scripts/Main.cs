@@ -226,6 +226,8 @@ public class Main : MonoBehaviour {
  		}
     }
 
+    // FUNCTION: finalFitnessCalculation() 
+   	//	This function determines an individual's final fitness, taking into account its' fitness scores throughout the trial.
     float finalFitnessCalculation() {
     	overallFitnessScore = (((hIRlLDRfitnessScore/totalIterations)*100) + ((lIRhLDRfitnessScore/totalIterations)*100) + 
     			((((hIRlLDRfitnessScore/totalIterations)*100) + 
@@ -238,8 +240,10 @@ public class Main : MonoBehaviour {
     	return overallFitnessScore;
     }
 
-
-	// Use to reset timing variables between trial runs.
+    // FUNCTION: reset()
+	//	This function resets the trial experiment with the current individual in the generation being tested.
+	//  If the entire generation has been run, this function will create a new generation of the offspring from the previous
+	//	that are mutated and deleted. The program will then start running trials for this new experiment.
     public void reset() {
     	hIRlLDRfitnessScore = 0;
         lIRhLDRfitnessScore = 0; 
@@ -254,7 +258,10 @@ public class Main : MonoBehaviour {
     		currentIndex = testGeneration.individualIndex;
     		SceneManager.LoadScene("Experiment");
    		} else {
+   			testGeneration.createNewGeneration();
+   			currentIndex = 0;
    			Debug.Log("End of generation");
+   			SceneManager.LoadScene("Experiment");
    		}
     }
 
