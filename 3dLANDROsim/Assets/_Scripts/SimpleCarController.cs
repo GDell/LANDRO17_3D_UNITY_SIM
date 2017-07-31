@@ -406,7 +406,7 @@ public class SimpleCarController : MonoBehaviour {
    		// Grab wheels in order to drive them.
    		WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
 		WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
-		float turnTime = 100f;
+		float turnTime = 1f;
 
 		string frontBumpType = "";
 		string backBumpType = "";
@@ -430,6 +430,7 @@ public class SimpleCarController : MonoBehaviour {
 			}
 		}
 		if (hasBumped == false) {
+			Debug.Log("NO BUMP FRONT");
 			frontBumpType = "";
 		}
 
@@ -449,6 +450,7 @@ public class SimpleCarController : MonoBehaviour {
 			}
 		}
 		if (hasBumpedB == false) {
+			Debug.Log("NO BUMP BACK");
 			backBumpType = "";
 		}
 
@@ -461,67 +463,66 @@ public class SimpleCarController : MonoBehaviour {
 		} else if (frontBumpType == "leftFront") {
 			// Debug.Log("FORCE APPLIED FOR BRAKES");
 			float time = 0f;
-			Debug.Log(frontBumpType);
-			// while (time < turnTime) {
-				leftMotor.motorTorque = -118725;
-				rightMotor.motorTorque = -119000;
+			// Debug.Log(frontBumpType);
+			while (time < turnTime) {
+				leftMotor.motorTorque = 15000;
+				rightMotor.motorTorque = -12500;
 				time = time + Time.deltaTime;
-				Debug.Log("TURNING");
-			// } 
+				Debug.Log("TURNING RIGHT");
+			} 
 		} else if (frontBumpType == "rightFront") {
 			// Debug.Log("FORCE APPLIED FOR BRAKES");
 			float time = 0f;
 			// Debug.Log(frontBumpReading);
-			// while (time < turnTime) {
-				leftMotor.motorTorque =	-119000;
-				rightMotor.motorTorque = -118725;
+			while (time < turnTime) {
+				leftMotor.motorTorque =	-12500;
+				rightMotor.motorTorque = 15000;
 				time = time + Time.deltaTime;
-				Debug.Log("TURNING");
-			// }
+				Debug.Log("TURNING LEFT");
+			}
 		} else if (frontBumpType == "middleFront") {
 			// Debug.Log("FORCE APPLIED FOR BRAKES");
 			float time = 0f;
 			// Debug.Log(frontBumpReading);
-			// while (time < turnTime) {
-				leftMotor.motorTorque = -117500;
-				rightMotor.motorTorque = -117725;
-				time = time + Time.deltaTime;
-				Debug.Log("TURNING");
-			// } 
-		} else if (backBumpType == "middleBack") {
-			// Debug.Log("FORCE APPLIED FOR BRAKES");
-			float time = 0f;
-			Debug.Log(backBumpType);
 			while (time < turnTime) {
-				leftMotor.motorTorque = -115000;
-				rightMotor.motorTorque = -115000;
+				leftMotor.motorTorque = -1000;
+				rightMotor.motorTorque = -2000;
 				time = time + Time.deltaTime;
-				Debug.Log("TURNING");
-			}
-		} else if (backBumpType == "rightBack") {
-			// Debug.Log("FORCE APPLIED FOR BRAKES");
-			float time = 0f;
-			// Debug.Log(backBumpReading);
-			while (time < turnTime) {
-				leftMotor.motorTorque = -114000;
-				rightMotor.motorTorque = -113725;
-				time = time + Time.deltaTime;
-				Debug.Log("TURNING");
-			}
-		} else if (backBumpType == "leftBack") {
-			// Debug.Log("FORCE APPLIED FOR BRAKES");
-			float time = 0f;
-			// Debug.Log(backBumpReading);
-			while (time < turnTime) {
-				leftMotor.motorTorque = -113725;
-				rightMotor.motorTorque = -114000;
-				time = time + Time.deltaTime;
-				Debug.Log("TURNING");
-			}
+				Debug.Log("MOVING BACK");
+			} 
 		}
-
+		// } else if (backBumpType == "middleBack") {
+		// 	// Debug.Log("FORCE APPLIED FOR BRAKES");
+		// 	float time = 0f;
+		// 	Debug.Log(backBumpType);
+		// 	while (time < turnTime) {
+		// 		leftMotor.motorTorque = -115000;
+		// 		rightMotor.motorTorque = -115000;
+		// 		time = time + Time.deltaTime;
+		// 		Debug.Log("TURNING");
+		// 	}
+		// } else if (backBumpType == "rightBack") {
+		// 	// Debug.Log("FORCE APPLIED FOR BRAKES");
+		// 	float time = 0f;
+		// 	// Debug.Log(backBumpReading);
+		// 	while (time < turnTime) {
+		// 		leftMotor.motorTorque = -114000;
+		// 		rightMotor.motorTorque = -113725;
+		// 		time = time + Time.deltaTime;
+		// 		Debug.Log("TURNING");
+		// 	}
+		// } else if (backBumpType == "leftBack") {
+		// 	// Debug.Log("FORCE APPLIED FOR BRAKES");
+		// 	float time = 0f;
+		// 	// Debug.Log(backBumpReading);
+		// 	while (time < turnTime) {
+		// 		leftMotor.motorTorque = -113725;
+		// 		rightMotor.motorTorque = -114000;
+		// 		time = time + Time.deltaTime;
+		// 		Debug.Log("TURNING");
+		// 	}
+		// }
 		arrowMove();
-
     }
 
 
@@ -567,7 +568,8 @@ public class SimpleCarController : MonoBehaviour {
 		arrowMove();
     }
    
-    
+    // FUNCTION: stopMovement()
+    // This function stops all movement of the landro body.	
     public static void stopMovement() {
     	WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
 		WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
@@ -598,8 +600,7 @@ public class SimpleCarController : MonoBehaviour {
 		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
 		return (mapVal);
 	}
-
-
+	// SCALES MOTOR VALUES PRIOR TO ASSIGNING MOTOR TORQUE.
     public static float motorScale(float val) {
 		float fromLow = -1;
 		float fromHigh = 1;
@@ -612,15 +613,12 @@ public class SimpleCarController : MonoBehaviour {
 		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
 		return (mapVal);
 	}
-
-    // PRINTS INFORMATION ABOUT AN ARRAY.
+    // PRINTS INFORMATION ABOUT AN ARRAY GIVEN THE SHOWORNAH BOOLEAN.
     void showArrayInformation (Array arr, bool showORnah) {
     	if (showORnah) {
     		print("The length of array: " + arr.Length);
     	}
     }
-
-
     // Allows the user to control Landro using the arrow keys. Good for debugging and testing purposes.
     public static void arrowMove() {
     	WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
@@ -646,19 +644,16 @@ public class SimpleCarController : MonoBehaviour {
 		    print("LEFT");
     	}
 	}
-
+	// FUNCTIONS FOR RETURNING SENSOR DATA ARRAYS.
     public static float[] returnRawLDRdata() {
     	return rawldrDataArray;
     } 
-
     public static float[] returnRawIRdata() {
     	return rawirDataArray;
     }
-
     public static float[] returnLDRdata() {
     	return ldrDataArray;
     }
-
     public static float[] returnIRdata() {
     	return irDataArray;
     }

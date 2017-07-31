@@ -39,7 +39,7 @@ public class Main : MonoBehaviour {
 	public float delRate = 0.01f;
 	public float changePercent = 0.15f;
 
-	public float trialTime = 50f;
+	public float trialTime = 60f;
     public float timeCurrent;
 
 	// Threshold values for the fitness function. 
@@ -119,6 +119,8 @@ public class Main : MonoBehaviour {
 		if (pastStartScreen) {
 			if (!(firstGenerationRun)) {
 				beginRun();
+			} else {
+				totalIterations = 0;
 			}
 			firstGenerationRun = false;
 		}
@@ -181,16 +183,16 @@ public class Main : MonoBehaviour {
     		print("NOT FIT");
     	} else if(exceededIRthreshold && (!exceededLDRthreshold)) {
     		hIRlLDRfitnessScore = hIRlLDRfitnessScore + 1;
+    		print("FIT");
     		// print("hIRlLDRfitnessScore: " + hIRlLDRfitnessScore);
     	} else if(exceededLDRthreshold && (!exceededIRthreshold)) {
     		lIRhLDRfitnessScore = lIRhLDRfitnessScore + 1;
+    		print("FIT");
     		// print("lIRhLDRfitnessScore: " + lIRhLDRfitnessScore);
     	}
     }
 
-
     // This function begins running the individual at the current index.
-
     void beginRun() {
 
     	float[] currentLDRdata;
