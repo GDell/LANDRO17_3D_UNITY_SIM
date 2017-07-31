@@ -39,7 +39,7 @@ public class Main : MonoBehaviour {
 	public float delRate = 0.01f;
 	public float changePercent = 0.15f;
 
-	public float trialTime = 60f;
+	public float trialTime = 10f;
     public float timeCurrent;
 
 	// Threshold values for the fitness function. 
