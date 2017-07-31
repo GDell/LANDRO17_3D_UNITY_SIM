@@ -16,10 +16,6 @@ public class SimpleCarController : MonoBehaviour {
     public int LDRnumber = 0;
 	public int IRnumber = 0;
 
-	// Motor torque and steering parameters.
-    public float maxMotorTorque;
-    public float maxSteeringAngle;
-
     // BOOLEANS: Toggle to change further function behaviors.
     	// True if you want to print IR and LDR data.
     public bool displayFitnessInfo;
@@ -27,7 +23,6 @@ public class SimpleCarController : MonoBehaviour {
 	public bool useNetwork;
 		// True if you want bumper debug info.
 	public bool debugBumper;
-
 	public int baseMovementRate;
 
     // SENSOR ARRAYS
@@ -50,7 +45,7 @@ public class SimpleCarController : MonoBehaviour {
 	public int leftMovementValue;
 	public int frontMovementValue;
 	public int backMovementValue;
-    public string moveType;
+
     public int numberCollidedIR;
     public int numberCollidedLeftIR;
     public int numberCollidedRightIR;
@@ -77,9 +72,6 @@ public class SimpleCarController : MonoBehaviour {
 
 	public float fitnessLDRscore;
 	public float fitnessIRscore;
-
-    public float rightWheelTorque;
-    public float leftWheelTorque;
 
 	BumpSensor[] bump_sensorsPOSITION;
 	BumpSensorBack[] backBump_sensorsPOSITION;
@@ -195,11 +187,6 @@ public class SimpleCarController : MonoBehaviour {
 		leftLDRreadings = 0;
 		rightLDRreadings = 0;
 		baseMovementRate = 500;
-
-
-
-		leftMotor.motorTorque = rightWheelTorque;
-		rightMotor.motorTorque = leftWheelTorque;
 
 		// // Selected sensors for input into neural network function.
 		// chosenSensorArray = new int[4] {2,3,13,14}; 
@@ -397,7 +384,6 @@ public class SimpleCarController : MonoBehaviour {
 		maxOfLDRArray = ldrReadingArray.Max();
  		maxLDRIndex = ldrReadingArray.ToList().IndexOf(maxOfLDRArray);
     }
-
 
     // FUNCTION: runMotors() 
     // This function takes two motor torque (left and right) values, checks the bumpers,
