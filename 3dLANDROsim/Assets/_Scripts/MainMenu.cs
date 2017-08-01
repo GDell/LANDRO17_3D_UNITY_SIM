@@ -3,58 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
 public class MainMenu : MonoBehaviour {
-
+	// INPUT FIELDS IN MAIN MENUS.
 	public InputField numIndInput;
 	public InputField avgGeneInput;
 	public InputField numGenerations;
-	// // public InputField numIndInput = GameObject.Find("Number_of_Individuals").GetComponent<InputField>();
-
-
-	public int INPUTnumberOfIndividuals;
-	public int INPUTavgGenomeSize;
-	public int INPUTnumberOfGenerations;
-	// Use this for initialization
+	// VARIABLES TO STORE USER INPUT.
+	public static int INPUTnumberOfIndividuals;
+	public static int INPUTavgGenomeSize;
+	public static int INPUTnumberOfGenerations;
+	// INITIALIZE THE DEFAULT VALUES.
 	void Start () {
+		// DEFAULT VALUES
 		INPUTnumberOfGenerations = 20;
 		INPUTavgGenomeSize = 10;
 		INPUTnumberOfIndividuals = 10;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	}
-
+	// FUNCTION: startSimulation()
+	// This function is called by the start button in the main menu.
+	// It grabs the user input in the menu's input fields and assigns them
+	// to public variables such that they may be references in other scripts.
 	public void StartSimulation() {
-
+		// Assign input to storage variables.
 		INPUTnumberOfIndividuals = int.Parse(numIndInput.text);
 		INPUTavgGenomeSize = int.Parse(avgGeneInput.text);
 		INPUTnumberOfGenerations = int.Parse(numGenerations.text);
-
-
-		// if (avgGeneInput.Text == null) {
-		// 	INPUTavgGenomeSize = 10;
-		// 	Debug.Log("Average genome size set to default 10");
-		// } else {
-		// 	INPUTavgGenomeSize = Int32.TryParse(avgGeneInput.text);
-		// }
-
-		// if (numIndInput.Text == null) {
-		// 	INPUTnumberOfIndividuals = 20;
-		// 	Debug.Log("Average generation size set to default 20");
-		// } else {
-		// 	INPUTnumberOfIndividuals = Int32.TryParse(numIndInput.text);
-		// }
-
-
-		// if (numGenerations.Text == null) {
-		// 	INPUTnumberOfGenerations = 20;
-		// 	Debug.Log("Number of generations set to default 10");
-		// } else {
-		// 	INPUTnumberOfGenerations = Int32.TryParse(numIndInput.text);
-		// }
-
+		// LOAD THE EXPERIMENT.
 		SceneManager.LoadScene("Experiment");
 		Main.pastStartScreen = true;
 	}

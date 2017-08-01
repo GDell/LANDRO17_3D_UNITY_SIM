@@ -1041,6 +1041,9 @@ public class genomeHandler {
 		public int numberOfGenes;
 		public int meanStandardDeviationOfGenes;
 
+		public int numberOfGenerations;
+		public int generationIndex;
+
 		public int individualIndex;
 		public int numberOfTotalOffspring;
 
@@ -1049,12 +1052,15 @@ public class genomeHandler {
 		// FUNCTION: setGenerationParamters()
 		// This function sets a generations mean/sd regarding number of genes in each genome/individual of the generation.
 		// It also determines teh number of individuals in the generation.
-		public void setGenerationParameters(int meanNumberOfG, int meanStandardDeviationOfG, int numberOfInd) {
-			rand = new System.Random(); 
-			// numberOfGenes = meanNumberOfG;
-			meanStandardDeviationOfGenes = meanStandardDeviationOfG;
+		public void setGenerationParameters(int numberOfG, int numGenerations, int numberOfInd) {
+			rand = new System.Random();
+
+			numberOfGenes = numberOfG;
 			numberOfIndividualsInGeneration = numberOfInd;
+			numberOfGenerations = numGenerations;
+			
 			collectionOfIndividuals = new individual[numberOfInd];
+			generationIndex = 0;
 			individualIndex = 0;
 			done = false;
 		}
@@ -1084,7 +1090,7 @@ public class genomeHandler {
 				int gDurationMin = 1;
 				int gDurationMax = 100;
 
-				numberOfGenes = 20;
+				// numberOfGenes = 20;
 
 				float dupeRate = 0.5f;
 				float muteRate = 0.05f;
@@ -1122,7 +1128,6 @@ public class genomeHandler {
 			}
 		}
 
-		
 		// FUNCTION: nextIndividual() 
 		// This function iterates the individualIndex number as long as it is 
 		// less than the number of individuals in the generation.

@@ -73,8 +73,6 @@ public class Main : MonoBehaviour {
         lIRhLDRfitnessScore = 0; 
 
 		// Test for creating a generation.
-		testGeneration.setGenerationParameters(20, 2, 20); 
-		testGeneration.createStartGeneration();
 
 		// // CREATING A GENOME:
 		// testGenome.createRandomFunction();
@@ -110,13 +108,20 @@ public class Main : MonoBehaviour {
 	
 	void Update () {	
 		
-		timeCurrent = Time.timeSinceLevelLoad;
-
-		// if (timeCurrent >= (trialTime)) {	
+		timeCurrent = Time.timeSinceLevelLoad;	
 
 		Debug.Log("RUNNING INDIVIDUAL: " + currentIndex);
 
+		// IF we have passed the start screen...
 		if (pastStartScreen) {
+			// If this is the first run after passing the start screen...
+			if (firstRun) {
+				// Create a generation.
+				// (int numberOfG, int numGenerations, int numberOfInd)
+				testGeneration.setGenerationParameters(MainMenu.INPUTnumberOfIndividuals, MainMenu.INPUTnumberOfGenerations, MainMenu.INPUTnumberOfIndividuals); 
+				testGeneration.createStartGeneration();
+			}
+
 			if (!(firstGenerationRun)) {
 				beginRun();
 			} else {
