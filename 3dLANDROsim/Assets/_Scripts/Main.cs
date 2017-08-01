@@ -55,7 +55,7 @@ public class Main : MonoBehaviour {
     public int currentIndex;
    	// public int numberOfindividuals;
 
-   	public bool simulationDone = false;
+   	public bool simulationRunning;
 
     public int overallFitnessScore;
     public int hIRlLDRfitnessScore;
@@ -67,6 +67,9 @@ public class Main : MonoBehaviour {
     public int currentGeneration;
 
 	void Start () {
+
+		simulationRunning = true;
+
 		mainScript = GameObject.Find("MainScript");
 		DontDestroyOnLoad(mainScript);
 
@@ -85,7 +88,7 @@ public class Main : MonoBehaviour {
 
 		// // CREATING A GENOME:
 		// testGenome.createRandomFunction();
-		// testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
+		// testGenome.setGenomeParameters(2, dupeRate, muteRate, delRate, changePercent);
 		// testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
 		// testGenome.printGenomeContents();
 
@@ -93,7 +96,7 @@ public class Main : MonoBehaviour {
 		// testGtoP.passGenome(testGenome);
 		// testGtoP.runDevoGraphics();
 		// testGtoP.makeConnectome();
-		// testGtoP.printConnectomeContents();
+		// // testGtoP.printConnectomeContents();
 
 		// // CREATING NEURAL NETWORK PARAMETERS
 		// testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
@@ -122,7 +125,8 @@ public class Main : MonoBehaviour {
 		Debug.Log("RUNNING INDIVIDUAL: " + currentIndex);
 		Debug.Log("RUNNING GENERATION: " + testGeneration.generationIndex);
 
-		if (simulationDone == false) {
+		if (simulationRunning) {
+			Debug.Log("WHAT THE HELL");
 
 		// IF we have passed the start screen...
 			if (pastStartScreen) {
@@ -158,7 +162,7 @@ public class Main : MonoBehaviour {
 					   			SceneManager.LoadScene("Experiment");
 				   			} else if (testGeneration.generationIndex >= testGeneration.numberOfGenerations) {
 					   			Debug.Log("END OF SIMULATION REACHED, NUMBER OF GENERATIONS EVALUATED: " + testGeneration.numberOfGenerations);
-					   			simulationDone = true;
+					   			simulationRunning = false;
 				   			}   	
 						}  
 							

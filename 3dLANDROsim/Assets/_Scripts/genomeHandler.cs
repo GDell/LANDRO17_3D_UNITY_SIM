@@ -1067,7 +1067,7 @@ public class genomeHandler {
 		// the function setGenerationParameters().
 		public void createStartGeneration() {
 	
-		    int generationLength = collectionOfIndividuals.Length;
+		    int generationLength = numberOfIndividualsInGeneration;
 		    Debug.Log("Number of individuals in a generation: " + generationLength);
 
 		    // Instantiates all of the individuals in the generation.
@@ -1104,7 +1104,7 @@ public class genomeHandler {
 				collectionOfIndividuals[i].GtoPCollection.passGenome(collectionOfIndividuals[i].genomeCollection);
 				collectionOfIndividuals[i].GtoPCollection.runDevoGraphics();
 				collectionOfIndividuals[i].GtoPCollection.makeConnectome();
-				collectionOfIndividuals[i].GtoPCollection.printConnectomeContents();
+				// collectionOfIndividuals[i].GtoPCollection.printConnectomeContents();
 
 				// Creates neural net parameters for each individual.
 				collectionOfIndividuals[i].paramsCollection.passConnectionMatrix(collectionOfIndividuals[i].GtoPCollection.sortedConnects, collectionOfIndividuals[i].genomeCollection);
