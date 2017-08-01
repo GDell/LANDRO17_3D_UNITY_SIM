@@ -39,7 +39,7 @@ public class Main : MonoBehaviour {
 	public float delRate = 0.01f;
 	public float changePercent = 0.15f;
 
-	public float trialTime = 10f;
+	public float trialTime;
     public float timeCurrent;
 
 	// Threshold values for the fitness function. 
@@ -116,9 +116,11 @@ public class Main : MonoBehaviour {
 		if (pastStartScreen) {
 			// If this is the first run after passing the start screen...
 			if (firstRun) {
+				trialTime = MainMenu.INPUTtrialLength;
+				Debug.Log("THIS IS THE TRIAL TIME: " + trialTime);
 				// Create a generation.
 				// (int numberOfG, int numGenerations, int numberOfInd)
-				testGeneration.setGenerationParameters(MainMenu.INPUTnumberOfIndividuals, MainMenu.INPUTnumberOfGenerations, MainMenu.INPUTnumberOfIndividuals); 
+				testGeneration.setGenerationParameters(MainMenu.INPUTavgGenomeSize, MainMenu.INPUTnumberOfGenerations, MainMenu.INPUTnumberOfIndividuals); 
 				testGeneration.createStartGeneration();
 			}
 
@@ -262,11 +264,13 @@ public class Main : MonoBehaviour {
     		testGeneration.nextIndividual();
     		currentIndex = testGeneration.individualIndex;
     		SceneManager.LoadScene("Experiment");
-   		} else {
+   		} else if (testGeneration.generationIndex < testGeneration.numberOfGenerations) {
    			testGeneration.createNewGeneration();
    			currentIndex = 0;
    			Debug.Log("End of generation");
    			SceneManager.LoadScene("Experiment");
+   		} else {
+   			Debug.Log("END OF SIMULATION REACHED, NUMBER OF GENERATIONS EVALUATED: " + testGeneration.numberOfGenerations);
    		}
     }
 

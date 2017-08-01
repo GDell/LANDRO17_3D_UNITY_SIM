@@ -1142,7 +1142,11 @@ public class genomeHandler {
 		}
 
 		// FUNCTION: runNeuralNetOnIndividual() 
-		// This function runs the neural net of an individual in the generation.
+		//		Input:
+		//			- LDRarray: the array of LDR sensor readings.
+		//			- IRarray: 	the array of IR sensor readings.
+		// This function runs the current individual using the two sensor reading arrays 
+		// acquired in the simpleCarController script.
 		public void runNeuralNetOnIndividual(float[] theLDRarray, float[] theIRarray) {
 			float[] currentLDRdataArray = theLDRarray;
 			float[] currentIRdataArray = theIRarray;
@@ -1198,10 +1202,15 @@ public class genomeHandler {
 					listOfNewOffspring.Add(collectionOfIndividuals[i]);
 				}
 			}
-			// Change the offspring list to an array of individuals.
-			collectionOfIndividuals = listOfNewOffspring.ToArray();
-			// Mutate and duplicate the new offspring, as they would in actual biology.
-			mutateAndDuplicateGeneration();
+
+			generationIndex = generationIndex + 1;
+			if (generationIndex < numberOfGenerations) {
+				// Change the offspring list to an array of individuals.
+				collectionOfIndividuals = listOfNewOffspring.ToArray();
+				// Mutate and duplicate the new offspring, as they would in actual biology.
+				mutateAndDuplicateGeneration();
+			} 
+
 		}
 
 		// HELPER FUNCTIONS.
@@ -1216,7 +1225,6 @@ public class genomeHandler {
 		// 	return numberOfGenes;
 		// }
 	}
-
 
 	void Start () {	
 	}

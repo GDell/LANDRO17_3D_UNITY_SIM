@@ -8,13 +8,16 @@ public class MainMenu : MonoBehaviour {
 	public InputField numIndInput;
 	public InputField avgGeneInput;
 	public InputField numGenerations;
+	public InputField trialLength;
 	// VARIABLES TO STORE USER INPUT.
 	public static int INPUTnumberOfIndividuals;
 	public static int INPUTavgGenomeSize;
 	public static int INPUTnumberOfGenerations;
+	public static int INPUTtrialLength;
 	// INITIALIZE THE DEFAULT VALUES.
 	void Start () {
 		// DEFAULT VALUES
+		INPUTtrialLength = 60;
 		INPUTnumberOfGenerations = 20;
 		INPUTavgGenomeSize = 10;
 		INPUTnumberOfIndividuals = 10;
@@ -28,6 +31,7 @@ public class MainMenu : MonoBehaviour {
 		INPUTnumberOfIndividuals = int.Parse(numIndInput.text);
 		INPUTavgGenomeSize = int.Parse(avgGeneInput.text);
 		INPUTnumberOfGenerations = int.Parse(numGenerations.text);
+		INPUTtrialLength = int.Parse(trialLength.text);
 		// LOAD THE EXPERIMENT.
 		SceneManager.LoadScene("Experiment");
 		Main.pastStartScreen = true;
