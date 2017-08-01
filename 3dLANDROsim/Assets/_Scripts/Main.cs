@@ -39,6 +39,7 @@ public class Main : MonoBehaviour {
 	public float delRate = 0.01f;
 	public float changePercent = 0.15f;
 
+
 	public float trialTime;
     public float timeCurrent;
 
@@ -52,12 +53,18 @@ public class Main : MonoBehaviour {
 
 
     public int currentIndex;
-   	public int numberOfindividuals;
+   	// public int numberOfindividuals;
+
+   	public bool simulationDone = false;
 
     public int overallFitnessScore;
     public int hIRlLDRfitnessScore;
     public int lIRhLDRfitnessScore;
     public int totalIterations;
+
+
+
+    public int currentGeneration;
 
 	void Start () {
 		mainScript = GameObject.Find("MainScript");
@@ -65,6 +72,8 @@ public class Main : MonoBehaviour {
 
 		timeCurrent = 0;
 		currentIndex = 0;
+
+		currentGeneration = 0;
 
 		overallFitnessScore = 0;
 		totalIterations = 0; 
@@ -111,25 +120,58 @@ public class Main : MonoBehaviour {
 		timeCurrent = Time.timeSinceLevelLoad;	
 
 		Debug.Log("RUNNING INDIVIDUAL: " + currentIndex);
+		Debug.Log("RUNNING GENERATION: " + testGeneration.generationIndex);
+
+		if (simulationDone == false) {
 
 		// IF we have passed the start screen...
-		if (pastStartScreen) {
-			// If this is the first run after passing the start screen...
-			if (firstRun) {
-				trialTime = MainMenu.INPUTtrialLength;
-				Debug.Log("THIS IS THE TRIAL TIME: " + trialTime);
-				// Create a generation.
-				// (int numberOfG, int numGenerations, int numberOfInd)
-				testGeneration.setGenerationParameters(MainMenu.INPUTavgGenomeSize, MainMenu.INPUTnumberOfGenerations, MainMenu.INPUTnumberOfIndividuals); 
-				testGeneration.createStartGeneration();
+			if (pastStartScreen) {
+				// If this is the first run after passing the start screen...
+				if (firstRun) {
+					trialTime = MainMenu.INPUTtrialLength;
+					Debug.Log("THIS IS THE TRIAL TIME: " + trialTime);
+					// Create a generation.
+					// (int numberOfG, int numGenerations, int numberOfInd)
+					testGeneration.setGenerationParameters(MainMenu.INPUTavgGenomeSize, MainMenu.INPUTnumberOfGenerations, MainMenu.INPUTnumberOfIndividuals); 
+					testGeneration.createStartGeneration();
+				}
+				if (!(firstGenerationRun)) {
+
+					if (timeCurrent <  trialTime) {	
+						beginRun();
+					} else if (timeCurrent >= trialTime) {
+						SimpleCarController.stopMovement();
+						Debug.Log("DONE RUNNING INDIVIDUAL: "+ currentIndex);
+						testGeneration.collectionOfIndividuals[currentIndex].fitnessScore = finalFitnessCalculation();
+						// testGeneration.nextIndividual();
+
+
+						int numberOfindividuals = testGeneration.numberOfIndividualsInGeneration;
+						if (currentIndex < numberOfindividuals) {
+							reset();
+						} else if (currentIndex >= numberOfindividuals) {
+
+				   			if(testGeneration.generationIndex < testGeneration.numberOfGenerations) {
+				   				Debug.Log("Starting next generation");
+					   			testGeneration.createNewGeneration();
+					   			currentIndex = 0;
+					   			SceneManager.LoadScene("Experiment");
+				   			} else if (testGeneration.generationIndex >= testGeneration.numberOfGenerations) {
+					   			Debug.Log("END OF SIMULATION REACHED, NUMBER OF GENERATIONS EVALUATED: " + testGeneration.numberOfGenerations);
+					   			simulationDone = true;
+				   			}   	
+						}  
+							
+					}
+					
+				} else {
+					totalIterations = 0;
+				}
+				firstGenerationRun = false;
 			}
 
-			if (!(firstGenerationRun)) {
-				beginRun();
-			} else {
-				totalIterations = 0;
-			}
-			firstGenerationRun = false;
+		} else {
+			Debug.Log("Simulation has finished!");
 		}
 
 	}
@@ -258,20 +300,24 @@ public class Main : MonoBehaviour {
     	overallFitnessScore = 0;
     	timeCurrent = 0;
     	// currentIndex = testGeneration.individualIndex;
-    	numberOfindividuals = testGeneration.numberOfIndividualsInGeneration;
+    	int numberOfindividuals = testGeneration.numberOfIndividualsInGeneration;
 
-    	if (currentIndex < numberOfindividuals) {
-    		testGeneration.nextIndividual();
-    		currentIndex = testGeneration.individualIndex;
-    		SceneManager.LoadScene("Experiment");
-   		} else if (testGeneration.generationIndex < testGeneration.numberOfGenerations) {
-   			testGeneration.createNewGeneration();
-   			currentIndex = 0;
-   			Debug.Log("End of generation");
-   			SceneManager.LoadScene("Experiment");
-   		} else {
-   			Debug.Log("END OF SIMULATION REACHED, NUMBER OF GENERATIONS EVALUATED: " + testGeneration.numberOfGenerations);
-   		}
+		testGeneration.nextIndividual();
+		currentIndex = currentIndex + 1;
+		SceneManager.LoadScene("Experiment");
+   		// } else if (currentIndex >= numberOfindividuals) {
+   		// 	if(testGeneration.generationIndex < testGeneration.numberOfGenerations) {
+   		// 		Debug.Log("Starting next generation");
+	   	// 		testGeneration.createNewGeneration();
+	   	// 		currentIndex = 0;
+	   	// 		SceneManager.LoadScene("Experiment");
+
+   		// 	} else if (testGeneration.generationIndex >= testGeneration.numberOfGenerations) {
+
+	   	// 		Debug.Log("END OF SIMULATION REACHED, NUMBER OF GENERATIONS EVALUATED: " + testGeneration.numberOfGenerations);
+	   	// 		simulationDone = true;
+   		// 	}
+   		// }
     }
 
 

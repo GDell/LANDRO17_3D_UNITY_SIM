@@ -998,6 +998,7 @@ public class genomeHandler {
 		// This function takes in the population size and determines offspring based off of 
 		// the individuals fitness score.
 		public void determineOffspring(int populationSize) {
+				Debug.Log("DETERMINING OFFSPRING!");
 				float lowerBase = 0.30f;
 				float highChance = 0.50f;
 				if ((fitnessScore < (20+populationSize)) && (rand.NextDouble() < lowerBase)) {
@@ -1033,7 +1034,6 @@ public class genomeHandler {
 	// 		createNumberOfGenes() : creates the number of genes for a given genome in the generation.
 	public struct generation {
 		System.Random rand;
-
 		// A generation is a set of individuals.
 		public individual[] collectionOfIndividuals;
 
@@ -1046,8 +1046,6 @@ public class genomeHandler {
 
 		public int individualIndex;
 		public int numberOfTotalOffspring;
-
-		bool done;
 
 		// FUNCTION: setGenerationParamters()
 		// This function sets a generations mean/sd regarding number of genes in each genome/individual of the generation.
@@ -1062,7 +1060,6 @@ public class genomeHandler {
 			collectionOfIndividuals = new individual[numberOfInd];
 			generationIndex = 0;
 			individualIndex = 0;
-			done = false;
 		}
 
 		// FUNCTION: createStartGeneration()
@@ -1132,13 +1129,12 @@ public class genomeHandler {
 		// This function iterates the individualIndex number as long as it is 
 		// less than the number of individuals in the generation.
 		public void nextIndividual() {
-			int collectionLength = collectionOfIndividuals.Length;
-			if (individualIndex < collectionLength) {
+			// int collectionLength = collectionOfIndividuals.Length;
 				individualIndex = individualIndex + 1;
-			} else {
-				Debug.Log("ENTIRE GENERATION HAS BEEN RUN");
-				done = true;
-			}
+			// } else {
+				// Debug.Log("ENTIRE GENERATION HAS BEEN RUN");
+			// 	done = true;
+			// }
 		}
 
 		// FUNCTION: runNeuralNetOnIndividual() 
@@ -1168,9 +1164,10 @@ public class genomeHandler {
 		//	Calculates the number of children each individual in the generation gets 
 		//	to pass on to the next generation.
 		public void determineOffspringForGeneration() {
+			Debug.Log("ATTEMPTING TO DETERMINE OFFSPRING FOR THE GENERATION");
 			numberOfTotalOffspring = 0;
 			int popSize = collectionOfIndividuals.Length;
-			int[] numberOfOffspringArray = new int[numberOfIndividualsInGeneration];
+			// int[] numberOfOffspringArray = new int[numberOfIndividualsInGeneration];
 			for (int i = 0; i < numberOfIndividualsInGeneration; i++) {
 				collectionOfIndividuals[i].determineOffspring(popSize);
 			}
@@ -1204,13 +1201,12 @@ public class genomeHandler {
 			}
 
 			generationIndex = generationIndex + 1;
-			if (generationIndex < numberOfGenerations) {
 				// Change the offspring list to an array of individuals.
-				collectionOfIndividuals = listOfNewOffspring.ToArray();
-				// Mutate and duplicate the new offspring, as they would in actual biology.
-				mutateAndDuplicateGeneration();
-			} 
+			collectionOfIndividuals = listOfNewOffspring.ToArray();
 
+			numberOfIndividualsInGeneration = collectionOfIndividuals.Length;
+			// Mutate and duplicate the new offspring, as they would in actual biology.
+			mutateAndDuplicateGeneration();
 		}
 
 		// HELPER FUNCTIONS.
