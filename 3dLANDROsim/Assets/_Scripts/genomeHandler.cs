@@ -409,19 +409,20 @@ public class genomeHandler {
 
 		}
 
-
-		public void printConnectomeContents() {
-			int[,] sortedConnectsArray = To2D(sortedConnects.ToArray());
-			int lengthOfArrayRow = sortedConnectsArray.GetLength(0);
-			int lengthOfArrayCol = sortedConnectsArray.GetLength(1);
-			string printString = "CONNECTOME: ";
-			for (int j = 0; j < lengthOfArrayRow; j++) {
-				for (int i = 0; i < lengthOfArrayCol; i++) {
-				printString += sortedConnectsArray[j,i] + ", ";
-				}
-			}
-			Debug.Log(printString);
-		}
+		// THIS FUNCTION WONT WORK: can't convert a jagged array to a 2d, unequal array sizes 
+		// throw an error.
+		// public void printConnectomeContents() {
+		// 	int[,] sortedConnectsArray = To2D(sortedConnects.ToArray());
+		// 	int lengthOfArrayRow = sortedConnectsArray.GetLength(0);
+		// 	int lengthOfArrayCol = sortedConnectsArray.GetLength(1);
+		// 	string printString = "CONNECTOME: ";
+		// 	for (int j = 0; j < lengthOfArrayRow; j++) {
+		// 		for (int i = 0; i < lengthOfArrayCol; i++) {
+		// 		printString += sortedConnectsArray[j,i] + ", ";
+		// 		}
+		// 	}
+		// 	Debug.Log(printString);
+		// }
 
 		// HELPER FUNCTIONS:
 		// Converts a degreee to a Radian
@@ -1104,7 +1105,6 @@ public class genomeHandler {
 				collectionOfIndividuals[i].GtoPCollection.passGenome(collectionOfIndividuals[i].genomeCollection);
 				collectionOfIndividuals[i].GtoPCollection.runDevoGraphics();
 				collectionOfIndividuals[i].GtoPCollection.makeConnectome();
-				// collectionOfIndividuals[i].GtoPCollection.printConnectomeContents();
 
 				// Creates neural net parameters for each individual.
 				collectionOfIndividuals[i].paramsCollection.passConnectionMatrix(collectionOfIndividuals[i].GtoPCollection.sortedConnects, collectionOfIndividuals[i].genomeCollection);

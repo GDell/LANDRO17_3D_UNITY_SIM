@@ -96,7 +96,6 @@ public class Main : MonoBehaviour {
 		// testGtoP.passGenome(testGenome);
 		// testGtoP.runDevoGraphics();
 		// testGtoP.makeConnectome();
-		// // testGtoP.printConnectomeContents();
 
 		// // CREATING NEURAL NETWORK PARAMETERS
 		// testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
