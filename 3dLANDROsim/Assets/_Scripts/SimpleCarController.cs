@@ -197,7 +197,7 @@ public class SimpleCarController : MonoBehaviour {
 		foreach(BumpSensor bump_sensor in bump_sensorsPOSITION){
 			bump_rotation = Quaternion.Euler(0, 45 * i, 180);
 			bump_position = this.transform.position;
-			bump_position.y = 40f;
+			bump_position.y = 50f;
 			bump_position.z += Mathf.Cos(Mathf.PI/4 * i) * 1f;//Divide by 2 because scaled IRs by 0.5
 			bump_position.x += Mathf.Sin(Mathf.PI/4 * i) * 1f;
 			bump_sensor.transform.rotation = bump_rotation;
@@ -392,7 +392,7 @@ public class SimpleCarController : MonoBehaviour {
    		// Grab wheels in order to drive them.
    		WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
 		WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
-		float turnTime = 10f;
+		float turnTime = 15f;
 
 		string frontBumpType = "";
 		string backBumpType = "";
@@ -416,7 +416,7 @@ public class SimpleCarController : MonoBehaviour {
 			}
 		}
 		if (hasBumped == false) {
-			Debug.Log("NO BUMP FRONT");
+			// Debug.Log("NO BUMP FRONT");
 			frontBumpType = "";
 		}
 
@@ -436,13 +436,12 @@ public class SimpleCarController : MonoBehaviour {
 			}
 		}
 		if (hasBumpedB == false) {
-			Debug.Log("NO BUMP BACK");
+			// Debug.Log("NO BUMP BACK");
 			backBumpType = "";
 		}
 
 		if ((backBumpType == "") && (frontBumpType == "")) {
-			Debug.Log("MOVEMENT FROM NEURAL NETWORK");
-
+			// Debug.Log("MOVEMENT FROM NEURAL NETWORK");
 			leftMotor.motorTorque = motorScale(leftMotorTorque);
 			rightMotor.motorTorque = motorScale(rightMotorTorque);
 
@@ -471,8 +470,8 @@ public class SimpleCarController : MonoBehaviour {
 			float time = 0f;
 			// Debug.Log(frontBumpReading);
 			while (time < turnTime) {
-				leftMotor.motorTorque = -1000;
-				rightMotor.motorTorque = -2000;
+				leftMotor.motorTorque = -10000;
+				rightMotor.motorTorque = -20000;
 				time = time + Time.deltaTime;
 				Debug.Log("MOVING BACK");
 			} 

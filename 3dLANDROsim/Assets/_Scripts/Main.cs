@@ -6,9 +6,11 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 
 public class Main : MonoBehaviour {
+	// Grab the main script so that we can declare it as 
+	// "dont destroy on load".
 	public GameObject mainScript;
 
-	/////  TEST STRUCTURES
+	// TEST STRUCTURES \\
    	// Genome
 	public genomeHandler.genome testGenome = new genomeHandler.genome();
 	// G-->P
@@ -20,11 +22,13 @@ public class Main : MonoBehaviour {
 	// Generation
 	public genomeHandler.generation testGeneration = new genomeHandler.generation();
 
-
+	// Bools to keep track of what point the program is at during 
+	// generation and trial initialization.
 	public static bool pastStartScreen = false;
 	public static bool firstGenerationRun = true;
 	public static bool firstRun = true;
 
+	// G-->P variables.
 	public int maxSpawn = 100;
 	public int vMax = 5;
 	public int vDurationMin = 1;
@@ -33,13 +37,15 @@ public class Main : MonoBehaviour {
 	public int gDurationMin = 1;
 	public int gDurationMax = 100;
 
+	// Genome variables.
 	public int numberOfGenes = 20;
 	public float dupeRate = 0.5f;
 	public float muteRate = 0.05f;
 	public float delRate = 0.01f;
 	public float changePercent = 0.15f;
 
-
+	// Timing variables to keep track of overall 
+	// trial length and the current time in a trial.
 	public float trialTime;
     public float timeCurrent;
 
@@ -48,10 +54,11 @@ public class Main : MonoBehaviour {
 	public float IRthreshold = 200f;
 	public float LDRthreshold = 500f;
 
+	// Variables for calculating fitness.
 	public float meanIRscore;
    	public float meanLDRscore;
 
-
+   	// Keeps track of the which individual in a generation we are loading.
     public int currentIndex;
    	// public int numberOfindividuals;
 
@@ -83,6 +90,9 @@ public class Main : MonoBehaviour {
 
 		hIRlLDRfitnessScore = 0;
         lIRhLDRfitnessScore = 0; 
+
+    	meanLDRscore = 0;
+    	meanIRscore = 0;
 
 		// Test for creating a generation.
 
@@ -125,7 +135,7 @@ public class Main : MonoBehaviour {
 		Debug.Log("RUNNING GENERATION: " + testGeneration.generationIndex);
 
 		if (simulationRunning) {
-			Debug.Log("WHAT THE HELL");
+			// Debug.Log("WHAT THE HELL");
 
 		// IF we have passed the start screen...
 			if (pastStartScreen) {
@@ -146,11 +156,11 @@ public class Main : MonoBehaviour {
 						SimpleCarController.stopMovement();
 						Debug.Log("DONE RUNNING INDIVIDUAL: "+ currentIndex);
 						testGeneration.collectionOfIndividuals[currentIndex].fitnessScore = finalFitnessCalculation();
-						// testGeneration.nextIndividual();
-
-
 						int numberOfindividuals = testGeneration.numberOfIndividualsInGeneration;
+
 						if (currentIndex < numberOfindividuals) {
+							testGeneration.collectionOfIndividuals[currentIndex].fitnessScore = finalFitnessCalculation();
+							SimpleCarController.stopMovement();
 							reset();
 						} else if (currentIndex >= numberOfindividuals) {
 
@@ -249,33 +259,33 @@ public class Main : MonoBehaviour {
 
     	float[] currentLDRdata;
 		float[] currentIRdata;
-
 		float[] rawLDRdata;
 		float[] rawIRdata;
-
+		// Grabs the LDR and IR sensor data to pass to neural net.
 		currentIRdata = SimpleCarController.returnIRdata();
-		currentLDRdata = SimpleCarController.returnLDRdata();
-
+		currentLDRdata = SimpleCarController.returnLDRdata();	
 		rawLDRdata = SimpleCarController.returnRawLDRdata();
 		rawIRdata = SimpleCarController.returnRawIRdata();
 
+		// If it's the first run we set the time to zero and begin 
+		// neural network drive.s
 		if (firstRun) {
     		timeCurrent = 0;
     		firstRun = false;
     	}
 
-		if (timeCurrent <  trialTime) {	
+		// if (timeCurrent <  trialTime) {	
 
-			testGeneration.runNeuralNetOnIndividual(currentLDRdata, currentIRdata);
-			evaluateTrialFitness(rawLDRdata, rawIRdata, testGeneration.collectionOfIndividuals[currentIndex].paramsCollection.chosenSensorArray);
+		testGeneration.runNeuralNetOnIndividual(currentLDRdata, currentIRdata);
+		evaluateTrialFitness(rawLDRdata, rawIRdata, testGeneration.collectionOfIndividuals[currentIndex].paramsCollection.chosenSensorArray);
 
 		// Else if we have reached the end of a trial, stop Landro, iterate to the next individual, and reload the experiment.
-		} else if (timeCurrent >= trialTime){
-			testGeneration.collectionOfIndividuals[currentIndex].fitnessScore = finalFitnessCalculation();
-			SimpleCarController.stopMovement();
+		// } else if (timeCurrent >= trialTime){
+			// testGeneration.collectionOfIndividuals[currentIndex].fitnessScore = finalFitnessCalculation();
+			// SimpleCarController.stopMovement();
 			// testGeneration.nextIndividual();
-			reset();
- 		}
+			// reset();
+ 		// }
     }
 
     // FUNCTION: finalFitnessCalculation() 
@@ -302,6 +312,9 @@ public class Main : MonoBehaviour {
     	totalIterations = 0;
     	overallFitnessScore = 0;
     	timeCurrent = 0;
+
+    	meanLDRscore = 0;
+    	meanIRscore = 0;
     	// currentIndex = testGeneration.individualIndex;
     	int numberOfindividuals = testGeneration.numberOfIndividualsInGeneration;
 
