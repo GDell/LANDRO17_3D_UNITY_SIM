@@ -7,14 +7,9 @@ using UnityEngine.SceneManagement;
 
 public class SimpleCarController : MonoBehaviour {    
 
-
 	GameObject wheelColliders;
     List<WheelCollider> wheels = new List<WheelCollider>();
     public static Rigidbody rb;
-
-    // Keeping track of number of LDR and IR sensors.
-    public int LDRnumber = 0;
-	public int IRnumber = 0;
 
     // BOOLEANS: Toggle to change further function behaviors.
     	// True if you want to print IR and LDR data.
@@ -23,12 +18,6 @@ public class SimpleCarController : MonoBehaviour {
 	public bool useNetwork;
 		// True if you want bumper debug info.
 	public bool debugBumper;
-	public int baseMovementRate;
-
-    // SENSOR ARRAYS
-
-    // public BumpSensor[] bump_sensors;
-    // public BumpSensorBack[] backBump_sensors;
 
 	public WheelCollider rightMotor;
 	public WheelCollider leftMotor;
@@ -39,18 +28,6 @@ public class SimpleCarController : MonoBehaviour {
 	public float maxOfLDRArray;
 	public int maxLDRIndex;
 
-	// IR DATA COLLECTION VARIABLES 
-	public int rightMovemntValue;
-	public int leftMovementValue;
-	public int frontMovementValue;
-	public int backMovementValue;
-
-    public int numberCollidedIR;
-    public int numberCollidedLeftIR;
-    public int numberCollidedRightIR;
-    public int numberCollidedFrontIR;
-    public int numberCollidedBackIR;
-
     public static float[] rawirDataArray;
     public static float[] irDataArray;
     public float[] irCollisionDataArray;
@@ -58,12 +35,6 @@ public class SimpleCarController : MonoBehaviour {
     public static int[] chosenSensorArray;
     public int[][] listOfChosenSensorArrays;
 
-    // LDR DATA COLLECTION VARIABLES
-    public float LEFTfrontLDRreadings;
-    public float RIGHTfrontLDRreadings;
-    public float rightLDRreadings; 
-    public float leftLDRreadings;
-    public float backLDRreadings;
 
     public static float[] rawldrDataArray;
     public static float[] ldrDataArray;
@@ -88,58 +59,6 @@ public class SimpleCarController : MonoBehaviour {
     	bump_sensors =  GameObject.FindObjectsOfType<BumpSensor>();
     	backBump_sensors = GameObject.FindObjectsOfType<BumpSensorBack>();
 
-
-		int maxSpawn = 100;
-		int vMax = 5;
-		int vDurationMin = 1;
-		int vDurationMax = 100;
-		int gMax = 3;
-		int gDurationMin = 1;
-		int gDurationMax = 100;
-
-		int numberOfGenes = 20;
-		float dupeRate = 0.5f;
-		float muteRate = 0.05f;
-		float delRate = 0.01f;
-		float changePercent = 0.15f;
-
-		// Test for creating a generation.
-		// testGeneration.setGenerationParameters(20, 2, 20); 
-		// testGeneration.createStartGeneration();
-		// currrentInd = testGeneration.individualIndex;
-		// individualLength = testGeneration.collectionOfIndividuals.Length;
-		// CREATING A GENOME:
-		// testGenome.createRandomFunction();
-		// testGenome.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
-		// testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
-		// testGenome.printGenomeContents();
-
-		// // RUNNING THE G-->P PROCESS:
-		// testGtoP.passGenome(testGenome);
-		// testGtoP.runDevoGraphics();
-		// testGtoP.makeConnectome();
-		// testGtoP.printConnectomeContents();
-
-		// // CREATING NEURAL NETWORK PARAMETERS
-		// testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
-		// testParams.setNodeLayerNumbers();
-		// testParams.motorIndexes();
-		// testParams.sensorToInputs();
-		// testParams.createInputToHidden();
-		// testParams.createHiddenToHidden();
-		// testParams.createHiddenToOutput();
-		// testParams.createInputToOutput();
-		// testParams.createOutputToHidden();
-		// testParams.finalToArray();
-		// // testParams.printParamsContents();
-
-		// // CREATING THE NEURAL NETWORK.
-		// testNeuralStruct.setStartVariables(testParams.RMIlength,testParams.LMIlength,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
-		// testNeuralStruct.setStartingArrays(testParams.finalRMI, testParams.finalLMI);
-		// testNeuralStruct.setConnections(testParams.input_to_output,testParams.input_to_hidden,testParams.hidden_to_hidden, testParams.hidden_to_output, testParams.output_to_hidden);
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
     	wheelColliders = GameObject.Find("WheelColliders");
 		// VECTORS FOR PLACING SENSORS.
 		Quaternion backBump_rotation = new Quaternion();
@@ -162,7 +81,7 @@ public class SimpleCarController : MonoBehaviour {
 			// T: enable print statements for bumper functions.
 		debugBumper = false;
 
-
+		// CREATE LANDRO'S WHEELS AND ACCESS THEIR MOTORS.
     	wheels.Add(wheelColliders.transform.Find("frontRight").GetComponent<WheelCollider>());
 		wheels.Add(wheelColliders.transform.Find("frontLeft").GetComponent<WheelCollider>());
 		WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
@@ -176,23 +95,6 @@ public class SimpleCarController : MonoBehaviour {
 		bump_sensorsPOSITION = GameObject.FindObjectsOfType<BumpSensor>();
 		backBump_sensorsPOSITION = GameObject.FindObjectsOfType<BumpSensorBack>();
 
-		// IR DATA VARIABLE INITIALIZATION.
-		numberCollidedIR = 0;
-		numberCollidedBackIR = 0;
-		numberCollidedFrontIR = 0;
-		numberCollidedRightIR = 0;
-		numberCollidedLeftIR = 0;
-
-		// LDR DATA VARIABLE INITIALIZATION.
-		LEFTfrontLDRreadings = 0;
-		RIGHTfrontLDRreadings = 0;
-		backLDRreadings = 0;
-		leftLDRreadings = 0;
-		rightLDRreadings = 0;
-		baseMovementRate = 500;
-
-		// // Selected sensors for input into neural network function.
-		// chosenSensorArray = new int[4] {2,3,13,14}; 
 
 		//////////////////////////// PLACING SENSORS ON LANDRO BODY //////////////////////////// 
 		// PLACE FRONT BUMP SENSORS.
@@ -257,18 +159,12 @@ public class SimpleCarController : MonoBehaviour {
 		rawirDataArray = new float[irSensorNumber];
 		irDataArray = new float[irSensorNumber];
 		ldrDataArray = new float[ldrSensorNumber];
-
-		// sensorReadings currentReadings = new sensorReadings();
-		// currentReadings.setSensorArrays();
-
     }
  
     public void FixedUpdate() {	
 
     	leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
 		rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
-
-    	
 
     	// GATHERING IR DATA INFO.
     	int i = 0;
@@ -287,105 +183,6 @@ public class SimpleCarController : MonoBehaviour {
     		// print((photoScale(ldr_sensor.clacLightScore)).ToString());
     		j++;	
     	}
-
-		// showArrayInformation(ldrDataArray, false);
-		// showArrayInformation(irDataArray, false);
-		
-		//////////////////////COLLECT IR DATA.//////////////////////////////////////
-		foreach(IR ir_sensor in ir_sensors){
-			if((ir_sensor.hitWall == true) && (ir_sensor.name.Contains("FRONT"))) {
-				//print("FRONT IS HIT");
-				numberCollidedIR = numberCollidedIR + 1;
-				numberCollidedFrontIR = numberCollidedFrontIR + 1;
-
-				ir_sensor.sensorName = ir_sensor.name;
-				ir_sensor.collisionScore = ir_sensor.collisionScore +1;
-				
-				ir_sensor.hitWall = false;
-				// print(ir_sensor.sensorName + " Score is: " + ir_sensor.collisionScore);
-			} else if((ir_sensor.hitWall == true) && (ir_sensor.name.Contains("BACK"))) {
-				//print("BACK IS HIT");
-				numberCollidedIR = numberCollidedIR + 1;
-				numberCollidedBackIR = numberCollidedBackIR + 1;
-
-				ir_sensor.sensorName = ir_sensor.name;
-				ir_sensor.collisionScore = ir_sensor.collisionScore +1;
-				
-				ir_sensor.hitWall = false;
-				// print(ir_sensor.sensorName + " Score is: " + ir_sensor.collisionScore);
-			} else if((ir_sensor.hitWall == true) && (ir_sensor.name.Contains("RIGHT"))) {
-				//print("RIGHT IS HIT");
-				numberCollidedIR = numberCollidedIR + 1;
-				numberCollidedRightIR = numberCollidedRightIR + 1;
-
-				ir_sensor.sensorName = ir_sensor.name;
-				ir_sensor.collisionScore = ir_sensor.collisionScore +1;
-				
-				ir_sensor.hitWall = false;
-				// print(ir_sensor.sensorName + " Score is: " + ir_sensor.collisionScore);
-			} else if((ir_sensor.hitWall == true) && (ir_sensor.name.Contains("LEFT"))) {
-				//print("LEFT IS HIT");
-				numberCollidedIR = numberCollidedIR + 1;
-				numberCollidedLeftIR = numberCollidedLeftIR + 1;
-
-				ir_sensor.collisionScore = ir_sensor.collisionScore +1;
-				ir_sensor.sensorName = ir_sensor.name;
-
-				// print(ir_sensor.sensorName + " Score is: " + ir_sensor.collisionScore);
-				ir_sensor.hitWall = false;
-			} else if ((ir_sensor.hitWall != true) && (numberCollidedLeftIR > 0)) {
-				numberCollidedLeftIR = numberCollidedLeftIR - 1;
-			} else if ((ir_sensor.hitWall != true) && (numberCollidedRightIR > 0)) {
-				numberCollidedRightIR = numberCollidedRightIR - 1;
-			} else if ((ir_sensor.hitWall != true) && (numberCollidedFrontIR > 0)) {
-				numberCollidedFrontIR = numberCollidedFrontIR - 1;
-			} else if ((ir_sensor.hitWall != true) && (numberCollidedBackIR > 0)) {
-				numberCollidedBackIR = numberCollidedBackIR - 1;
-			}
-		}
-		//////////////////////COLLECT LDR DATA//////////////////////////////////////
-		foreach(LDR ldr_sensor in ldr_sensors) {
-			fitnessLDRscore = fitnessLDRscore + ldr_sensor.clacLightScore;
-
-			if( (ldr_sensor.clacLightScore > 0) && (ldr_sensor.name.Contains("FRONT_LEFT")) ) {
-				// frontLDRreadings = frontLDRreadings + 1;
-				LEFTfrontLDRreadings = (LEFTfrontLDRreadings + ldr_sensor.clacLightScore) / 2;
-
-			} else if( (ldr_sensor.clacLightScore > 0) && (ldr_sensor.name.Contains("FRONT_RIGHT")) ) {
-				// frontLDRreadings = frontLDRreadings + 1;
-				RIGHTfrontLDRreadings = (RIGHTfrontLDRreadings + ldr_sensor.clacLightScore) / 2;
-
-			} else if ((ldr_sensor.clacLightScore > 0) && (ldr_sensor.name.Contains("BACK")) ) {
-				// backLDRreadings = backLDRreadings + 1;
-				backLDRreadings = (backLDRreadings + ldr_sensor.clacLightScore) / 2;
-
-			} else if ((ldr_sensor.clacLightScore > 0) && (ldr_sensor.name.Contains("LEFT"))) {
-				// leftLDRreadings = leftLDRreadings + 1;
-				leftLDRreadings = (leftLDRreadings + ldr_sensor.clacLightScore) / 2;
-
-			} else if ((ldr_sensor.clacLightScore > 0) && (ldr_sensor.name.Contains("RIGHT"))) {
-			  	// rightLDRreadings = rightLDRreadings + 10;
-			  	rightLDRreadings = (rightLDRreadings + ldr_sensor.clacLightScore) / 2;
-
-			} else if ( (ldr_sensor.clacLightScore < 10) && (ldr_sensor.name.Contains("FRONT_LEFT")) && (LEFTfrontLDRreadings > 0) ) {
-				LEFTfrontLDRreadings = LEFTfrontLDRreadings - 10;
-			} else if ( (ldr_sensor.clacLightScore < 10) && (ldr_sensor.name.Contains("FRONT_RIGHT")) && (RIGHTfrontLDRreadings > 0) ) {
-				RIGHTfrontLDRreadings = RIGHTfrontLDRreadings - 10;
-			} else if ( (ldr_sensor.clacLightScore < 10) && (ldr_sensor.name.Contains("LEFT")) && (leftLDRreadings > 0) ) {
-				leftLDRreadings = leftLDRreadings - 10;
-			} else if ( (ldr_sensor.clacLightScore < 10) && (ldr_sensor.name.Contains("RIGHT")) && (rightLDRreadings > 0) ) {
-				rightLDRreadings = rightLDRreadings - 10;
-			} else if ( (ldr_sensor.clacLightScore < 10) && (ldr_sensor.name.Contains("BACK")) && (backLDRreadings > 0) ) {
-				backLDRreadings = backLDRreadings - 10;
-			}
-		}
-
-		irReadingArray = new int[4] {numberCollidedFrontIR, numberCollidedLeftIR, numberCollidedRightIR, 
-						  numberCollidedBackIR};
-		ldrReadingArray = new float[5] {LEFTfrontLDRreadings, RIGHTfrontLDRreadings, backLDRreadings, leftLDRreadings, rightLDRreadings};
-
-		maxOfLDRArray = ldrReadingArray.Max();
- 		maxLDRIndex = ldrReadingArray.ToList().IndexOf(maxOfLDRArray);
     }
 
     // FUNCTION: runMotors() 
@@ -443,6 +240,8 @@ public class SimpleCarController : MonoBehaviour {
 			backBumpType = "";
 		}
 
+		// Runs motors if the bumpers havent been hit, otherwise 
+		// applies fixed bumper reactions.
 		if ((backBumpType == "") && (frontBumpType == "")) {
 			// Debug.Log("MOVEMENT FROM NEURAL NETWORK");
 			leftMotor.motorTorque = motorScale(leftMotorTorque);
@@ -513,49 +312,6 @@ public class SimpleCarController : MonoBehaviour {
 		arrowMove();
     }
 
-
-
-    void autoMovement(int frontIRreading, int leftIRreading, int rightIRreading, int backIRreading, int ldrIndex, float[] ldrArray, string frontBumpType, string backBumpType) {
-    	// FIND WHEEL COLLIDERS AND LANDRO RIGID BODY.
-    	print("AUTO MOVEMENT");
-    	WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
-		WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
-		rb = GameObject.Find("L16A").GetComponent<Rigidbody>();
-		// CALCULATE TORQUE VALUES GIVEN INPUT.
-		leftMovementValue = (leftIRreading * 500);
-		rightMovemntValue = (rightIRreading * 500);
-		frontMovementValue = ((frontIRreading * 1000)* 2);
-		backMovementValue = ((backIRreading * 500));
-		// ASSIGN TORQUE VALUES TO MOTORS.
-		if( (frontIRreading > 0)||(leftIRreading > 0)||(rightIRreading > 0)||(backIRreading > 0) ) {
-			// leftMotor.motorTorque = (baseMovementRate*2) + leftMovementValue - (rightMovemntValue/1) - frontMovementValue + backMovementValue;
-			// rightMotor.motorTorque = (baseMovementRate*2) + rightMovemntValue - (leftMovementValue/1) - frontMovementValue + backMovementValue;
-			leftMotor.motorTorque = -(leftMovementValue) - frontMovementValue -(rightMovemntValue/2) - 2000 + (backMovementValue *3);
-			rightMotor.motorTorque = -(rightMovemntValue) - frontMovementValue -(leftMovementValue/2) - 2000 + (backMovementValue * 3);
-			// print("IR MOVEMENT: leftM: "+ leftMotor.motorTorque + ", rightM: "+ rightMotor.motorTorque);
-		} else if(ldrIndex == 0) {
-			leftMotor.motorTorque = baseMovementRate*2;
-			rightMotor.motorTorque = baseMovementRate*3;
-			// print("LIGHT MOVEMENT: FORWARD LEFT");
-		} else if(ldrIndex == 1) {
-			leftMotor.motorTorque = baseMovementRate*3;
-			rightMotor.motorTorque = -(baseMovementRate*2);
-			// print("LIGHT MOVEMENT: FORWARD RIGHT");
-		} else if(ldrIndex == 2) {
- 			leftMotor.motorTorque = -(baseMovementRate*4);
-			rightMotor.motorTorque = baseMovementRate*4;
-			// print("LIGHT MOVEMENT: BACKWARDS");
-		} else if(ldrIndex == 3) {
-			leftMotor.motorTorque = 400;
-			rightMotor.motorTorque = baseMovementRate;
-			// print("LIGHT MOVEMENT: LEFT");
-		} else if(ldrIndex == 4) {
-			leftMotor.motorTorque = baseMovementRate;
-			rightMotor.motorTorque = 400;
-		}
-		arrowMove();
-    }
-   
     // FUNCTION: stopMovement()
     // This function stops all movement of the landro body.	
     public static void stopMovement() {
@@ -601,13 +357,8 @@ public class SimpleCarController : MonoBehaviour {
 		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
 		return (mapVal);
 	}
-    // PRINTS INFORMATION ABOUT AN ARRAY GIVEN THE SHOWORNAH BOOLEAN.
-    void showArrayInformation (Array arr, bool showORnah) {
-    	if (showORnah) {
-    		print("The length of array: " + arr.Length);
-    	}
-    }
-    // Allows the user to control Landro using the arrow keys. Good for debugging and testing purposes.
+    // FUNCTION: arrowMove()
+    // This function allows the user to control Landro using the arrow keys. Good for debugging and testing purposes.
     public static void arrowMove() {
     	WheelCollider leftMotor = GameObject.Find("frontLeft").GetComponent<WheelCollider>();
 		WheelCollider rightMotor = GameObject.Find("frontRight").GetComponent<WheelCollider>();
@@ -632,7 +383,9 @@ public class SimpleCarController : MonoBehaviour {
 		    // print("LEFT");
     	}
 	}
+
 	// FUNCTIONS FOR RETURNING SENSOR DATA ARRAYS.
+	// Raw readings have not been scaled using the sensor scaling functions.
     public static float[] returnRawLDRdata() {
     	return rawldrDataArray;
     } 

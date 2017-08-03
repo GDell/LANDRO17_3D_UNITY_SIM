@@ -148,28 +148,6 @@ public class Main : MonoBehaviour {
 		ldrDataArray = SimpleCarController.returnLDRdata();
 		irDataArray = SimpleCarController.returnIRdata();
 
-		// float[] rawLDRdata;
-		// float[] rawIRdata;
-		// rawLDRdata = SimpleCarController.returnRawLDRdata();
-		// rawIRdata = SimpleCarController.returnRawIRdata();
-		// ir_sensors = GameObject.FindObjectsOfType<IR>();
-		// ldr_sensors = GameObject.FindObjectsOfType<LDR>();
-
-		// int i = 0;
-  //   	foreach(IR ir_sensor in ir_sensors) {
-  //   		rawirDataArray[i] = ir_sensor.irScore;
-  //   		irDataArray[i] = irScale(ir_sensor.irScore);
-		// 	// print((irScale(ir_sensor.irScore)).ToString());
-  //    		i++;
-  //   	}
-		// 	    	// GATHERING LDR DATA INFO.
-  //   	int j = 0;
-  //   	foreach(LDR ldr_sensor in ldr_sensors) {
-  //   		rawldrDataArray[j] = ldr_sensor.clacLightScore;
-  //   		ldrDataArray[j] = photoScale(ldr_sensor.clacLightScore);
-  //   		// print((photoScale(ldr_sensor.clacLightScore)).ToString());
-  //   		j++;	
-  //   	}
 
 		if (simulationRunning) {
 			// Debug.Log("WHAT THE HELL");
