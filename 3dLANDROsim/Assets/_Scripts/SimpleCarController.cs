@@ -26,8 +26,7 @@ public class SimpleCarController : MonoBehaviour {
 	public int baseMovementRate;
 
     // SENSOR ARRAYS
-    public IR[] ir_sensors;
-    public LDR[] ldr_sensors;
+
     // public BumpSensor[] bump_sensors;
     // public BumpSensorBack[] backBump_sensors;
 
@@ -78,6 +77,10 @@ public class SimpleCarController : MonoBehaviour {
 
 	public static BumpSensor[] bump_sensors;
 	public static BumpSensorBack[] backBump_sensors;
+	
+    public IR[] ir_sensors;
+    public LDR[] ldr_sensors;
+
 
     // INITIALIZE SIMULATION.
     public void Start(){
@@ -285,8 +288,8 @@ public class SimpleCarController : MonoBehaviour {
     		j++;	
     	}
 
-		showArrayInformation(ldrDataArray, false);
-		showArrayInformation(irDataArray, false);
+		// showArrayInformation(ldrDataArray, false);
+		// showArrayInformation(irDataArray, false);
 		
 		//////////////////////COLLECT IR DATA.//////////////////////////////////////
 		foreach(IR ir_sensor in ir_sensors){
@@ -611,22 +614,22 @@ public class SimpleCarController : MonoBehaviour {
     	 if (Input.GetKey(KeyCode.UpArrow)) {
 		    leftMotor.motorTorque = 2000;
 		    rightMotor.motorTorque = 2000;
-		    print("UP");
+		    // print("UP");
 		}
 		if (Input.GetKey(KeyCode.DownArrow)){
 		    leftMotor.motorTorque = -1000;
 		    rightMotor.motorTorque = -1000;
-		    print("DOWN");
+		    // print("DOWN");
 		}
 		if (Input.GetKey(KeyCode.RightArrow)){
 		    leftMotor.motorTorque = 1000;
 		    rightMotor.motorTorque = -1000;
-		    print("RIGHT");
+		    // print("RIGHT");
 		}
 		if (Input.GetKey(KeyCode.LeftArrow)){
 		    leftMotor.motorTorque = -1000;
 		    rightMotor.motorTorque = 1000;
-		    print("LEFT");
+		    // print("LEFT");
     	}
 	}
 	// FUNCTIONS FOR RETURNING SENSOR DATA ARRAYS.

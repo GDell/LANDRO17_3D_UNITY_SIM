@@ -50,9 +50,9 @@ public class Main : MonoBehaviour {
     public float timeCurrent;
 
 	// Threshold values for the fitness function. 
-    // Currently 25:75 ratio for good/bad XOR ratio in simulated arena.
-	public float IRthreshold = 200f;
-	public float LDRthreshold = 500f;
+    // Currently a rough 50:50 ratio for good/bad XOR ratio in simulated arena.
+	public float IRthreshold = 366f;
+	public float LDRthreshold = 2426.46f;
 
 	// Variables for calculating fitness.
 	public float meanIRscore;
@@ -69,9 +69,14 @@ public class Main : MonoBehaviour {
     public int lIRhLDRfitnessScore;
     public int totalIterations;
 
+    // public IR[] ir_sensors;
+    // public LDR[] ldr_sensors;
 
+    public float[] rawldrDataArray;
+    public float[] ldrDataArray;
 
-    public int currentGeneration;
+    public float[] rawirDataArray;
+    public float[] irDataArray;
 
 	void Start () {
 
@@ -83,16 +88,19 @@ public class Main : MonoBehaviour {
 		timeCurrent = 0;
 		currentIndex = 0;
 
-		currentGeneration = 0;
-
 		overallFitnessScore = 0;
 		totalIterations = 0; 
 
 		hIRlLDRfitnessScore = 0;
         lIRhLDRfitnessScore = 0; 
 
-    	meanLDRscore = 0;
-    	meanIRscore = 0;
+		rawldrDataArray = new float[8];
+		rawirDataArray = new float[8];
+		irDataArray = new float[8];
+		ldrDataArray = new float[8];
+
+    	// meanLDRscore = 0;
+    	// meanIRscore = 0;
 
 		// Test for creating a generation.
 
@@ -134,6 +142,35 @@ public class Main : MonoBehaviour {
 		Debug.Log("RUNNING INDIVIDUAL: " + currentIndex);
 		Debug.Log("RUNNING GENERATION: " + testGeneration.generationIndex);
 
+		rawirDataArray = SimpleCarController.returnRawIRdata();
+		rawldrDataArray = SimpleCarController.returnRawLDRdata();
+
+		ldrDataArray = SimpleCarController.returnLDRdata();
+		irDataArray = SimpleCarController.returnIRdata();
+
+		// float[] rawLDRdata;
+		// float[] rawIRdata;
+		// rawLDRdata = SimpleCarController.returnRawLDRdata();
+		// rawIRdata = SimpleCarController.returnRawIRdata();
+		// ir_sensors = GameObject.FindObjectsOfType<IR>();
+		// ldr_sensors = GameObject.FindObjectsOfType<LDR>();
+
+		// int i = 0;
+  //   	foreach(IR ir_sensor in ir_sensors) {
+  //   		rawirDataArray[i] = ir_sensor.irScore;
+  //   		irDataArray[i] = irScale(ir_sensor.irScore);
+		// 	// print((irScale(ir_sensor.irScore)).ToString());
+  //    		i++;
+  //   	}
+		// 	    	// GATHERING LDR DATA INFO.
+  //   	int j = 0;
+  //   	foreach(LDR ldr_sensor in ldr_sensors) {
+  //   		rawldrDataArray[j] = ldr_sensor.clacLightScore;
+  //   		ldrDataArray[j] = photoScale(ldr_sensor.clacLightScore);
+  //   		// print((photoScale(ldr_sensor.clacLightScore)).ToString());
+  //   		j++;	
+  //   	}
+
 		if (simulationRunning) {
 			// Debug.Log("WHAT THE HELL");
 
@@ -141,6 +178,10 @@ public class Main : MonoBehaviour {
 			if (pastStartScreen) {
 				// If this is the first run after passing the start screen...
 				if (firstRun) {
+
+					// ir_sensors = GameObject.FindObjectsOfType<IR>();
+					// ldr_sensors = GameObject.FindObjectsOfType<LDR>();
+
 					trialTime = MainMenu.INPUTtrialLength;
 					Debug.Log("THIS IS THE TRIAL TIME: " + trialTime);
 					// Create a generation.
@@ -151,7 +192,10 @@ public class Main : MonoBehaviour {
 				if (!(firstGenerationRun)) {
 
 					if (timeCurrent <  trialTime) {	
-						beginRun();
+
+						evaluateTrialFitness(rawldrDataArray, rawirDataArray, testGeneration.collectionOfIndividuals[currentIndex].paramsCollection.chosenSensorArray);
+						beginRun(ldrDataArray, irDataArray);
+
 					} else if (timeCurrent >= trialTime) {
 						SimpleCarController.stopMovement();
 						Debug.Log("DONE RUNNING INDIVIDUAL: "+ currentIndex);
@@ -159,7 +203,7 @@ public class Main : MonoBehaviour {
 						int numberOfindividuals = testGeneration.numberOfIndividualsInGeneration;
 
 						if (currentIndex < numberOfindividuals) {
-							testGeneration.collectionOfIndividuals[currentIndex].fitnessScore = finalFitnessCalculation();
+							// testGeneration.collectionOfIndividuals[currentIndex].fitnessScore = finalFitnessCalculation();
 							SimpleCarController.stopMovement();
 							reset();
 						} else if (currentIndex >= numberOfindividuals) {
@@ -190,6 +234,8 @@ public class Main : MonoBehaviour {
 	}
 
 	void evaluateTrialFitness(float[] ldrSensorArray, float[] irSensorArray, int[] selectedSensors) {
+    	meanLDRscore = 0;
+    	meanIRscore = 0;
     	int selectedArraySize = selectedSensors.Length;
     	bool exceededIRthreshold = false;
     	bool exceededLDRthreshold = false;
@@ -197,6 +243,7 @@ public class Main : MonoBehaviour {
     	totalIterations = totalIterations + 1;
     	// Find means of LDR and IR sensor values but only for those that are currently active/chosen.
     	for (int runs = 0; runs < selectedArraySize; runs++){
+    		// Debug.Log("GETTING INTO THE EVALUATE TRIAL FITNESS FUNCTION");
 			if(selectedSensors[runs] == 0) {
 				meanIRscore = (meanIRscore + irSensorArray[0])/2;
     		} else if(selectedSensors[runs] == 1) {
@@ -231,11 +278,12 @@ public class Main : MonoBehaviour {
     			meanLDRscore = (meanLDRscore + ldrSensorArray[1])/2;
     		}
     	}
+
     	// Check if the thresholds have been reached for both IR and LDR.
-    	if (meanIRscore >= IRthreshold) {
+    	if (meanIRscore > 0) {
     		exceededIRthreshold = true;
     	}
-    	if (meanLDRscore >= LDRthreshold) {
+    	if (meanLDRscore > 0) {
     		exceededLDRthreshold = true;
     	}
     	// Check if Landro is in an XOR location.
@@ -255,17 +303,17 @@ public class Main : MonoBehaviour {
     }
 
     // This function begins running the individual at the current index.
-    void beginRun() {
+    void beginRun(float[] ldrData, float[] irData) {
 
     	float[] currentLDRdata;
 		float[] currentIRdata;
 		float[] rawLDRdata;
 		float[] rawIRdata;
 		// Grabs the LDR and IR sensor data to pass to neural net.
-		currentIRdata = SimpleCarController.returnIRdata();
-		currentLDRdata = SimpleCarController.returnLDRdata();	
-		rawLDRdata = SimpleCarController.returnRawLDRdata();
-		rawIRdata = SimpleCarController.returnRawIRdata();
+		// currentIRdata = SimpleCarController.returnIRdata();
+		// currentLDRdata = SimpleCarController.returnLDRdata();	
+		// rawLDRdata = SimpleCarController.returnRawLDRdata();
+		// rawIRdata = SimpleCarController.returnRawIRdata();
 
 		// If it's the first run we set the time to zero and begin 
 		// neural network drive.s
@@ -274,18 +322,11 @@ public class Main : MonoBehaviour {
     		firstRun = false;
     	}
 
-		// if (timeCurrent <  trialTime) {	
+		if (timeCurrent <  trialTime) {	
+			// evaluateTrialFitness(rawLDRdata, rawIRdata, testGeneration.collectionOfIndividuals[currentIndex].paramsCollection.chosenSensorArray);
+			testGeneration.runNeuralNetOnIndividual(ldrData, irData);
+		}
 
-		testGeneration.runNeuralNetOnIndividual(currentLDRdata, currentIRdata);
-		evaluateTrialFitness(rawLDRdata, rawIRdata, testGeneration.collectionOfIndividuals[currentIndex].paramsCollection.chosenSensorArray);
-
-		// Else if we have reached the end of a trial, stop Landro, iterate to the next individual, and reload the experiment.
-		// } else if (timeCurrent >= trialTime){
-			// testGeneration.collectionOfIndividuals[currentIndex].fitnessScore = finalFitnessCalculation();
-			// SimpleCarController.stopMovement();
-			// testGeneration.nextIndividual();
-			// reset();
- 		// }
     }
 
     // FUNCTION: finalFitnessCalculation() 
@@ -307,34 +348,39 @@ public class Main : MonoBehaviour {
 	//  If the entire generation has been run, this function will create a new generation of the offspring from the previous
 	//	that are mutated and deleted. The program will then start running trials for this new experiment.
     public void reset() {
+    	// Reset fitness and timing variables.
     	hIRlLDRfitnessScore = 0;
         lIRhLDRfitnessScore = 0; 
     	totalIterations = 0;
     	overallFitnessScore = 0;
     	timeCurrent = 0;
-
     	meanLDRscore = 0;
     	meanIRscore = 0;
-    	// currentIndex = testGeneration.individualIndex;
-    	int numberOfindividuals = testGeneration.numberOfIndividualsInGeneration;
-
+    	// Load the next individual.
 		testGeneration.nextIndividual();
 		currentIndex = currentIndex + 1;
+		// Reload the scene.
 		SceneManager.LoadScene("Experiment");
-   		// } else if (currentIndex >= numberOfindividuals) {
-   		// 	if(testGeneration.generationIndex < testGeneration.numberOfGenerations) {
-   		// 		Debug.Log("Starting next generation");
-	   	// 		testGeneration.createNewGeneration();
-	   	// 		currentIndex = 0;
-	   	// 		SceneManager.LoadScene("Experiment");
-
-   		// 	} else if (testGeneration.generationIndex >= testGeneration.numberOfGenerations) {
-
-	   	// 		Debug.Log("END OF SIMULATION REACHED, NUMBER OF GENERATIONS EVALUATED: " + testGeneration.numberOfGenerations);
-	   	// 		simulationDone = true;
-   		// 	}
-   		// }
     }
+
+       	// SCALES IR VALUES GIVEN MIN AND MAX POSSIBLE IR VALUES.
+	public static float irScale(float val) {
+		float fromLow = 0;
+		float fromHigh = 409;
+		float toLow = 0;
+		float toHigh = 1;
+		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
+		return (mapVal);
+	}
+	// SCALES LDR VALUES GIVEN MIN AND MAX POSSIBLE IR VALUES.
+	public static float photoScale(float val) {
+		float fromLow = 0;
+		float fromHigh = 1550f;
+		float toLow = 0;
+		float toHigh = 1;
+		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
+		return (mapVal);
+	}
 
 
 }

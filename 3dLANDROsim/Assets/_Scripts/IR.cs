@@ -9,7 +9,7 @@ public class IR : MonoBehaviour {
 	public float irScore;
 	public int collisionScore = 0;
 	public string sensorName;
-	public float IRthreshold = 200;
+	public float IRthreshold = 336;
 
 	public bool isBumped = false;
 
@@ -20,7 +20,7 @@ public class IR : MonoBehaviour {
 	// wfcRIGHT = _colliderRR.sidewaysFriction;
 	// myWfc.extremumSlip = 40f;
 	// _colliderRR.sidewaysFriction = myWfc;
-
+ 
 	GameObject landroBody;
 	
 	// Use this for initialization
@@ -48,6 +48,7 @@ public class IR : MonoBehaviour {
 
 		if ((this.hitWall == false)) {
 			this.irScore = 0;
+			// Debug.Log("NOT COLLIDING WITH WALL");
 		}
 
 
@@ -72,10 +73,18 @@ public class IR : MonoBehaviour {
 		//if(!source.name.Contains("L16A")){
 			//print(this.name + " hit " + source.name);
 			if (source.name.Contains ("Wall")) {
+				// Debug.Log("IR HAS DETECTED THE WALL");
 				hitWall = true;
 				irDistance = Vector3.Distance(this.transform.position,source.transform.position);
-				irScore = maxIRdistance - irDistance;
-				if (irScore > IRthreshold) {
+				// Debug.Log("THE IR DISTANCE IS: " + irDistance);
+				// float irTemp = irDistance - IRthreshold;
+				// if (irTemp < 0) {
+				// 	irTemp = 0; 
+				// }
+
+				irScore = irScore + 1;
+
+				if (irScore > 0) {
 					print("IR threshold exceeded!");
 				} 
 				// print(irScore);
