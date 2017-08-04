@@ -12,13 +12,13 @@ public class Main : MonoBehaviour {
 
 	// TEST STRUCTURES \\
    	// Genome
-	public genomeHandler.genome testGenome = new genomeHandler.genome();
+	public static genomeHandler.genome testGenome = new genomeHandler.genome();
 	// G-->P
-	public genomeHandler.genomeToPhenotype testGtoP = new genomeHandler.genomeToPhenotype();
+	public static genomeHandler.genomeToPhenotype testGtoP = new genomeHandler.genomeToPhenotype();
 	// Parameters 
-	public genomeHandler.createParams testParams = new genomeHandler.createParams();
+	public static genomeHandler.createParams testParams = new genomeHandler.createParams();
 	// Neural Network
-	public NeuralNetworkHandler.NeuralNetworkParameters testNeuralStruct = new NeuralNetworkHandler.NeuralNetworkParameters();
+	public static NeuralNetworkHandler.NeuralNetworkParameters testNeuralStruct = new NeuralNetworkHandler.NeuralNetworkParameters();
 	// Generation
 	public genomeHandler.generation testGeneration = new genomeHandler.generation();
 
@@ -29,20 +29,20 @@ public class Main : MonoBehaviour {
 	public static bool firstRun = true;
 
 	// G-->P variables.
-	public int maxSpawn = 100;
-	public int vMax = 5;
-	public int vDurationMin = 1;
-	public int vDurationMax = 100;
-	public int gMax = 3;
-	public int gDurationMin = 1;
-	public int gDurationMax = 100;
+	public static int maxSpawn = 100;
+	public static int vMax = 5;
+	public static int vDurationMin = 1;
+	public static int vDurationMax = 100;
+	public static int gMax = 3;
+	public static int gDurationMin = 1;
+	public static int gDurationMax = 100;
 
 	// Genome variables.
-	public int numberOfGenes = 20;
-	public float dupeRate = 0.5f;
-	public float muteRate = 0.05f;
-	public float delRate = 0.01f;
-	public float changePercent = 0.15f;
+	public static int numberOfGenes = 20;
+	public static float dupeRate = 0.5f;
+	public static float muteRate = 0.05f;
+	public static float delRate = 0.01f;
+	public static float changePercent = 0.15f;
 
 	// Timing variables to keep track of overall 
 	// trial length and the current time in a trial.
@@ -69,9 +69,6 @@ public class Main : MonoBehaviour {
     public int lIRhLDRfitnessScore;
     public int totalIterations;
 
-    // public IR[] ir_sensors;
-    // public LDR[] ldr_sensors;
-
     public float[] rawldrDataArray;
     public float[] ldrDataArray;
 
@@ -79,7 +76,6 @@ public class Main : MonoBehaviour {
     public float[] irDataArray;
 
 	void Start () {
-
 		simulationRunning = true;
 
 		mainScript = GameObject.Find("MainScript");
@@ -97,50 +93,15 @@ public class Main : MonoBehaviour {
 		rawldrDataArray = new float[8];
 		rawirDataArray = new float[8];
 		irDataArray = new float[8];
-		ldrDataArray = new float[8];
-
-    	// meanLDRscore = 0;
-    	// meanIRscore = 0;
-
-		// Test for creating a generation.
-
-		// // CREATING A GENOME:
-		// testGenome.createRandomFunction();
-		// testGenome.setGenomeParameters(2, dupeRate, muteRate, delRate, changePercent);
-		// testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
-		// testGenome.printGenomeContents();
-
-		// // RUNNING THE G-->P PROCESS:
-		// testGtoP.passGenome(testGenome);
-		// testGtoP.runDevoGraphics();
-		// testGtoP.makeConnectome();
-
-		// // CREATING NEURAL NETWORK PARAMETERS
-		// testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
-		// testParams.setNodeLayerNumbers();
-		// testParams.motorIndexes();
-		// testParams.sensorToInputs();
-		// testParams.createInputToHidden();
-		// testParams.createHiddenToHidden();
-		// testParams.createHiddenToOutput();
-		// testParams.createInputToOutput();
-		// testParams.createOutputToHidden();
-		// testParams.finalToArray();
-		// // testParams.printParamsContents();
-
-		// // CREATING THE NEURAL NETWORK.
-		// testNeuralStruct.setStartVariables(testParams.RMIlength,testParams.LMIlength,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
-		// testNeuralStruct.setStartingArrays(testParams.finalRMI, testParams.finalLMI);
-		// testNeuralStruct.setConnections(testParams.input_to_output,testParams.input_to_hidden,testParams.hidden_to_hidden, testParams.hidden_to_output, testParams.output_to_hidden);
-
+		ldrDataArray = new float[8];	
 	}
 	
 	void Update () {	
 		
 		timeCurrent = Time.timeSinceLevelLoad;	
 
-		Debug.Log("RUNNING INDIVIDUAL: " + currentIndex);
 		Debug.Log("RUNNING GENERATION: " + testGeneration.generationIndex);
+		Debug.Log("RUNNING INDIVIDUAL: " + currentIndex);
 
 		rawirDataArray = SimpleCarController.returnRawIRdata();
 		rawldrDataArray = SimpleCarController.returnRawLDRdata();
@@ -157,13 +118,9 @@ public class Main : MonoBehaviour {
 				// If this is the first run after passing the start screen...
 				if (firstRun) {
 
-					// ir_sensors = GameObject.FindObjectsOfType<IR>();
-					// ldr_sensors = GameObject.FindObjectsOfType<LDR>();
-
 					trialTime = MainMenu.INPUTtrialLength;
 					Debug.Log("THIS IS THE TRIAL TIME: " + trialTime);
 					// Create a generation.
-					// (int numberOfG, int numGenerations, int numberOfInd)
 					testGeneration.setGenerationParameters(MainMenu.INPUTavgGenomeSize, MainMenu.INPUTnumberOfGenerations, MainMenu.INPUTnumberOfIndividuals); 
 					testGeneration.createStartGeneration();
 				}
@@ -195,8 +152,7 @@ public class Main : MonoBehaviour {
 					   			Debug.Log("END OF SIMULATION REACHED, NUMBER OF GENERATIONS EVALUATED: " + testGeneration.numberOfGenerations);
 					   			simulationRunning = false;
 				   			}   	
-						}  
-							
+						}  				
 					}
 					
 				} else {
@@ -358,6 +314,39 @@ public class Main : MonoBehaviour {
 		float toHigh = 1;
 		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
 		return (mapVal);
+	}
+	// FUNCTION: singleIndividualTest()
+	// 		This function runs a single test on the whole genome to phenotype process:
+	//		genome creation --> G->P development process --> Params creation --> Neural Network Creation
+	public static void singleIndivualTest() {
+		// CREATING A GENOME:
+		testGenome.createRandomFunction();
+		testGenome.setGenomeParameters(2, dupeRate, muteRate, delRate, changePercent);
+		testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
+		testGenome.printGenomeContents();
+
+		// RUNNING THE G-->P PROCESS:
+		testGtoP.passGenome(testGenome);
+		testGtoP.runDevoGraphics();
+		testGtoP.makeConnectome();
+
+		// CREATING NEURAL NETWORK PARAMETERS
+		testParams.passConnectionMatrix(testGtoP.sortedConnects, testGenome);
+		testParams.setNodeLayerNumbers();
+		testParams.motorIndexes();
+		testParams.sensorToInputs();
+		testParams.createInputToHidden();
+		testParams.createHiddenToHidden();
+		testParams.createHiddenToOutput();
+		testParams.createInputToOutput();
+		testParams.createOutputToHidden();
+		testParams.finalToArray();
+		// testParams.printParamsContents();
+
+		// CREATING THE NEURAL NETWORK.
+		testNeuralStruct.setStartVariables(testParams.RMIlength,testParams.LMIlength,testParams.NUM_INPUT,testParams.NUM_HIDDEN,testParams.NUM_OUTPUT);
+		testNeuralStruct.setStartingArrays(testParams.finalRMI, testParams.finalLMI);
+		testNeuralStruct.setConnections(testParams.input_to_output,testParams.input_to_hidden,testParams.hidden_to_hidden, testParams.hidden_to_output, testParams.output_to_hidden);
 	}
 
 

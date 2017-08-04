@@ -84,8 +84,15 @@
 -define:UNITY_EDITOR_WIN
 -define:ENABLE_NATIVE_ARRAY_CHECKS
 -define:UNITY_TEAM_LICENSE
-Assets/genomeHandler.cs
-Assets/neuralNetworkHandler.cs
+Assets/BumpSensor.cs
+Assets/BumpSensorBack.cs
+Assets/_Scripts/IR.cs
+Assets/_Scripts/LDR.cs
+Assets/_Scripts/Main.cs
+Assets/_Scripts/MainMenu.cs
+Assets/_Scripts/NeuralNetworkHandler.cs
+Assets/_Scripts/SimpleCarController.cs
+Assets/_Scripts/genomeHandler.cs
 -r:"C:\Program Files\Unity\Editor\Data\Mono\lib\mono\unity\System.Runtime.Serialization.dll"
 -r:"C:\Program Files\Unity\Editor\Data\Mono\lib\mono\unity\System.Xml.Linq.dll"
 -r:"C:\Program Files\Unity\Editor\Data\Mono\lib\mono\unity\UnityScript.dll"
