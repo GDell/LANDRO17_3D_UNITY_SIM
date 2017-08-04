@@ -277,38 +277,38 @@ public class SimpleCarController : MonoBehaviour {
 				time = time + Time.deltaTime;
 				Debug.Log("MOVING BACK");
 			} 
+		// } // THIS COMMENTED PART IS THE BACK BUMPER REACTIONS
+		} else if (backBumpType == "middleBack") {
+			// Debug.Log("FORCE APPLIED FOR BRAKES");
+			float time = 0f;
+			Debug.Log(backBumpType);
+			while (time < turnTime) {
+				leftMotor.motorTorque = -115000;
+				rightMotor.motorTorque = -115000;
+				time = time + Time.deltaTime;
+				Debug.Log("TURNING");
+			}
+		} else if (backBumpType == "rightBack") {
+			// Debug.Log("FORCE APPLIED FOR BRAKES");
+			float time = 0f;
+			// Debug.Log(backBumpReading);
+			while (time < turnTime) {
+				leftMotor.motorTorque = -114000;
+				rightMotor.motorTorque = -113725;
+				time = time + Time.deltaTime;
+				Debug.Log("TURNING");
+			}
+		} else if (backBumpType == "leftBack") {
+			// Debug.Log("FORCE APPLIED FOR BRAKES");
+			float time = 0f;
+			// Debug.Log(backBumpReading);
+			while (time < turnTime) {
+				leftMotor.motorTorque = -113725;
+				rightMotor.motorTorque = -114000;
+				time = time + Time.deltaTime;
+				Debug.Log("TURNING");
+			}
 		}
-		// } else if (backBumpType == "middleBack") {
-		// 	// Debug.Log("FORCE APPLIED FOR BRAKES");
-		// 	float time = 0f;
-		// 	Debug.Log(backBumpType);
-		// 	while (time < turnTime) {
-		// 		leftMotor.motorTorque = -115000;
-		// 		rightMotor.motorTorque = -115000;
-		// 		time = time + Time.deltaTime;
-		// 		Debug.Log("TURNING");
-		// 	}
-		// } else if (backBumpType == "rightBack") {
-		// 	// Debug.Log("FORCE APPLIED FOR BRAKES");
-		// 	float time = 0f;
-		// 	// Debug.Log(backBumpReading);
-		// 	while (time < turnTime) {
-		// 		leftMotor.motorTorque = -114000;
-		// 		rightMotor.motorTorque = -113725;
-		// 		time = time + Time.deltaTime;
-		// 		Debug.Log("TURNING");
-		// 	}
-		// } else if (backBumpType == "leftBack") {
-		// 	// Debug.Log("FORCE APPLIED FOR BRAKES");
-		// 	float time = 0f;
-		// 	// Debug.Log(backBumpReading);
-		// 	while (time < turnTime) {
-		// 		leftMotor.motorTorque = -113725;
-		// 		rightMotor.motorTorque = -114000;
-		// 		time = time + Time.deltaTime;
-		// 		Debug.Log("TURNING");
-		// 	}
-		// }
 		arrowMove();
     }
 

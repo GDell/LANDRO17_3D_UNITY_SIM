@@ -6,9 +6,9 @@ public class LDR : MonoBehaviour {
 
 	public GameObject lightSource;
 	public float clacLightScore;
+	
 	// The light threshold. Light sensors must be at least this far away from
 	// the light source in order to be considered in a high light area of the arena.
-
 	public float lightThreshold = 2426.46f;
 	public string sensorName;
 	

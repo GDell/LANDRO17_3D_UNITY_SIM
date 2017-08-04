@@ -97,7 +97,7 @@ public class Main : MonoBehaviour {
 	}
 	
 	void Update () {	
-		
+
 		timeCurrent = Time.timeSinceLevelLoad;	
 
 		Debug.Log("RUNNING GENERATION: " + testGeneration.generationIndex);
@@ -111,7 +111,6 @@ public class Main : MonoBehaviour {
 
 
 		if (simulationRunning) {
-			// Debug.Log("WHAT THE HELL");
 
 		// IF we have passed the start screen...
 			if (pastStartScreen) {
@@ -167,6 +166,7 @@ public class Main : MonoBehaviour {
 
 	}
 
+	// Checks to see whether or not we are in an XOR space at the current time step in the trial.
 	void evaluateTrialFitness(float[] ldrSensorArray, float[] irSensorArray, int[] selectedSensors) {
     	meanLDRscore = 0;
     	meanIRscore = 0;
@@ -236,18 +236,14 @@ public class Main : MonoBehaviour {
     	}
     }
 
-    // This function begins running the individual at the current index.
+    // This function begins running the individual at the current index given the LDR and IR
+    // data arrays obtained from the SimpleCarControllerScipt.
     void beginRun(float[] ldrData, float[] irData) {
 
     	float[] currentLDRdata;
 		float[] currentIRdata;
 		float[] rawLDRdata;
 		float[] rawIRdata;
-		// Grabs the LDR and IR sensor data to pass to neural net.
-		// currentIRdata = SimpleCarController.returnIRdata();
-		// currentLDRdata = SimpleCarController.returnLDRdata();	
-		// rawLDRdata = SimpleCarController.returnRawLDRdata();
-		// rawIRdata = SimpleCarController.returnRawIRdata();
 
 		// If it's the first run we set the time to zero and begin 
 		// neural network drive.s

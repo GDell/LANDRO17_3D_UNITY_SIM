@@ -1088,7 +1088,14 @@ public class genomeHandler {
 				int gDurationMin = 1;
 				int gDurationMax = 100;
 
-				// numberOfGenes = 20;
+				double tempNumGenes = createNumberOfGenes(numberOfGenes);
+				float tempFloat = (float)tempNumGenes;
+				int tempInt = Mathf.RoundToInt(tempFloat);
+				// int myInt = Mathf.RoundToInt(tempFloat);
+				Debug.Log("TEMP INT GENES #: "+ tempInt);
+
+				// numberOfGenes = tempInt;
+				Debug.Log("THIS IS THE NUMBER OF GENES IN IND #: " + i+ ", GENE #: " + tempInt);
 
 				float dupeRate = 0.5f;
 				float muteRate = 0.05f;
@@ -1097,7 +1104,7 @@ public class genomeHandler {
 
 				// Creates a genome for each individual.
 				collectionOfIndividuals[i].genomeCollection.createRandomFunction();
-				collectionOfIndividuals[i].genomeCollection.setGenomeParameters(numberOfGenes, dupeRate, muteRate, delRate, changePercent);
+				collectionOfIndividuals[i].genomeCollection.setGenomeParameters(tempInt, dupeRate, muteRate, delRate, changePercent);
 				collectionOfIndividuals[i].genomeCollection.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
 				collectionOfIndividuals[i].genomeCollection.printGenomeContents();
 
@@ -1209,17 +1216,24 @@ public class genomeHandler {
 			mutateAndDuplicateGeneration();
 		}
 
-		// HELPER FUNCTIONS.
-		// public int normalizeRandom(int minVal, int maxVal) {
-		// 	int mean = (minVal  + maxVal) /2;
-		// 	int sigma = (maxVal = mean) / 3;
-		// 	return rand.Next(mean, sigma);
-		// }
+		// // HELPER FUNCTIONS.
+		public double createNumberOfGenes(int avgNumGenes) {
 
-		// public int createNumberOfGenes() {
-		// 	numberOfGenes = normalizeRandom(4,16);
-		// 	return numberOfGenes;
-		// }
+			int min = avgNumGenes - (avgNumGenes / 2);
+			int max = avgNumGenes + min;
+
+			int sigma = (max - avgNumGenes)/3;
+
+			double u1 = 1.0 - rand.NextDouble();
+			double u2 = 1.0 - rand.NextDouble();
+
+			double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
+			double randNormal = avgNumGenes + sigma * randStdNormal;
+
+			// int finalResult = Convert.ToInt32(randNormal);
+
+			return randNormal;
+		}
 	}
 
 	void Start () {	
