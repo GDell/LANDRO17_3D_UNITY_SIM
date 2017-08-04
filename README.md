@@ -6,30 +6,14 @@ This project uses the Unity 5.6.1 game engine, you will need it downloaded in or
 
 Reach me at: gadellaccio@vassar.edu
 
-## Finishing the Simulation:
-#### Closing the reality gap
-- Sensor readings need to be calibrated and scaled to match that of physical Landro's. We need to determine at what length from the light (inluding effects of orientation) that light sensors recieve zero input.
-- Need to double check that everything is to scale. Length and width of the arena needs to be altered slightly.
-- Bump sensor reactions need to be calibrateed to match those of physical Landro. (Change movement time and the motor torque inputs in SimpleCarController script)
-- Create a function to randomly place Landro at the start of trials.
-- G-->P process needs to be slightly adapted to incorporate the new ranges for velocity and growth duration, in addition to the growth start variable.
-
-#### Improving the speed of simulations
-- Further, we need to implement a mode in which we can run the simulations without 3D rendering turned on. 
-- With 3D rendering turned off, we need to implement a way in which to run multiple individuals in a generation at once.
-- Finalize the fitness function (in main script).
-
-#### Coding Practices
-- Create a trial stucture to manage trial and generation information. 
-
 ## Important Functions and Structs by File Name:
 **genomeHandler**: This file manages creating genomes, the G->P process, and creating generations of individuals.
-- gene 
-- genome
-- genotypeToPhenotype
-- createParams
-- individual
-- generation
+- gene - This structure stores all of the information of a single gene.
+- genome - This structure stores an array of genes.
+- genotypeToPhenotype - This structure takes a genome and creates a connectome which can then be processed in order to create neural network parameters for said genome.
+- createParams - This structure takes the connectome produced by the G->P struct and produces a set of neural network parameters.
+- individual - This structure brings together all of the structures above, including the NeuralNetworkParameters structure from the NeuralNetworkHandler script, representing a full Landro individual (genome, G->P process, and a neural network specific to that individual).
+- generation - This structure stores an array of individuals, representing a full generationof Landro individuals. This structure also handles the transition from one parent generation to its next child generation after running the entire said parent generation through simulations.
 
 **IR**: This file/class is attached to all the IR sensors on Landro's body and assigns sensor readings.
 
@@ -55,8 +39,8 @@ Reach me at: gadellaccio@vassar.edu
 - updateMotorValues() - calls the runMotors() function in SimpleCarController using the neural network output to power the motors.
 - activation() - used to apply the Tanh function.
 
-**MainMenu**: This file manages the main menu
-	
+**MainMenu**: This file manages the main menu and prompts the user for input regarding trial and generation parameters.
+- StartSimulation() - This function grabs anything the user typed into the input fields and stores it in variables for further use. It then loads the start of the experiment given the user specifications.
 
 **Main**: This file is constantly active while the simulation is running. It manages trials through creating generations and reseting the simulation between trials and generation runs. It also manages assigning and computing fitness scores for individuals of generations.
 	
@@ -70,6 +54,22 @@ Reach me at: gadellaccio@vassar.edu
 
 - singleIndividualTest() - This function tests the genome creation --> G->P development process --> Params creation --> Neural Network Creation process. Rather than creating a whole generation it creates each struct present in an individual to test that the process is working.
 	
-Adjust irThreshold and ldrThreshold values in this script in order to change the percentages of "good XOR" and "bad XOR" areas in the simulated environment. (May also need to adjust these threshold values in the LDR and IR scripts)
+*NOTE*: Adjust irThreshold and ldrThreshold values in this script in order to change the percentages of "good XOR" and "bad XOR" areas in the simulated environment. (May also need to adjust these threshold values in the LDR and IR scripts)
+
+## Finishing the Simulation:
+#### Closing the reality gap
+- Sensor readings need to be calibrated and scaled to match that of physical Landro's. We need to determine at what length from the light (inluding effects of orientation) that light sensors recieve zero input.
+- Need to double check that everything is to scale. Length and width of the arena needs to be altered slightly.
+- Bump sensor reactions need to be calibrateed to match those of physical Landro. (Change movement time and the motor torque inputs in SimpleCarController script)
+- Create a function to randomly place Landro at the start of trials.
+- G-->P process needs to be slightly adapted to incorporate the new ranges for velocity and growth duration, in addition to the growth start variable.
+
+#### Improving the speed of simulations
+- Further, we need to implement a mode in which we can run the simulations without 3D rendering turned on. 
+- With 3D rendering turned off, we need to implement a way in which to run multiple individuals in a generation at once.
+- Finalize the fitness function (in main script).
+
+#### Coding Practices
+- Create a trial stucture to manage trial and generation information. 
 
 
