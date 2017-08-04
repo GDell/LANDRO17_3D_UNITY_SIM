@@ -1216,7 +1216,8 @@ public class genomeHandler {
 			mutateAndDuplicateGeneration();
 		}
 
-		// // HELPER FUNCTIONS.
+		// Creating nmber of genes --> from a random gaussian distribution: 
+		// Refer to ..... https://stackoverflow.com/questions/218060/random-gaussian-variables
 		public double createNumberOfGenes(int avgNumGenes) {
 
 			int min = avgNumGenes - (avgNumGenes / 2);

@@ -299,7 +299,7 @@ public class Main : MonoBehaviour {
 	public static void singleIndivualTest() {
 		// CREATING A GENOME:
 		testGenome.createRandomFunction();
-		testGenome.setGenomeParameters(2, dupeRate, muteRate, delRate, changePercent);
+		testGenome.setGenomeParameters(10, dupeRate, muteRate, delRate, changePercent);
 		testGenome.createWholeGenome(maxSpawn, vMax, vDurationMin, vDurationMax, gMax, gDurationMin, gDurationMax);
 		testGenome.printGenomeContents();
 
