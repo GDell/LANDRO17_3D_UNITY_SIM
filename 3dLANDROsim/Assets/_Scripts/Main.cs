@@ -297,24 +297,6 @@ public class Main : MonoBehaviour {
 		SceneManager.LoadScene("Experiment");
     }
 
-       	// SCALES IR VALUES GIVEN MIN AND MAX POSSIBLE IR VALUES.
-	public static float irScale(float val) {
-		float fromLow = 0;
-		float fromHigh = 409;
-		float toLow = 0;
-		float toHigh = 1;
-		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
-		return (mapVal);
-	}
-	// SCALES LDR VALUES GIVEN MIN AND MAX POSSIBLE IR VALUES.
-	public static float photoScale(float val) {
-		float fromLow = 0;
-		float fromHigh = 1550f;
-		float toLow = 0;
-		float toHigh = 1;
-		float mapVal = (((val - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow)) + toLow;
-		return (mapVal);
-	}
 	// FUNCTION: singleIndividualTest()
 	// 		This function runs a single test on the whole genome to phenotype process:
 	//		genome creation --> G->P development process --> Params creation --> Neural Network Creation
