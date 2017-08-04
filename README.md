@@ -4,8 +4,15 @@ This project simulates Landro and the XOR developmental/evolutionary task.
 
 This project uses the Unity 5.6.1 game engine, you will need it downloaded in order to run simulations.
 
-Important Functions and Structs by File Name
+# Still to Implement
+Closing the reality gap:
+- Sensor readings need to be calibrated and scaled to match that of physical Landro's. We need to determine at what length from the light (inluding effects of orientation) that light sensors recieve zero input.
+- Need to double check that everything is to scale. Length and width of the arena needs to be altered slightly.
+Improving the speed of simulations: 
+- Further, we need to implement a mode in which we can run the simulations without 3D rendering turned on. 
+- With 3D rendering turned off, we need to implement a way in which to run multiple individuals in a generation at once.
 
+# Important Functions and Structs by File Name
 genomeHandler: This file manages creating genomes, the G->P process, and creating generations of individuals.
 - gene 
 - genome
