@@ -15,17 +15,6 @@ Reach me at: gadellaccio@vassar.edu
 - individual - This structure brings together all of the structures above, including the NeuralNetworkParameters structure from the NeuralNetworkHandler script, representing a full Landro individual (genome, G->P process, and a neural network specific to that individual).
 - generation - This structure stores an array of individuals, representing a full generationof Landro individuals. This structure also handles the transition from one parent generation to its next child generation after running the entire said parent generation through simulations.
 
-**IR**: This file/class is attached to all the IR sensors on Landro's body and assigns sensor readings.
-
-- onTriggerStay() - This function is constantly checking to see whether an IR has collided with (sensed) a wall. If it does, the script assinges a sensor reading to that IR by taking the distance from said wall and said IR variable. 
-
-*NOTE*: This file should be updated such that IR sensors are assigned readings even if they aren't recieving enough input to reach the IR threshold.
-
-**LDR**: This file/class is attached to all the LDR sensors on Landro's body. It is constantly computing the distance between the light source and all of Landro's LDR sensors and using that to assign sensor reading values. Currently, LDR sensors are assigned sensor readings above 0 only if the distance reaches the LDR distance threshold.
-
-*NOTE*: This file should be updated such that LDR sensors are assigned readings even if the LDR threshold has not been reached. We need to figure out at what point/distance LDR readings read zero light. 
-
-
 **SimpleCarController**: Controlling Simulated Landro and gathering sensor data.
 - runMotors(): A function that runs the motors provided left and right motor torque values.
 - irScale(): Scales gathered IR data.
@@ -56,10 +45,19 @@ Reach me at: gadellaccio@vassar.edu
 	
 *NOTE*: Adjust irThreshold and ldrThreshold values in this script in order to change the percentages of "good XOR" and "bad XOR" areas in the simulated environment. (May also need to adjust these threshold values in the LDR and IR scripts)
 
+**IR**: This file/class is attached to all the IR sensors on Landro's body and assigns sensor readings.
+
+- onTriggerStay() - This function is constantly checking to see whether an IR has collided with (sensed) a wall. If it does, the script assinges a sensor reading to that IR by taking the distance from said wall and said IR variable. 
+
+*NOTE*: This file should be updated such that IR sensors are assigned readings even if they aren't recieving enough input to reach the IR threshold.
+
+**LDR**: This file/class is attached to all the LDR sensors on Landro's body. It is constantly computing the distance between the light source and all of Landro's LDR sensors and using that to assign sensor reading values. Currently, LDR sensors are assigned sensor readings above 0 only if the distance reaches the LDR distance threshold.
+
+*NOTE*: This file should be updated such that LDR sensors are assigned readings even if the LDR threshold has not been reached. We need to figure out at what point/distance LDR readings read zero light. 
+
 ## Finishing the Simulation:
 #### Closing the reality gap
 - Sensor readings need to be calibrated and scaled to match that of physical Landro's. We need to determine at what length from the light (inluding effects of orientation) that light sensors recieve zero input.
-- Need to double check that everything is to scale. Length and width of the arena needs to be altered slightly.
 - Bump sensor reactions need to be calibrateed to match those of physical Landro. (Change movement time and the motor torque inputs in SimpleCarController script)
 - Create a function to randomly place Landro at the start of trials.
 - G-->P process needs to be slightly adapted to incorporate the new ranges for velocity and growth duration, in addition to the growth start variable.
@@ -69,7 +67,7 @@ Reach me at: gadellaccio@vassar.edu
 - With 3D rendering turned off, we need to implement a way in which to run multiple individuals in a generation at once.
 - Finalize the fitness function (in main script).
 
-#### Coding Practices
+#### Neater Coding Practices
 - Create a trial stucture to manage trial and generation information. 
 
 
