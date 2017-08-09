@@ -21,6 +21,13 @@ public class IR : MonoBehaviour {
 	public bool isBumped = false;
 
 	public float[] irDataArray;
+
+
+	public static int IRindex; 
+	public static string IRstring;
+
+	public static float phiOrientation;
+
  
 	GameObject landroBody;
 	
@@ -30,6 +37,12 @@ public class IR : MonoBehaviour {
 	}	
 	
 	void Update () {
+
+
+		float tempPhi = (float)this.transform.eulerAngles.x;
+		phiOrientation = calcPhi(tempPhi);
+
+		Debug.Log(this + " IR rotation = "+ phiOrientation);
 		// Constantly checks to see whether the IR is in range to sense the wall.
 		// If it isn't, we know the ir sensor readings are 0.
 		if ((this.hitWall == false)) {
@@ -39,7 +52,7 @@ public class IR : MonoBehaviour {
 	}
 
 	void OnTriggerStay(Collider source){
-		
+			
 
 			// Checks to see whether the IR cone has collided with the wall.
 			if (source.name.Contains ("Wall")) {
@@ -62,5 +75,17 @@ public class IR : MonoBehaviour {
 				} 
 			} 
 
+	}
+
+
+	float calcPhi(float tempPhi) {
+		float calculatedPhi;
+		calculatedPhi = tempPhi + 90; 
+
+		if (calculatedPhi > 360) {
+			calculatedPhi = calculatedPhi - 360;
+		}
+
+		return calculatedPhi;
 	}
 }
